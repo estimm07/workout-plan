@@ -79,6 +79,30 @@
   .icon-main { background: rgba(232,255,71,0.12); }
   .icon-cardio { background: rgba(78,205,196,0.12); }
   .icon-cool { background: rgba(138,43,226,0.12); }
+  .icon-pre-rec { background: rgba(255,59,59,0.15); }
+  .icon-post-rec { background: rgba(100,180,255,0.15); }
+
+  /* ── RECOVERY BLOCKS ── */
+  .recovery-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .recovery-item:last-child { border-bottom: none; }
+  .rec-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; width: 28px; text-align: center; }
+  .rec-name { font-weight: 500; font-size: 13px; color: var(--text); }
+  .rec-detail { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .rec-tag {
+    display: inline-block; font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 1px; padding: 2px 7px; border-radius: 4px;
+    text-transform: uppercase; margin-right: 4px; margin-top: 4px;
+  }
+  .rec-tag.heat { background: rgba(255,107,53,0.15); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); }
+  .rec-tag.ice { background: rgba(78,205,196,0.1); color: var(--accent3); border: 1px solid rgba(78,205,196,0.25); }
+  .rec-tag.roll { background: rgba(232,255,71,0.08); color: var(--accent); border: 1px solid rgba(232,255,71,0.2); }
+  .rec-tag.gun { background: rgba(180,100,255,0.1); color: #c084fc; border: 1px solid rgba(180,100,255,0.25); }
+  .rec-tag.ball { background: rgba(255,200,50,0.1); color: #fcd34d; border: 1px solid rgba(255,200,50,0.25); }
+  .rec-tag.optional { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
   .block-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text); flex: 1; }
   .block-meta { font-size: 11px; color: var(--muted); }
   .block-toggle { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
@@ -110,6 +134,42 @@
   .set-done-btn:hover { border-color: var(--accent); color: var(--accent); }
   .set-bubble.done .set-done-btn { background: var(--accent); border-color: var(--accent); color: var(--bg); }
   .tracker-hint { font-family: 'DM Mono', monospace; font-size: 10px; color: #3a3a3a; margin-top: 6px; letter-spacing: 0.5px; width: 100%; }
+
+  /* ── REST TIMER ── */
+  .rest-timer {
+    display: flex; align-items: center; gap: 10px;
+    margin: 6px 0 2px 0;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+  .rest-timer.running { border-color: var(--accent2); }
+  .rest-timer.done-timer { border-color: var(--accent); }
+  .rest-timer-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  .rest-timer-display { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text); line-height: 1; min-width: 52px; text-align: center; transition: color 0.2s; }
+  .rest-timer.running .rest-timer-display { color: var(--accent2); }
+  .rest-timer.done-timer .rest-timer-display { color: var(--accent); }
+  .rest-timer-btn {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
+    padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: none; color: var(--muted); cursor: pointer; white-space: nowrap;
+    transition: all 0.15s; margin-left: auto;
+  }
+  .rest-timer-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .rest-timer.running .rest-timer-btn { border-color: var(--accent2); color: var(--accent2); }
+  .rest-timer.done-timer .rest-timer-btn { border-color: var(--accent); color: var(--accent); }
+  .rest-progress {
+    height: 3px; background: var(--border); border-radius: 2px;
+    width: 100%; margin-top: 4px; overflow: hidden;
+  }
+  .rest-progress-bar {
+    height: 100%; background: var(--accent2); border-radius: 2px;
+    width: 100%; transition: width 1s linear, background 0.3s;
+  }
+  .rest-timer.done-timer .rest-progress-bar { background: var(--accent); width: 0%; }
 
   .note-box { background: rgba(232,255,71,0.05); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 12px 16px; font-size: 12px; color: var(--muted); margin-top: 12px; }
   .note-box strong { color: var(--accent); }
@@ -201,9 +261,9 @@
 </div>
 
 <nav class="nav-bar">
-  <button class="nav-btn active" onclick="showSection('summary',this)">Overview</button>
+  <button class="nav-btn" onclick="showSection('summary',this)">Overview</button>
   <button class="nav-btn" onclick="showSection('schedule',this)">Schedule</button>
-  <button class="nav-btn" onclick="showSection('workouts',this)">Workouts</button>
+  <button class="nav-btn active" onclick="showSection('workouts',this)">Workouts</button>
   <button class="nav-btn" onclick="showSection('progression',this)">Progression</button>
   <button class="nav-btn" onclick="showSection('checklist',this)">Pre-Session</button>
   <button class="nav-btn" onclick="showSection('safety',this)">Safety</button>
@@ -213,7 +273,7 @@
 <div class="main">
 
 <!-- ===== OVERVIEW ===== -->
-<div id="summary" class="section active">
+<div id="summary" class="section">
   <div class="summary-grid">
     <div class="stat-card"><div class="stat-label">Duration</div><div class="stat-value">8</div><div class="stat-desc">weeks / 3 phases</div></div>
     <div class="stat-card"><div class="stat-label">Sessions/Week</div><div class="stat-value">4–5</div><div class="stat-desc">Upper/Lower split</div></div>
@@ -252,7 +312,7 @@
 </div>
 
 <!-- ===== WORKOUTS ===== -->
-<div id="workouts" class="section">
+<div id="workouts" class="section active">
   <div class="section-title">Workout Plans — All 8 Weeks</div>
   <div class="week-selector-bar">
     <label>Logging for:</label>
@@ -278,6 +338,25 @@
 
   <!-- DAY 1 -->
   <div id="d1" class="day-panel active">
+
+    <!-- PRE-WORKOUT RECOVERY -->
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Upper body focus</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="recovery-item">
+          <div class="rec-icon">🌡️</div>
+          <div><div class="rec-name">Heating Pad — Lower Back</div><div class="rec-detail">Apply for 8–10 min to the lower back while seated. Increases blood flow and loosens the erectors before any hinging or rowing. Remove before starting movement.</div><span class="rec-tag heat">Heat</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🪣</div>
+          <div><div class="rec-name">Foam Roller — Thoracic Spine</div><div class="rec-detail">Place roller perpendicular to spine at mid-back. Support your head, gently extend over roller. Move up and down from shoulder blades to mid-back. 60–90 sec. Opens up the thoracic spine for pressing and rowing.</div><span class="rec-tag roll">Foam Roller</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🔫</div>
+          <div><div class="rec-name">Massage Gun — Chest & Lats</div><div class="rec-detail">30 sec each side on the pec (avoid the armpit) and lat. Use a medium speed, low pressure attachment. Wakes up the tissue before loading.</div><span class="rec-tag gun">Massage Gun</span><span class="rec-tag optional">Optional</span></div>
+        </div>
+      </div>
+    </div>
     <div class="workout-block">
       <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Movement prep · Shoulder & thoracic</div><div class="block-toggle">▾</div></div>
       <div class="block-body">
@@ -327,10 +406,57 @@
         <tr><td><div class="ex-name">Supine Spinal Twist</div><div class="ex-cue">Keep shoulders flat, gentle rotation</div></td><td>45 sec/side</td></tr>
       </tbody></table></div>
     </div>
+
+    <!-- POST-WORKOUT RECOVERY -->
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Upper body</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="recovery-item">
+          <div class="rec-icon">🪣</div>
+          <div><div class="rec-name">Foam Roller — Lats & Upper Back</div><div class="rec-detail">Roll lats side-lying (arm extended overhead) for 45 sec each side. Then thoracic spine 60 sec. Focus on any tight spots — pause and breathe into them.</div><span class="rec-tag roll">Foam Roller</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🔫</div>
+          <div><div class="rec-name">Massage Gun — Biceps & Upper Back</div><div class="rec-detail">30–45 sec each: biceps (front of arm), rear delts, and rhomboids (between shoulder blades). Use low-medium speed. Helps clear metabolic waste and reduce next-day soreness.</div><span class="rec-tag gun">Massage Gun</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">⚾</div>
+          <div><div class="rec-name">Massage Ball — Pec Minor</div><div class="rec-detail">Place ball between chest and wall near the front of the shoulder. Lean in gently and make small circles for 30–45 sec each side. Targets the pec minor which tightens after pressing.</div><span class="rec-tag ball">Massage Ball</span><span class="rec-tag optional">Optional</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🧊</div>
+          <div><div class="rec-name">Ice — Lower Back (if needed)</div><div class="rec-detail">Only use if lower back feels aggravated or inflamed after rowing. Apply wrapped ice pack for 10–15 min. Do NOT ice if it just feels tired — that's normal. Ice is for sharp, hot, or inflamed discomfort only.</div><span class="rec-tag ice">Ice</span><span class="rec-tag optional">If Needed</span></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /d1 -->
 
   <!-- DAY 2 -->
   <div id="d2" class="day-panel">
+
+    <!-- PRE-WORKOUT RECOVERY -->
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Lower body & back focus</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="recovery-item">
+          <div class="rec-icon">🌡️</div>
+          <div><div class="rec-name">Heating Pad — Lower Back</div><div class="rec-detail">Apply 8–10 min to lower back before starting. This is a lower-body day with hip hinging — heat is especially important here to pre-loosen the lumbar erectors and reduce injury risk.</div><span class="rec-tag heat">Heat</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🪣</div>
+          <div><div class="rec-name">Foam Roller — Quads & Hip Flexors</div><div class="rec-detail">Roll each quad 60 sec, pausing on tight spots. Then roll the TFL (outer hip, just below the hip bone) 30 sec each side. Loosens the anterior chain before squatting and lunging.</div><span class="rec-tag roll">Foam Roller</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">⚾</div>
+          <div><div class="rec-name">Massage Ball — Glutes</div><div class="rec-detail">Sit on the ball and cross one ankle over the opposite knee. Lean into the glute and find tight spots. 45–60 sec each side. Critical prep before hip thrusts — a loose glute fires better.</div><span class="rec-tag ball">Massage Ball</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🔫</div>
+          <div><div class="rec-name">Massage Gun — Hamstrings</div><div class="rec-detail">30 sec each leg along the back of the thigh. Avoid the back of the knee. Medium speed. Wakes up the hamstrings before RDLs.</div><span class="rec-tag gun">Massage Gun</span><span class="rec-tag optional">Optional</span></div>
+        </div>
+      </div>
+    </div>
     <div class="workout-block">
       <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Hip & glute activation · Back prep</div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th><th>Notes</th></tr></thead><tbody>
@@ -376,6 +502,30 @@
         <tr><td><div class="ex-name">Lying Quad Stretch (side lying)</div><div class="ex-cue">Keep hips stacked, pull heel to glute</div></td><td>45 sec/side</td></tr>
       </tbody></table></div>
     </div>
+
+    <!-- POST-WORKOUT RECOVERY -->
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Lower body & back</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="recovery-item">
+          <div class="rec-icon">🪣</div>
+          <div><div class="rec-name">Foam Roller — Glutes & IT Band</div><div class="rec-detail">Roll each glute 60 sec seated on the roller. Then roll the outer thigh (IT band) 45 sec each side — go slow, this will be tender after lunges and squats.</div><span class="rec-tag roll">Foam Roller</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">⚾</div>
+          <div><div class="rec-name">Massage Ball — Glutes & Piriformis</div><div class="rec-detail">Deep glute work post-session. Sit on ball, cross one leg, find the piriformis (deep in the glute toward the tailbone). 45–60 sec each side. Essential for hip health with all the hip thrust volume.</div><span class="rec-tag ball">Massage Ball</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🔫</div>
+          <div><div class="rec-name">Massage Gun — Quads & Calves</div><div class="rec-detail">30–45 sec each: sweep down each quad, then calves. Medium-low speed. Reduces post-squat and lunge soreness significantly when done consistently.</div><span class="rec-tag gun">Massage Gun</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🧊</div>
+          <div><div class="rec-name">Ice — Lower Back (if needed)</div><div class="rec-detail">Apply only if the lower back feels hot, sharp, or inflamed after the RDL or hip thrust. 10–15 min wrapped ice pack. Normal fatigue = no ice needed. Inflammation or sharp discomfort = ice.</div><span class="rec-tag ice">Ice</span><span class="rec-tag optional">If Needed</span></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /d2 -->
 
   <!-- DAY 3 REST -->
@@ -391,6 +541,25 @@
 
   <!-- DAY 4 -->
   <div id="d4" class="day-panel">
+
+    <!-- PRE-WORKOUT RECOVERY -->
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Shoulder & upper body focus</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="recovery-item">
+          <div class="rec-icon">🌡️</div>
+          <div><div class="rec-name">Heating Pad — Lower Back</div><div class="rec-detail">8–10 min on the lower back even on upper body days — the seated shoulder press and any bracing still loads the lumbar. Keep it warm and protected.</div><span class="rec-tag heat">Heat</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🔫</div>
+          <div><div class="rec-name">Massage Gun — Shoulders & Traps</div><div class="rec-detail">30 sec each: rear delt, upper trap, and side delt. Use low speed, round attachment. Loosens the shoulder capsule before overhead pressing — reduces impingement risk.</div><span class="rec-tag gun">Massage Gun</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🪣</div>
+          <div><div class="rec-name">Foam Roller — Thoracic Spine</div><div class="rec-detail">60–90 sec on the mid-back. Essential before any overhead pressing. A stiff thoracic spine forces the lower back to compensate when pressing overhead.</div><span class="rec-tag roll">Foam Roller</span></div>
+        </div>
+      </div>
+    </div>
     <div class="workout-block">
       <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Shoulder · Rotator cuff · Core</div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th></tr></thead><tbody>
@@ -432,10 +601,57 @@
         <tr><td><div class="ex-name">Child's Pose</div></td><td>60 sec</td></tr>
       </tbody></table></div>
     </div>
+
+    <!-- POST-WORKOUT RECOVERY -->
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Shoulders & upper back</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="recovery-item">
+          <div class="rec-icon">🔫</div>
+          <div><div class="rec-name">Massage Gun — Triceps & Rear Delts</div><div class="rec-detail">30–45 sec each: back of upper arm (triceps) and rear shoulder. Use low-medium speed. Skull crushers and overhead extensions create significant tricep fatigue — flush it out now.</div><span class="rec-tag gun">Massage Gun</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">⚾</div>
+          <div><div class="rec-name">Massage Ball — Rear Delt & Rotator Cuff</div><div class="rec-detail">Place ball against wall, position on the back of the shoulder. Lean in and make small circles. 30–45 sec each side. Targets the infraspinatus and teres minor — key muscles for shoulder longevity.</div><span class="rec-tag ball">Massage Ball</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🪣</div>
+          <div><div class="rec-name">Foam Roller — Upper Back & Lats</div><div class="rec-detail">Thoracic spine 60 sec, then each lat side-lying 45 sec. Chin-ups and face pulls create upper back tightness — rolling now prevents next-day stiffness.</div><span class="rec-tag roll">Foam Roller</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🧊</div>
+          <div><div class="rec-name">Ice — Shoulder (if needed)</div><div class="rec-detail">Only if a shoulder feels sharp, clicking with pain, or inflamed after pressing. 10 min wrapped ice. Normal pump or fatigue doesn't need ice.</div><span class="rec-tag ice">Ice</span><span class="rec-tag optional">If Needed</span></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /d4 -->
 
   <!-- DAY 5 -->
   <div id="d5" class="day-panel">
+
+    <!-- PRE-WORKOUT RECOVERY -->
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Posterior chain & hips</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="recovery-item">
+          <div class="rec-icon">🌡️</div>
+          <div><div class="rec-name">Heating Pad — Lower Back & Glutes</div><div class="rec-detail">This is your heaviest posterior chain day (Nordics, BSS, SL hip thrusts). Apply 8–10 min to the lower back. If possible, briefly apply to each glute as well. This day benefits the most from pre-heat.</div><span class="rec-tag heat">Heat</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">⚾</div>
+          <div><div class="rec-name">Massage Ball — Glutes (Both Sides)</div><div class="rec-detail">Spend 60 sec on each glute before starting. This day has single-leg hip thrusts and Bulgarian split squats — a loose, activated glute makes both dramatically more effective and safer.</div><span class="rec-tag ball">Massage Ball</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🪣</div>
+          <div><div class="rec-name">Foam Roller — Hamstrings & Calves</div><div class="rec-detail">45 sec each hamstring, 30 sec each calf. Nordic curls are brutally demanding on cold hamstrings — rolling them first significantly reduces the risk of a strain.</div><span class="rec-tag roll">Foam Roller</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🔫</div>
+          <div><div class="rec-name">Massage Gun — Hip Flexors & TFL</div><div class="rec-detail">Run the gun along the front of the hip (hip flexor) and the outer hip (TFL) for 30 sec each side. Loosens the tissue that gets compressed during split squats.</div><span class="rec-tag gun">Massage Gun</span><span class="rec-tag optional">Optional</span></div>
+        </div>
+      </div>
+    </div>
     <div class="workout-block">
       <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Glute & hip activation</div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th></tr></thead><tbody>
@@ -478,6 +694,30 @@
         <tr><td><div class="ex-name">Supine Knees to Chest</div></td><td>60 sec</td></tr>
       </tbody></table></div>
     </div>
+
+    <!-- POST-WORKOUT RECOVERY -->
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Posterior chain priority</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="recovery-item">
+          <div class="rec-icon">⚾</div>
+          <div><div class="rec-name">Massage Ball — Glutes & Piriformis</div><div class="rec-detail">Your most important post-session recovery tool on this day. 60 sec each side on the glute, then shift toward the piriformis (deep, toward tailbone). Your glutes have done serious work today — give them the attention they need.</div><span class="rec-tag ball">Massage Ball</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🪣</div>
+          <div><div class="rec-name">Foam Roller — Hamstrings & IT Band</div><div class="rec-detail">60 sec each hamstring moving slowly. Then 45 sec IT band each side. After Nordics and BSS, these tissues will be loaded — rolling now reduces 2-day-later soreness significantly.</div><span class="rec-tag roll">Foam Roller</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🔫</div>
+          <div><div class="rec-name">Massage Gun — Glutes & Hamstrings</div><div class="rec-detail">30–45 sec each glute and each hamstring. Medium speed. This is a high-volume posterior chain day — the massage gun post-session is worth 10 extra minutes of stretching in terms of next-day recovery.</div><span class="rec-tag gun">Massage Gun</span></div>
+        </div>
+        <div class="recovery-item">
+          <div class="rec-icon">🧊</div>
+          <div><div class="rec-name">Ice — Lower Back or Hips (if needed)</div><div class="rec-detail">This is the day most likely to aggravate the lower back given the hip hinge volume. If anything feels inflamed, sharp, or hot — 10–15 min wrapped ice immediately after. Don't wait until the next morning.</div><span class="rec-tag ice">Ice</span><span class="rec-tag optional">If Needed</span></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /d5 -->
 
   <!-- DAY 6 -->
@@ -528,6 +768,9 @@
       <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Resistance bands accessible</div></div></div>
       <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Treadmill on and set to starting grade</div></div></div>
       <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Water bottle filled (500ml minimum)</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Heating pad plugged in and applied to lower back</div><div class="check-sub">8–10 min before training starts</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Foam roller, massage ball & massage gun within reach</div><div class="check-sub">Pre-workout rolling done before warm-up</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Ice pack in freezer (ready if needed post-workout)</div></div></div>
     </div>
   </div>
   <div class="checklist">
@@ -604,35 +847,35 @@
 // ══════════════════════════════════════════════
 const EXERCISES = {
   d1: [
-    {id:'bench-press',   label:'DB Bench Press',          sets:3},
-    {id:'pullups',       label:'Pull-Ups',                 sets:3},
-    {id:'incline-press', label:'DB Incline Press (30°)',   sets:3},
-    {id:'bent-row',      label:'DB Bent-Over Row',         sets:3},
-    {id:'db-curl',       label:'DB Curl (Alternating)',    sets:3},
-    {id:'chest-row',     label:'Chest-Supported DB Row',   sets:3},
+    {id:'bench-press',   label:'DB Bench Press',          sets:3, rest:75},
+    {id:'pullups',       label:'Pull-Ups',                 sets:3, rest:90},
+    {id:'incline-press', label:'DB Incline Press (30°)',   sets:3, rest:75},
+    {id:'bent-row',      label:'DB Bent-Over Row',         sets:3, rest:75},
+    {id:'db-curl',       label:'DB Curl (Alternating)',    sets:3, rest:60},
+    {id:'chest-row',     label:'Chest-Supported DB Row',   sets:3, rest:60},
   ],
   d2: [
-    {id:'hip-thrust',    label:'DB Hip Thrust',            sets:3},
-    {id:'goblet-squat',  label:'Goblet Squat',             sets:3},
-    {id:'rdl',           label:'DB Romanian DL (Light)',   sets:3},
-    {id:'rev-lunge',     label:'Reverse Lunge (DB)',       sets:3},
-    {id:'calf-raise',    label:'Standing Calf Raise',      sets:3},
+    {id:'hip-thrust',    label:'DB Hip Thrust',            sets:3, rest:90},
+    {id:'goblet-squat',  label:'Goblet Squat',             sets:3, rest:75},
+    {id:'rdl',           label:'DB Romanian DL (Light)',   sets:3, rest:75},
+    {id:'rev-lunge',     label:'Reverse Lunge (DB)',       sets:3, rest:60},
+    {id:'calf-raise',    label:'Standing Calf Raise',      sets:3, rest:45},
   ],
   d4: [
-    {id:'shoulder-press',label:'DB Shoulder Press',       sets:3},
-    {id:'chinups',       label:'Chin-Ups',                 sets:3},
-    {id:'lat-raise',     label:'Lateral Raises',           sets:3},
-    {id:'skull-crusher', label:'DB Skull Crusher',         sets:3},
-    {id:'face-pull',     label:'Face Pulls (Band)',        sets:3},
-    {id:'oh-tricep',     label:'OH Tricep Extension',      sets:3},
+    {id:'shoulder-press',label:'DB Shoulder Press',       sets:3, rest:75},
+    {id:'chinups',       label:'Chin-Ups',                 sets:3, rest:90},
+    {id:'lat-raise',     label:'Lateral Raises',           sets:3, rest:60},
+    {id:'skull-crusher', label:'DB Skull Crusher',         sets:3, rest:60},
+    {id:'face-pull',     label:'Face Pulls (Band)',        sets:3, rest:60},
+    {id:'oh-tricep',     label:'OH Tricep Extension',      sets:3, rest:60},
   ],
   d5: [
-    {id:'sl-hip-thrust', label:'Single-Leg Hip Thrust',   sets:3},
-    {id:'bss',           label:'Bulgarian Split Squat',   sets:3},
-    {id:'nordic',        label:'Nordic Curl',              sets:3},
-    {id:'clamshell',     label:'Banded Clamshell',         sets:3},
-    {id:'dead-bug',      label:'Dead Bug (Weighted)',      sets:3},
-    {id:'plank',         label:'Plank (Forearm)',          sets:3},
+    {id:'sl-hip-thrust', label:'Single-Leg Hip Thrust',   sets:3, rest:75},
+    {id:'bss',           label:'Bulgarian Split Squat',   sets:3, rest:90},
+    {id:'nordic',        label:'Nordic Curl',              sets:3, rest:90},
+    {id:'clamshell',     label:'Banded Clamshell',         sets:3, rest:45},
+    {id:'dead-bug',      label:'Dead Bug (Weighted)',      sets:3, rest:60},
+    {id:'plank',         label:'Plank (Forearm)',          sets:3, rest:45},
   ],
 };
 
@@ -658,6 +901,115 @@ function allLogKeys() {
 function getActiveWeek() { return parseInt(document.getElementById('activeWeekSelect').value,10); }
 
 // ══════════════════════════════════════════════
+//  REST TIMER ENGINE
+// ══════════════════════════════════════════════
+let activeTimer = null; // only one timer running at a time
+
+function createRestTimer(restSecs) {
+  const wrap = document.createElement('div');
+  wrap.className = 'rest-timer';
+
+  const lbl = document.createElement('span');
+  lbl.className = 'rest-timer-label';
+  lbl.textContent = 'REST';
+
+  const display = document.createElement('div');
+  display.className = 'rest-timer-display';
+
+  const btn = document.createElement('button');
+  btn.className = 'rest-timer-btn';
+
+  const progressWrap = document.createElement('div');
+  progressWrap.className = 'rest-progress';
+  const progressBar = document.createElement('div');
+  progressBar.className = 'rest-progress-bar';
+  progressWrap.appendChild(progressBar);
+
+  wrap.append(lbl, display, btn);
+
+  // Timer state
+  let remaining = restSecs;
+  let interval = null;
+  let running = false;
+
+  function fmt(s) {
+    return s >= 60 ? `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}` : `0:${String(s).padStart(2,'0')}`;
+  }
+
+  function updateDisplay() {
+    display.textContent = fmt(remaining);
+    const pct = (remaining / restSecs) * 100;
+    progressBar.style.width = pct + '%';
+  }
+
+  function stop() {
+    clearInterval(interval);
+    interval = null;
+    running = false;
+    wrap.classList.remove('running');
+    btn.textContent = 'START';
+    if (activeTimer === wrap) activeTimer = null;
+  }
+
+  function start() {
+    // Stop any other running timer
+    if (activeTimer && activeTimer !== wrap) {
+      activeTimer.dispatchEvent(new CustomEvent('forcestop'));
+    }
+    activeTimer = wrap;
+    running = true;
+    wrap.classList.add('running');
+    wrap.classList.remove('done-timer');
+    btn.textContent = 'STOP';
+    interval = setInterval(() => {
+      remaining--;
+      updateDisplay();
+      if (remaining <= 0) {
+        clearInterval(interval);
+        running = false;
+        wrap.classList.remove('running');
+        wrap.classList.add('done-timer');
+        display.textContent = 'GO!';
+        progressBar.style.width = '0%';
+        btn.textContent = 'RESET';
+        activeTimer = null;
+        // Vibrate on supported devices
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      }
+    }, 1000);
+  }
+
+  function reset() {
+    clearInterval(interval);
+    running = false;
+    remaining = restSecs;
+    wrap.classList.remove('running', 'done-timer');
+    btn.textContent = 'START';
+    updateDisplay();
+  }
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (wrap.classList.contains('done-timer')) { reset(); }
+    else if (running) { stop(); }
+    else { start(); }
+  });
+
+  wrap.addEventListener('forcestop', () => { stop(); });
+
+  // Initial state
+  updateDisplay();
+  btn.textContent = 'START';
+
+  // Wrap in a full-width container with progress bar underneath
+  const outer = document.createElement('div');
+  outer.style.cssText = 'width:100%;margin:4px 0;';
+  outer.appendChild(wrap);
+  outer.appendChild(progressWrap);
+  return outer;
+}
+
+// ══════════════════════════════════════════════
 //  BUILD SET TRACKERS
 // ══════════════════════════════════════════════
 function buildTrackers() {
@@ -667,8 +1019,13 @@ function buildTrackers() {
       const container = document.getElementById(`trk-${day}-${ex.id}`);
       if (!container) return;
       container.innerHTML = '';
+
+      const restSecs = ex.rest || 60;
+
       for (let s=0; s<ex.sets; s++) {
         const data = loadSet(week,day,ex.id,s);
+
+        // Set bubble
         const bubble = document.createElement('div');
         bubble.className = 'set-bubble' + (data.done?' done':'');
         const lbl = document.createElement('span'); lbl.className='set-label'; lbl.textContent=`S${s+1}`;
@@ -678,17 +1035,34 @@ function buildTrackers() {
         inp.addEventListener('input', ()=>{ saveSet(week,day,ex.id,s,inp.value, bubble.classList.contains('done')); });
         inp.addEventListener('click', e=>e.stopPropagation());
         const unit = document.createElement('span'); unit.className='set-unit'; unit.textContent='lb';
-        const btn = document.createElement('button'); btn.className='set-done-btn'; btn.title='Mark complete'; btn.textContent='✓';
-        btn.addEventListener('click', e=>{
+        const doneBtn = document.createElement('button'); doneBtn.className='set-done-btn'; doneBtn.title='Mark complete'; doneBtn.textContent='✓';
+
+        doneBtn.addEventListener('click', e=>{
           e.stopPropagation();
           const done = !bubble.classList.contains('done');
           bubble.classList.toggle('done', done);
           saveSet(getActiveWeek(),day,ex.id,s,inp.value,done);
+          // Auto-start rest timer after marking set done (not on last set)
+          if (done && s < ex.sets - 1) {
+            const timerEl = bubble.nextElementSibling;
+            if (timerEl) {
+              const startBtn = timerEl.querySelector('.rest-timer-btn');
+              if (startBtn && startBtn.textContent === 'START') startBtn.click();
+            }
+          }
         });
-        bubble.append(lbl,inp,unit,btn);
+
+        bubble.append(lbl,inp,unit,doneBtn);
         container.appendChild(bubble);
+
+        // Add rest timer after every set EXCEPT the last
+        if (s < ex.sets - 1) {
+          container.appendChild(createRestTimer(restSecs));
+        }
       }
-      const hint=document.createElement('div'); hint.className='tracker-hint'; hint.textContent='Enter weight (lbs) · tap ✓ to mark set complete';
+
+      const hint=document.createElement('div'); hint.className='tracker-hint';
+      hint.textContent='Enter weight (lbs) · tap ✓ to complete set · timer starts automatically';
       container.appendChild(hint);
     });
   });
