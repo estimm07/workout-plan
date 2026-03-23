@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>8-Week Home Training Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0d0f; --bg2: #141417; --bg3: #1c1c21;
+    --accent: #e8ff47; --accent2: #ff6b35; --accent3: #4ecdc4;
+    --text: #f0f0f0; --muted: #888; --border: #2a2a30; --card: #18181d;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; }
+
+  .hero { background: var(--bg2); border-bottom: 2px solid var(--border); padding: 48px 32px 40px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 320px; height: 320px; background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%); pointer-events: none; }
+  .hero-tag { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+  .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px, 8vw, 96px); line-height: 0.92; letter-spacing: 1px; color: var(--text); margin-bottom: 16px; }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub { color: var(--muted); font-size: 14px; max-width: 560px; margin-bottom: 28px; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { font-family: 'DM Mono', monospace; font-size: 11px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); background: var(--bg3); }
+  .pill.green { border-color: var(--accent); color: var(--accent); background: rgba(232,255,71,0.07); }
+  .pill.orange { border-color: var(--accent2); color: var(--accent2); background: rgba(255,107,53,0.07); }
+  .pill.teal { border-color: var(--accent3); color: var(--accent3); background: rgba(78,205,196,0.07); }
+
+  .nav-bar { position: sticky; top: 0; z-index: 100; background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; overflow-x: auto; }
+  .nav-bar::-webkit-scrollbar { height: 0; }
+  .nav-btn { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 16px 18px; background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .main { max-width: 1040px; margin: 0 auto; padding: 40px 24px 80px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 40px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--accent); line-height: 1; }
+  .stat-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .goal-list { list-style: none; margin-bottom: 32px; }
+  .goal-list li { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
+  .goal-num { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--accent); min-width: 28px; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; color: var(--text); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+  .week-overview { margin-bottom: 40px; }
+  .overview-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .overview-table th { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .overview-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+  .overview-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .phase-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+  .p1 { background: rgba(232,255,71,0.1); color: var(--accent); border: 1px solid rgba(232,255,71,0.2); }
+  .p2 { background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
+  .p3 { background: rgba(78,205,196,0.1); color: var(--accent3); border: 1px solid rgba(78,205,196,0.2); }
+  .rest-badge { font-size: 11px; color: var(--muted); font-style: italic; }
+
+  .week-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .week-tab { font-family: 'DM Mono', monospace; font-size: 11px; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg3); color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .week-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .week-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  /* ── WEEK SELECTOR ── */
+  .week-selector-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .week-selector-bar label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .week-select { font-family: 'DM Mono', monospace; font-size: 12px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 7px 12px; border-radius: 6px; cursor: pointer; outline: none; }
+  .week-select:focus { border-color: var(--accent); }
+  .week-info-badge { font-family: 'DM Mono', monospace; font-size: 10px; padding: 4px 10px; border-radius: 4px; }
+
+  .workout-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+  .block-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: var(--bg3); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
+  .block-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .icon-warm { background: rgba(255,107,53,0.15); }
+  .icon-main { background: rgba(232,255,71,0.12); }
+  .icon-cardio { background: rgba(78,205,196,0.12); }
+  .icon-cool { background: rgba(138,43,226,0.12); }
+  .block-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text); flex: 1; }
+  .block-meta { font-size: 11px; color: var(--muted); }
+  .block-toggle { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+  .block-toggle.open { transform: rotate(180deg); }
+  .block-body { padding: 16px 20px; }
+
+  .exercise-table { width: 100%; border-collapse: collapse; }
+  .exercise-table th { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .exercise-table td { padding: 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; vertical-align: top; }
+  .exercise-table tr:last-child td { border-bottom: none; }
+  .ex-name { font-weight: 500; color: var(--text); }
+  .ex-cue { font-size: 11px; color: var(--muted); margin-top: 3px; font-style: italic; }
+  .ex-sets { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); }
+  .ex-rest { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent2); }
+  .ex-tempo { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent3); }
+
+  /* ── SET TRACKER ── */
+  .set-tracker-row td { background: rgba(0,0,0,0.2); padding: 8px 10px 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .set-tracker { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .set-bubble { display: flex; align-items: center; gap: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; transition: border-color 0.15s, background 0.15s; min-width: 118px; }
+  .set-bubble.done { background: rgba(232,255,71,0.08); border-color: rgba(232,255,71,0.5); }
+  .set-bubble.done .set-label { color: var(--accent); }
+  .set-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; white-space: nowrap; }
+  .set-weight-input { font-family: 'DM Mono', monospace; font-size: 13px; width: 50px; background: transparent; border: none; border-bottom: 1px dashed #333; color: var(--text); padding: 1px 2px; outline: none; text-align: center; }
+  .set-weight-input:focus { border-bottom-color: var(--accent); }
+  .set-weight-input::placeholder { color: #3a3a3a; }
+  .set-unit { font-family: 'DM Mono', monospace; font-size: 10px; color: #555; }
+  .set-done-btn { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #333; background: none; color: #555; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .set-done-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .set-bubble.done .set-done-btn { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .tracker-hint { font-family: 'DM Mono', monospace; font-size: 10px; color: #3a3a3a; margin-top: 6px; letter-spacing: 0.5px; width: 100%; }
+
+  .note-box { background: rgba(232,255,71,0.05); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 12px 16px; font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .note-box strong { color: var(--accent); }
+  .warning-box { background: rgba(255,107,53,0.06); border-left: 3px solid var(--accent2); border-radius: 0 6px 6px 0; padding: 12px 16px; font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .warning-box strong { color: var(--accent2); }
+
+  .prog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .prog-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .prog-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--accent); margin-bottom: 10px; }
+  .prog-card ul { list-style: none; }
+  .prog-card ul li { font-size: 13px; color: var(--muted); padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 8px; }
+  .prog-card ul li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+  .phase-block { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 12px; }
+  .phase-block h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; margin-bottom: 6px; }
+  .phase-block p { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .phase-block ul { list-style: none; }
+  .phase-block ul li { font-size: 13px; color: var(--muted); padding: 4px 0; display: flex; gap: 8px; }
+  .phase-block ul li::before { content: '✓'; color: var(--accent3); flex-shrink: 0; }
+
+  .checklist { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .checklist-header { background: var(--bg3); padding: 14px 20px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text); border-bottom: 1px solid var(--border); }
+  .checklist-body { padding: 8px 0; }
+  .check-item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; transition: background 0.15s; user-select: none; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: rgba(255,255,255,0.02); }
+  .check-box { width: 18px; height: 18px; border: 1.5px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 11px; }
+  .check-item.checked .check-box { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .check-item.checked .check-text { color: var(--muted); text-decoration: line-through; }
+  .check-text { font-size: 13px; flex: 1; }
+  .check-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .reset-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; background: none; border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 6px; cursor: pointer; margin: 16px 20px; transition: all 0.15s; }
+  .reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .safety-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .safety-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .safety-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--accent2); margin-bottom: 12px; }
+  .safety-card ul { list-style: none; }
+  .safety-card ul li { font-size: 13px; color: var(--muted); padding: 5px 0; display: flex; gap: 8px; }
+  .safety-card ul li::before { content: '⚡'; flex-shrink: 0; }
+
+  /* ── LOG HISTORY ── */
+  .log-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 24px; }
+  .log-filter { font-family: 'DM Mono', monospace; font-size: 12px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 7px 12px; border-radius: 6px; cursor: pointer; outline: none; }
+  .log-filter:focus { border-color: var(--accent); }
+  .log-clear-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; background: none; border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s; margin-left: auto; }
+  .log-clear-btn:hover { border-color: #e84040; color: #e84040; }
+  .log-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+  .log-empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .log-session-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+  .log-session-header { background: var(--bg3); padding: 14px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
+  .log-session-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); flex: 1; }
+  .log-session-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+  .log-session-stats { display: flex; gap: 20px; flex-wrap: wrap; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .log-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--accent); line-height: 1; }
+  .log-stat-lbl { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .log-exercise-list { padding: 4px 0; }
+  .log-exercise-row { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+  .log-exercise-row:last-child { border-bottom: none; }
+  .log-ex-name { font-size: 13px; font-weight: 500; min-width: 180px; flex: 1; }
+  .log-sets-line { display: flex; flex-wrap: wrap; gap: 6px; }
+  .log-set-chip { font-family: 'DM Mono', monospace; font-size: 11px; padding: 3px 9px; border-radius: 5px; border: 1px solid var(--border); color: #555; }
+  .log-set-chip.completed { border-color: rgba(232,255,71,0.4); color: var(--accent); background: rgba(232,255,71,0.07); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    .hero { padding: 32px 16px 28px; }
+    .main { padding: 24px 14px 60px; }
+    .nav-bar { padding: 0 10px; }
+    .exercise-table th:nth-child(3), .exercise-table td:nth-child(3) { display: none; }
+    .set-bubble { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">Personal Training Program</div>
+  <h1>8-WEEK<br><span>MUSCLE &amp;</span><br>STRENGTH</h1>
+  <p class="hero-sub">A back-safe, progressive home program built around your goals, equipment, and schedule.</p>
+  <div class="hero-pills">
+    <span class="pill green">Advanced</span><span class="pill green">4–5 Days/Week</span>
+    <span class="pill orange">Lower Back Safe</span><span class="pill orange">Hip Focus</span>
+    <span class="pill teal">Dumbbells to 55 lbs</span><span class="pill teal">Pull-up Bar</span>
+    <span class="pill">30–60 min sessions</span>
+  </div>
+</div>
+
+<nav class="nav-bar">
+  <button class="nav-btn active" onclick="showSection('summary',this)">Overview</button>
+  <button class="nav-btn" onclick="showSection('schedule',this)">Schedule</button>
+  <button class="nav-btn" onclick="showSection('workouts',this)">Workouts</button>
+  <button class="nav-btn" onclick="showSection('progression',this)">Progression</button>
+  <button class="nav-btn" onclick="showSection('checklist',this)">Pre-Session</button>
+  <button class="nav-btn" onclick="showSection('safety',this)">Safety</button>
+  <button class="nav-btn" onclick="showSection('loghistory',this)">Log History</button>
+</nav>
+
+<div class="main">
+
+<!-- ===== OVERVIEW ===== -->
+<div id="summary" class="section active">
+  <div class="summary-grid">
+    <div class="stat-card"><div class="stat-label">Duration</div><div class="stat-value">8</div><div class="stat-desc">weeks / 3 phases</div></div>
+    <div class="stat-card"><div class="stat-label">Sessions/Week</div><div class="stat-value">4–5</div><div class="stat-desc">Upper/Lower split</div></div>
+    <div class="stat-card"><div class="stat-label">Session Length</div><div class="stat-value">45</div><div class="stat-desc">avg minutes</div></div>
+    <div class="stat-card"><div class="stat-label">Pull-up Target</div><div class="stat-value">15+</div><div class="stat-desc">by week 8</div></div>
+  </div>
+  <div class="section-title">Your Ranked Goals</div>
+  <ul class="goal-list">
+    <li><span class="goal-num">01</span><div><strong>Build Muscle</strong> — Progressive overload via volume and load increases each week</div></li>
+    <li><span class="goal-num">02</span><div><strong>Avoid Lower Back Reinjury</strong> — No conventional deadlifts; hip hinges replaced with hip thrusts, Romanian deadlifts (light), and glute bridges</div></li>
+    <li><span class="goal-num">03</span><div><strong>Burn Fat</strong> — Incline treadmill finishers + compound-heavy training to elevate metabolism</div></li>
+    <li><span class="goal-num">04</span><div><strong>Improve Cardio</strong> — Low-impact incline walking 3–4× per week, increasing grade over 8 weeks</div></li>
+  </ul>
+  <div class="section-title">Split Structure</div>
+  <div class="note-box"><strong>Upper / Lower Split</strong> — Best choice for your profile. Allows each muscle group 2× weekly frequency for muscle growth, keeps any single session under 60 min, and lets us isolate lower-body days to be fully back-safe with hip/glute emphasis while upper days handle the heavier pressing and pulling.<br><br><strong>Day Structure:</strong> Upper A → Lower A → Rest → Upper B → Lower B → Optional Cardio/Active → Rest</div>
+  <div class="section-title">Equipment Used</div>
+  <div class="summary-grid" style="margin-top:16px;">
+    <div class="stat-card"><div class="stat-label">Primary</div><div style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.8;">Dumbbells 5–55 lbs<br>Pull-up bar<br>Bench / box</div></div>
+    <div class="stat-card"><div class="stat-label">Secondary</div><div style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.8;">Resistance bands<br>Treadmill (incline)<br>Floor / mat</div></div>
+  </div>
+</div>
+
+<!-- ===== SCHEDULE ===== -->
+<div id="schedule" class="section">
+  <div class="section-title">8-Week Overview</div>
+  <div class="week-overview">
+    <table class="overview-table">
+      <thead><tr><th>Week</th><th>Phase</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
+      <tbody id="scheduleBody"></tbody>
+    </table>
+  </div>
+  <div class="section-title">Phase Summaries</div>
+  <div class="phase-block"><h3 style="color:var(--accent)">Phase 1 — Weeks 1–3: Foundation & Form</h3><p>Establish movement patterns, back-safe hip hinge mechanics, and baseline volume. Moderate loads, strict tempo.</p><ul><li>Sets: 3 per exercise | Reps: 10–12 | Rest: 75 sec</li><li>Incline walk: 10 min at 6–8% grade, 3.0 mph</li><li>Focus: Perfect form, feel the right muscles working</li></ul></div>
+  <div class="phase-block"><h3 style="color:var(--accent2)">Phase 2 — Weeks 4–6: Hypertrophy Peak</h3><p>Increase volume and load. This is the primary muscle-building block. Tempos tighten, weights go up.</p><ul><li>Sets: 4 per exercise | Reps: 8–10 | Rest: 60–90 sec</li><li>Incline walk: 12–15 min at 8–10% grade, 3.2 mph</li><li>Focus: Progressive overload, controlled fatigue</li></ul></div>
+  <div class="phase-block"><h3 style="color:var(--accent3)">Phase 3 — Weeks 7–8: Intensification</h3><p>Maintain volume, push heavier loads, introduce drop sets on key exercises. Peak performance block.</p><ul><li>Sets: 4–5 | Reps: 6–8 (heavy) | Rest: 90 sec</li><li>Incline walk: 15 min at 10–12% grade, 3.3 mph</li><li>Focus: Maximum load, strength expression</li></ul></div>
+</div>
+
+<!-- ===== WORKOUTS ===== -->
+<div id="workouts" class="section">
+  <div class="section-title">Workout Plans — All 8 Weeks</div>
+  <div class="week-selector-bar">
+    <label>Logging for:</label>
+    <select class="week-select" id="activeWeekSelect" onchange="onWeekChange()">
+      <option value="1">Week 1 — Foundation</option><option value="2">Week 2 — Foundation</option>
+      <option value="3">Week 3 — Foundation</option><option value="4">Week 4 — Hypertrophy</option>
+      <option value="5">Week 5 — Hypertrophy</option><option value="6">Week 6 — Hypertrophy</option>
+      <option value="7">Week 7 — Intensification</option><option value="8">Week 8 — Intensification</option>
+    </select>
+    <span id="weekPhaseBadge" class="week-info-badge p1">Phase 1 · Foundation</span>
+  </div>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Select your current week above. Enter weight used per set and tap <strong style="color:var(--accent)">✓</strong> to mark it complete — all data is <strong style="color:var(--text)">auto-saved</strong> to your browser. Review everything in the <strong style="color:var(--text)">Log History</strong> tab anytime.</p>
+
+  <div class="week-tabs">
+    <button class="week-tab active" onclick="showDay('d1',this)">Mon · Upper A</button>
+    <button class="week-tab" onclick="showDay('d2',this)">Tue · Lower A</button>
+    <button class="week-tab" onclick="showDay('d3',this)">Wed · Rest</button>
+    <button class="week-tab" onclick="showDay('d4',this)">Thu · Upper B</button>
+    <button class="week-tab" onclick="showDay('d5',this)">Fri · Lower B</button>
+    <button class="week-tab" onclick="showDay('d6',this)">Sat · Optional</button>
+    <button class="week-tab" onclick="showDay('d7',this)">Sun · Rest</button>
+  </div>
+
+  <!-- DAY 1 -->
+  <div id="d1" class="day-panel active">
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Movement prep · Shoulder & thoracic</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th><th>Notes</th></tr></thead><tbody>
+          <tr><td><div class="ex-name">Arm Circles</div><div class="ex-cue">Small to large, forward & back</div></td><td>60 sec</td><td>Loosen shoulder capsule</td></tr>
+          <tr><td><div class="ex-name">Band Pull-Aparts</div><div class="ex-cue">Keep arms straight, squeeze scapulas</div></td><td>2×15 reps</td><td>Band at chest height</td></tr>
+          <tr><td><div class="ex-name">Cat-Cow</div><div class="ex-cue">Slow, full spinal range</div></td><td>10 reps</td><td>On all fours</td></tr>
+          <tr><td><div class="ex-name">Dead Bug</div><div class="ex-cue">Lower back pressed to floor the entire time</div></td><td>6 reps/side</td><td>Core activation</td></tr>
+          <tr><td><div class="ex-name">Incline Treadmill Walk</div><div class="ex-cue">5% grade, 2.8 mph</div></td><td>3 min</td><td>Elevate heart rate gently</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-title">Main Workout — Upper A (Chest + Back + Biceps)</div><div class="block-meta">3 sets · 10–12 reps · Tempo 3-1-1</div><div class="block-toggle open">▾</div></div>
+      <div class="block-body" style="display:block;">
+        <table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th><th>Tempo</th></tr></thead><tbody>
+          <tr><td><div class="ex-name">Dumbbell Bench Press</div><div class="ex-cue">Feet flat, arch natural, press straight up, don't let elbows flare past 45°</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">75s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d1-bench-press"></div></td></tr>
+          <tr><td><div class="ex-name">Pull-Ups (Bodyweight)</div><div class="ex-cue">Dead hang start, drive elbows DOWN to chest, avoid shrugging</div></td><td class="ex-sets">3 × 6–8</td><td class="ex-rest">90s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d1-pullups"></div></td></tr>
+          <tr><td><div class="ex-name">Dumbbell Incline Press (30°)</div><div class="ex-cue">Bench at 30°, press in slight arc, full stretch at bottom</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">75s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d1-incline-press"></div></td></tr>
+          <tr><td><div class="ex-name">Dumbbell Bent-Over Row</div><div class="ex-cue">Hinge to 45° ONLY — no deeper. Brace core hard. Row to lower ribs.</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">75s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d1-bent-row"></div></td></tr>
+          <tr><td><div class="ex-name">Dumbbell Curl (Alternating)</div><div class="ex-cue">No swinging, supinate at top, control the lowering</div></td><td class="ex-sets">3 × 10/side</td><td class="ex-rest">60s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d1-db-curl"></div></td></tr>
+          <tr><td><div class="ex-name">Chest-Supported DB Row</div><div class="ex-cue">Lie chest on incline bench, let arms hang, pull elbows back</div></td><td class="ex-sets">3 × 12</td><td class="ex-rest">60s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d1-chest-row"></div></td></tr>
+        </tbody></table>
+        <div class="warning-box"><strong>Back note:</strong> On bent-over rows, hinge no deeper than 45°. If you feel any lower back tension, switch to chest-supported rows for all rowing work.</div>
+      </div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Cardio Finisher — 10 min Incline Walk</div><div class="block-meta">Treadmill · Fat burn · Low impact</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Interval</th><th>Grade</th><th>Speed</th><th>Duration</th></tr></thead><tbody>
+        <tr><td>Ramp-up</td><td>5%</td><td>3.0 mph</td><td>2 min</td></tr>
+        <tr><td>Work</td><td>8%</td><td>3.0 mph</td><td>6 min</td></tr>
+        <tr><td>Cool-down</td><td>3%</td><td>2.5 mph</td><td>2 min</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Upper body + thoracic mobility</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Stretch</th><th>Duration</th></tr></thead><tbody>
+        <tr><td><div class="ex-name">Doorway Chest Stretch</div><div class="ex-cue">Arms at 90°, lean through doorway</div></td><td>45 sec/side</td></tr>
+        <tr><td><div class="ex-name">Lat Stretch (bar hang)</div><div class="ex-cue">Passive dead hang on pull-up bar</div></td><td>30 sec × 2</td></tr>
+        <tr><td><div class="ex-name">Child's Pose</div><div class="ex-cue">Reach long, let thoracic relax</div></td><td>60 sec</td></tr>
+        <tr><td><div class="ex-name">Supine Spinal Twist</div><div class="ex-cue">Keep shoulders flat, gentle rotation</div></td><td>45 sec/side</td></tr>
+      </tbody></table></div>
+    </div>
+  </div><!-- /d1 -->
+
+  <!-- DAY 2 -->
+  <div id="d2" class="day-panel">
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Hip & glute activation · Back prep</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><div class="ex-name">Glute Bridge (Bodyweight)</div><div class="ex-cue">Squeeze glutes at top, hold 2 sec</div></td><td>2 × 15</td><td>Activate glutes before loading</td></tr>
+        <tr><td><div class="ex-name">Clamshells (Band)</div><div class="ex-cue">Keep hips stacked, rotate from hip not waist</div></td><td>15/side</td><td>Hip external rotator warmup</td></tr>
+        <tr><td><div class="ex-name">Hip 90/90 Stretch</div><div class="ex-cue">Sit on floor, both knees at 90°, switch sides</div></td><td>60 sec</td><td>Hip mobility</td></tr>
+        <tr><td><div class="ex-name">Leg Swing (front-back)</div><div class="ex-cue">Hold wall, keep torso still</div></td><td>10/side</td><td>Dynamic hip flexor stretch</td></tr>
+        <tr><td><div class="ex-name">Bodyweight Squat</div><div class="ex-cue">Sit back and down, knees track toes</div></td><td>15 reps</td><td>Prime quads & glutes</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-title">Main Workout — Lower A (Glutes + Quads + Calves)</div><div class="block-meta">3 sets · 10–12 reps · Hip & back safe</div><div class="block-toggle open">▾</div></div>
+      <div class="block-body" style="display:block;">
+        <table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th><th>Tempo</th></tr></thead><tbody>
+          <tr><td><div class="ex-name">Dumbbell Hip Thrust (bench)</div><div class="ex-cue">Upper back on bench, DB on hips, drive through heels, squeeze glutes at top. This replaces deadlifts — master it.</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">90s</td><td class="ex-tempo">2-2-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d2-hip-thrust"></div></td></tr>
+          <tr><td><div class="ex-name">Goblet Squat</div><div class="ex-cue">Hold DB at chest, sit down between knees, tall chest throughout</div></td><td class="ex-sets">3 × 12</td><td class="ex-rest">75s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d2-goblet-squat"></div></td></tr>
+          <tr><td><div class="ex-name">Dumbbell Romanian Deadlift (LIGHT)</div><div class="ex-cue">⚠️ Light weight only (20–30 lbs). Slight knee bend, hinge at hip, keep close to legs. Stop at mid-shin.</div></td><td class="ex-sets">3 × 12</td><td class="ex-rest">75s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d2-rdl"></div></td></tr>
+          <tr><td><div class="ex-name">Reverse Lunge (DB)</div><div class="ex-cue">Step back, lower knee to just above floor, drive through front heel to stand</div></td><td class="ex-sets">3 × 10/side</td><td class="ex-rest">60s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d2-rev-lunge"></div></td></tr>
+          <tr><td><div class="ex-name">Standing Calf Raise (DB)</div><div class="ex-cue">Full range — stretch at bottom, hold at top</div></td><td class="ex-sets">3 × 15</td><td class="ex-rest">45s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d2-calf-raise"></div></td></tr>
+        </tbody></table>
+        <div class="note-box"><strong>Lower back check:</strong> The RDL is included at light weight specifically to strengthen the posterior chain and protect your back long-term. If ANY discomfort appears, swap it for an extra set of hip thrusts.</div>
+      </div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Cardio Finisher — 12 min Incline Walk</div><div class="block-meta">Post-leg fat burn · Easy on joints</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Interval</th><th>Grade</th><th>Speed</th><th>Duration</th></tr></thead><tbody>
+        <tr><td>Ramp-up</td><td>6%</td><td>2.8 mph</td><td>2 min</td></tr>
+        <tr><td>Work</td><td>8%</td><td>3.0 mph</td><td>8 min</td></tr>
+        <tr><td>Cool-down</td><td>2%</td><td>2.5 mph</td><td>2 min</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Lower body · Hip flexors · Lower back</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Stretch</th><th>Duration</th></tr></thead><tbody>
+        <tr><td><div class="ex-name">Pigeon Pose</div><div class="ex-cue">Deep glute stretch — don't collapse to one side</div></td><td>60 sec/side</td></tr>
+        <tr><td><div class="ex-name">Kneeling Hip Flexor Stretch</div><div class="ex-cue">Lunge position, back knee down, tuck pelvis</div></td><td>45 sec/side</td></tr>
+        <tr><td><div class="ex-name">Supine Knees-to-Chest</div><div class="ex-cue">Gentle lower back decompression</div></td><td>60 sec</td></tr>
+        <tr><td><div class="ex-name">Lying Quad Stretch (side lying)</div><div class="ex-cue">Keep hips stacked, pull heel to glute</div></td><td>45 sec/side</td></tr>
+      </tbody></table></div>
+    </div>
+  </div><!-- /d2 -->
+
+  <!-- DAY 3 REST -->
+  <div id="d3" class="day-panel">
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">😴</div><div class="block-title">Wednesday — Rest or Active Recovery</div><div class="block-meta">Choose one option below</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="note-box"><strong>Complete Rest:</strong> No training. Prioritize sleep (7–9 hrs), hydration, and nutrition. This is where muscle is built — not during the workout.</div><br>
+        <div class="note-box" style="border-color:var(--accent3);background:rgba(78,205,196,0.05);"><strong style="color:var(--accent3)">Active Recovery Option:</strong> 20–25 min gentle incline walk at 3–5% grade, 2.5 mph. Or 15 min of mobility work: hip 90/90, world's greatest stretch, thoracic rotations. Keep heart rate under 120 bpm.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 4 -->
+  <div id="d4" class="day-panel">
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Shoulder · Rotator cuff · Core</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th></tr></thead><tbody>
+        <tr><td><div class="ex-name">Band External Rotation</div><div class="ex-cue">Elbow at 90°, anchor band at elbow height, rotate out</div></td><td>15/side</td></tr>
+        <tr><td><div class="ex-name">Scapular Push-Up</div><div class="ex-cue">In plank position, protract/retract scapulas only</div></td><td>12 reps</td></tr>
+        <tr><td><div class="ex-name">Inchworm</div><div class="ex-cue">Walk hands out to plank and back, slow and controlled</div></td><td>6 reps</td></tr>
+        <tr><td><div class="ex-name">Dead Bug</div><div class="ex-cue">Opposite arm/leg, back flat</div></td><td>8/side</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-title">Main Workout — Upper B (Shoulders + Triceps + Upper Back)</div><div class="block-meta">3 sets · 10–12 reps · Vertical push emphasis</div><div class="block-toggle open">▾</div></div>
+      <div class="block-body" style="display:block;">
+        <table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th><th>Tempo</th></tr></thead><tbody>
+          <tr><td><div class="ex-name">Dumbbell Shoulder Press (seated)</div><div class="ex-cue">Neutral or pronated grip, do NOT lock out overhead, keep core braced</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">75s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d4-shoulder-press"></div></td></tr>
+          <tr><td><div class="ex-name">Chin-Ups (underhand)</div><div class="ex-cue">Supinated grip, lead with chest, full hang at bottom</div></td><td class="ex-sets">3 × 6–8</td><td class="ex-rest">90s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d4-chinups"></div></td></tr>
+          <tr><td><div class="ex-name">Lateral Raises</div><div class="ex-cue">Slight forward lean, thumbs slightly down, control the descent</div></td><td class="ex-sets">3 × 12–15</td><td class="ex-rest">60s</td><td class="ex-tempo">2-1-3</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d4-lat-raise"></div></td></tr>
+          <tr><td><div class="ex-name">Dumbbell Skull Crusher</div><div class="ex-cue">Upper arms vertical, lower behind head not to forehead, keep elbows in</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">60s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d4-skull-crusher"></div></td></tr>
+          <tr><td><div class="ex-name">Face Pulls (band)</div><div class="ex-cue">Anchor band at face height, pull to ears, elbows flare out and back</div></td><td class="ex-sets">3 × 15</td><td class="ex-rest">60s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d4-face-pull"></div></td></tr>
+          <tr><td><div class="ex-name">Overhead Tricep Extension (DB)</div><div class="ex-cue">One DB, both hands, lower behind head, full stretch</div></td><td class="ex-sets">3 × 12</td><td class="ex-rest">60s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d4-oh-tricep"></div></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Cardio Finisher — 10 min Incline Walk</div><div class="block-meta">Treadmill · 8% grade</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><p style="font-size:13px;color:var(--muted);">8% grade · 3.0 mph · 10 minutes continuous. No hands on rails. Engage core, swing arms naturally.</p></div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Shoulder · Chest · Tricep</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Stretch</th><th>Duration</th></tr></thead><tbody>
+        <tr><td><div class="ex-name">Cross-Body Shoulder Stretch</div></td><td>45 sec/side</td></tr>
+        <tr><td><div class="ex-name">Overhead Tricep Stretch</div></td><td>45 sec/side</td></tr>
+        <tr><td><div class="ex-name">Thread the Needle</div><div class="ex-cue">On all fours, rotate one arm under — thoracic rotation</div></td><td>45 sec/side</td></tr>
+        <tr><td><div class="ex-name">Child's Pose</div></td><td>60 sec</td></tr>
+      </tbody></table></div>
+    </div>
+  </div><!-- /d4 -->
+
+  <!-- DAY 5 -->
+  <div id="d5" class="day-panel">
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Glute & hip activation</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th></tr></thead><tbody>
+        <tr><td><div class="ex-name">Glute Bridge (BW, slow)</div></td><td>2 × 12</td></tr>
+        <tr><td><div class="ex-name">Monster Walks (band)</div><div class="ex-cue">Band around ankles, stay low, shuffle side to side</div></td><td>2 × 10/direction</td></tr>
+        <tr><td><div class="ex-name">Hip 90/90 Transitions</div></td><td>8/side</td></tr>
+        <tr><td><div class="ex-name">BW Squat to Box (pause)</div><div class="ex-cue">Sit to box, pause 2 sec, stand without momentum</div></td><td>10 reps</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-title">Main Workout — Lower B (Hamstrings + Hips + Core)</div><div class="block-meta">3 sets · 10–12 reps · Posterior chain focus</div><div class="block-toggle open">▾</div></div>
+      <div class="block-body" style="display:block;">
+        <table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th><th>Tempo</th></tr></thead><tbody>
+          <tr><td><div class="ex-name">Single-Leg Hip Thrust (bench)</div><div class="ex-cue">One leg extended, drive through heel, level hips at top</div></td><td class="ex-sets">3 × 10/side</td><td class="ex-rest">75s</td><td class="ex-tempo">2-2-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d5-sl-hip-thrust"></div></td></tr>
+          <tr><td><div class="ex-name">Bulgarian Split Squat (DB)</div><div class="ex-cue">Rear foot on bench, torso slightly forward, feel stretch in hip flexor at bottom</div></td><td class="ex-sets">3 × 8–10/side</td><td class="ex-rest">90s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d5-bss"></div></td></tr>
+          <tr><td><div class="ex-name">Nordic Curl (assisted with band)</div><div class="ex-cue">Hook feet under bench/sofa, band for assistance, lower slowly, use hands to push back up</div></td><td class="ex-sets">3 × 5–6</td><td class="ex-rest">90s</td><td class="ex-tempo">4-0-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d5-nordic"></div></td></tr>
+          <tr><td><div class="ex-name">Banded Clamshell</div><div class="ex-cue">Side lying, band above knees, rotate top knee up without tilting pelvis</div></td><td class="ex-sets">3 × 15/side</td><td class="ex-rest">45s</td><td class="ex-tempo">2-1-2</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d5-clamshell"></div></td></tr>
+          <tr><td><div class="ex-name">Dead Bug (weighted)</div><div class="ex-cue">Hold one light DB overhead in extended arm, slow opposite leg lower</div></td><td class="ex-sets">3 × 8/side</td><td class="ex-rest">60s</td><td class="ex-tempo">3-1-1</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d5-dead-bug"></div></td></tr>
+          <tr><td><div class="ex-name">Plank (forearm)</div><div class="ex-cue">Neutral spine — no sagging hips, no raised butt, breathe!</div></td><td class="ex-sets">3 × 30–45 sec</td><td class="ex-rest">45s</td><td class="ex-tempo">—</td></tr>
+          <tr class="set-tracker-row"><td colspan="4"><div class="set-tracker" id="trk-d5-plank"></div></td></tr>
+        </tbody></table>
+        <div class="note-box"><strong>Core note:</strong> Dead bugs and planks are the safest core work for your lower back. Avoid sit-ups and Russian twists entirely throughout this program.</div>
+      </div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Cardio Finisher — 12 min Incline Walk</div><div class="block-meta">Higher grade · End strong</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><p style="font-size:13px;color:var(--muted);">10% grade · 3.0 mph · 12 minutes. Arms pumping, no holding rails. Push rate of perceived exertion to about 6/10.</p></div>
+    </div>
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Hamstrings · Glutes · Hip flexors</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><table class="exercise-table"><thead><tr><th>Stretch</th><th>Duration</th></tr></thead><tbody>
+        <tr><td><div class="ex-name">Supine Hamstring Stretch (band)</div></td><td>60 sec/side</td></tr>
+        <tr><td><div class="ex-name">Figure-4 Glute Stretch</div><div class="ex-cue">Lying on back, ankle on opposite knee, pull</div></td><td>60 sec/side</td></tr>
+        <tr><td><div class="ex-name">Kneeling Hip Flexor Stretch</div></td><td>45 sec/side</td></tr>
+        <tr><td><div class="ex-name">Supine Knees to Chest</div></td><td>60 sec</td></tr>
+      </tbody></table></div>
+    </div>
+  </div><!-- /d5 -->
+
+  <!-- DAY 6 -->
+  <div id="d6" class="day-panel">
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Saturday — Optional 5th Day</div><div class="block-meta">Only do if you feel recovered</div><div class="block-toggle">▾</div></div>
+      <div class="block-body">
+        <div class="note-box"><strong>Option A — Cardio Only:</strong> 20–30 min incline walk. 8–10% grade, 3.0 mph. Use this if your muscles feel fatigued but you want to stay active.</div><br>
+        <div class="note-box" style="border-color:var(--accent2);background:rgba(255,107,53,0.05);"><strong style="color:var(--accent2)">Option B — Arms & Core:</strong> Light pump session, 30 min. Bicep curls, hammer curls, tricep pushdowns (band), face pulls, dead bugs, planks. No lower back loading. RPE 6/10 max.</div><br>
+        <div class="note-box" style="border-color:var(--accent3);background:rgba(78,205,196,0.05);"><strong style="color:var(--accent3)">Option C — Full Rest:</strong> Skip it. Recovery is training. If you trained hard Mon–Fri, rest Saturday. Your body will thank you.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 7 -->
+  <div id="d7" class="day-panel">
+    <div class="workout-block">
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">😴</div><div class="block-title">Sunday — Full Rest</div><div class="block-meta">Non-negotiable recovery</div><div class="block-toggle">▾</div></div>
+      <div class="block-body"><div class="note-box"><strong>Rest day priorities:</strong> 7–9 hrs sleep, 3+ liters water, high-protein meals (target 0.8–1g protein per pound of bodyweight = ~130–165g/day), light walking if desired. No structured exercise.</div></div>
+    </div>
+  </div>
+</div><!-- /workouts -->
+
+<!-- ===== PROGRESSION ===== -->
+<div id="progression" class="section">
+  <div class="section-title">Progressive Overload Rules</div>
+  <div class="prog-grid">
+    <div class="prog-card"><h3>When to Add Weight</h3><ul><li>Complete all reps of all sets with good form</li><li>The last rep of the last set feels like RPE 7–8 (not 10)</li><li>Add 2.5–5 lbs next session for that exercise</li><li>On pull-ups: when you hit the top of the rep range cleanly, add a rep next week</li></ul></div>
+    <div class="prog-card"><h3>When to Scale Back</h3><ul><li>Form breaks down before completing all reps — drop weight 10%</li><li>Any lower back sensation — reduce range of motion or swap exercise</li><li>Fatigue carryover from the previous day — reduce sets to 2</li><li>Soreness so bad you can't move well — take an extra rest day</li></ul></div>
+    <div class="prog-card"><h3>Treadmill Progression</h3><ul><li>Weeks 1–2: 6–8% grade, 3.0 mph, 10 min</li><li>Weeks 3–4: 8–10% grade, 3.0 mph, 12 min</li><li>Weeks 5–6: 10% grade, 3.2 mph, 15 min</li><li>Weeks 7–8: 12% grade, 3.2–3.5 mph, 15 min</li></ul></div>
+    <div class="prog-card"><h3>Pull-Up Progression</h3><ul><li>Wk 1–2: 3 × 6–8 reps (bodyweight)</li><li>Wk 3–4: 3 × 8–10 reps</li><li>Wk 5–6: 4 × 8–10 reps</li><li>Wk 7–8: 4 × 10–12 or add band-weight vest if available</li></ul></div>
+  </div>
+  <div class="section-title">Week-by-Week Blueprint</div>
+  <div class="phase-block"><h3 style="color:var(--accent)">Weeks 1–3: Foundation</h3><p>Base template. Focus on form, not weight. Learn the hip thrust pattern — this is your deadlift replacement.</p><ul><li>Sets: 3 per main exercise</li><li>Reps: 10–12 (upper), 10–12 (lower)</li><li>Rest: 75 sec upper, 90 sec lower</li><li>Cardio: 10–12 min at 6–8% grade</li><li>Week 3: increase all loads by 5 lbs where form is clean</li></ul></div>
+  <div class="phase-block"><h3 style="color:var(--accent2)">Weeks 4–6: Hypertrophy</h3><p>Add 1 set to every main exercise. Reduce rest periods by 15 sec. Increase treadmill grade and duration.</p><ul><li>Sets: 4 per main exercise</li><li>Reps: 8–10 (heavier loads)</li><li>Rest: 60–75 sec upper, 75–90 sec lower</li><li>Cardio: 12–15 min at 8–10% grade</li><li>Week 5: add tempo technique — increase lowering phase to 4 seconds on one exercise per session</li><li>Week 6: introduce 1 drop set per session (last set of heaviest exercise, drop 20%, continue to failure)</li></ul></div>
+  <div class="phase-block"><h3 style="color:var(--accent3)">Weeks 7–8: Intensification</h3><p>Max effort block. Push loads on all main lifts. Keep form strict.</p><ul><li>Sets: 4–5 per main exercise</li><li>Reps: 6–8 (at highest sustainable load)</li><li>Rest: 90 sec throughout</li><li>Cardio: 15 min at 10–12% grade</li><li>Week 7: drop sets on hip thrust AND bench press</li><li>Week 8: test your 1-rep-range max on major lifts — note for cycle 2</li></ul></div>
+</div>
+
+<!-- ===== CHECKLIST ===== -->
+<div id="checklist" class="section">
+  <div class="section-title">Pre-Session Checklist</div>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:24px;">Click each item to check it off before you start. Reset between sessions.</p>
+  <div class="checklist">
+    <div class="checklist-header">⚙️ Equipment & Setup</div>
+    <div class="checklist-body">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Dumbbells selected and staged for first exercise</div><div class="check-sub">Have the next weight up nearby too</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Bench / box in position and stable</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Resistance bands accessible</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Treadmill on and set to starting grade</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Water bottle filled (500ml minimum)</div></div></div>
+    </div>
+  </div>
+  <div class="checklist">
+    <div class="checklist-header">🧠 Mental & Physical State</div>
+    <div class="checklist-body">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Slept at least 6+ hours last night</div><div class="check-sub">If under 6 hrs: reduce weight 10%, drop 1 set</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Eaten a meal 1–2 hours prior (protein + carbs)</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Lower back feels neutral — no tightness or soreness</div><div class="check-sub">Tightness = extra 5 min warm-up + reduce hinge range of motion</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">No lingering pain from last session</div></div></div>
+    </div>
+  </div>
+  <div class="checklist">
+    <div class="checklist-header">🔥 Warm-Up Reminders</div>
+    <div class="checklist-body">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Completed full warm-up (8 min minimum)</div><div class="check-sub">Never skip. Ever.</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Glutes feel activated (Lower days: did glute bridges)</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Broke a light sweat before first main set</div></div></div>
+    </div>
+  </div>
+  <div class="checklist">
+    <div class="checklist-header">⚡ Key Form Cues (Review Before You Start)</div>
+    <div class="checklist-body">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Hip Thrust: Drive heels, squeeze glutes, neutral neck</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">RDL: Hinge at hip (not waist), soft knees, back flat, stop mid-shin</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Rows: Brace core before each rep, NO rounding of lower back</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Pull-Ups: Dead hang start, elbows drive DOWN, no kipping</div></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-text">Treadmill: No holding rails, arms swinging, slight forward lean</div></div></div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetChecklist()">↺ Reset Checklist</button>
+</div>
+
+<!-- ===== SAFETY ===== -->
+<div id="safety" class="section">
+  <div class="section-title">Safety Guidelines & Form Cues</div>
+  <div class="safety-grid">
+    <div class="safety-card"><h3>Lower Back Protocol</h3><ul><li>No conventional deadlifts for the full 8 weeks</li><li>RDL kept light (20–30 lbs) and range limited to mid-shin</li><li>All rowing kept at 45° torso angle maximum</li><li>Core braced before EVERY single rep of every exercise</li><li>If back tightens during a set — rack the weight, reassess</li><li>Red flag: sharp, shooting, or radiating pain = stop immediately</li></ul></div>
+    <div class="safety-card"><h3>Hip Thrust (Key Lift)</h3><ul><li>Upper back across the bench, not neck or lower</li><li>Feet flat, heels directly under knees</li><li>Drive through entire foot — not toes</li><li>Chin tucked neutral — don't crane neck back</li><li>Top position: straight line from shoulder to knee</li><li>Progress: master bodyweight → add DB → increase load</li></ul></div>
+    <div class="safety-card"><h3>Shoulder Safety</h3><ul><li>Always do band pull-aparts before pressing</li><li>On shoulder press: do NOT fully lock out overhead</li><li>Lateral raises: slight forward lean, thumbs pointing slightly down</li><li>Face pulls every upper day — non-negotiable for shoulder health</li><li>If shoulder clicks or catches: reduce range of motion first</li></ul></div>
+    <div class="safety-card"><h3>Auto-Regulation Rules</h3><ul><li>RPE 9–10 every session = overreaching. Add rest day.</li><li>RPE under 6 for 2+ sessions = increase load or add a set</li><li>Unusual soreness in a joint (not muscle) = rest that area</li><li>Missed a day? Never double up lower days back to back</li><li>Travel or busy week? Keep 2 sessions minimum (Upper A + Lower A)</li></ul></div>
+    <div class="safety-card"><h3>Equipment Substitutions</h3><ul><li>No bench for hip thrust → Use floor glute bridge (harder to load but valid)</li><li>No bench for chest press → DB floor press</li><li>Nordic curls → Slow eccentric hamstring curls with band</li><li>Bulgarian split squat → Reverse lunge (more accessible)</li><li>Incline press without bench → Decline push-up variation</li></ul></div>
+    <div class="safety-card"><h3>Nutrition Reminders</h3><ul><li>Target: ~165g protein/day (1g per lb bodyweight)</li><li>Pre-workout: protein + carbs 1–2 hrs before</li><li>Post-workout: protein within 60 min after training</li><li>Hydration: 3+ liters/day, extra on training days</li><li>Calorie deficit for fat loss: 200–300 cal under maintenance</li></ul></div>
+  </div>
+</div>
+
+<!-- ===== LOG HISTORY ===== -->
+<div id="loghistory" class="section">
+  <div class="section-title">Workout Log History</div>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">All logged sets are saved to your browser and persist between sessions. Filter by week or day, or view everything at once.</p>
+  <div class="log-controls">
+    <select class="log-filter" id="logWeekFilter" onchange="renderLogHistory()">
+      <option value="">All Weeks</option>
+      <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option>
+      <option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option>
+      <option value="7">Week 7</option><option value="8">Week 8</option>
+    </select>
+    <select class="log-filter" id="logDayFilter" onchange="renderLogHistory()">
+      <option value="">All Days</option>
+      <option value="d1">Mon · Upper A</option>
+      <option value="d2">Tue · Lower A</option>
+      <option value="d4">Thu · Upper B</option>
+      <option value="d5">Fri · Lower B</option>
+    </select>
+    <button class="log-clear-btn" onclick="clearAllLogs()">🗑 Clear All Logs</button>
+  </div>
+  <div id="logHistoryContainer"></div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ══════════════════════════════════════════════
+//  EXERCISE CONFIG
+// ══════════════════════════════════════════════
+const EXERCISES = {
+  d1: [
+    {id:'bench-press',   label:'DB Bench Press',          sets:3},
+    {id:'pullups',       label:'Pull-Ups',                 sets:3},
+    {id:'incline-press', label:'DB Incline Press (30°)',   sets:3},
+    {id:'bent-row',      label:'DB Bent-Over Row',         sets:3},
+    {id:'db-curl',       label:'DB Curl (Alternating)',    sets:3},
+    {id:'chest-row',     label:'Chest-Supported DB Row',   sets:3},
+  ],
+  d2: [
+    {id:'hip-thrust',    label:'DB Hip Thrust',            sets:3},
+    {id:'goblet-squat',  label:'Goblet Squat',             sets:3},
+    {id:'rdl',           label:'DB Romanian DL (Light)',   sets:3},
+    {id:'rev-lunge',     label:'Reverse Lunge (DB)',       sets:3},
+    {id:'calf-raise',    label:'Standing Calf Raise',      sets:3},
+  ],
+  d4: [
+    {id:'shoulder-press',label:'DB Shoulder Press',       sets:3},
+    {id:'chinups',       label:'Chin-Ups',                 sets:3},
+    {id:'lat-raise',     label:'Lateral Raises',           sets:3},
+    {id:'skull-crusher', label:'DB Skull Crusher',         sets:3},
+    {id:'face-pull',     label:'Face Pulls (Band)',        sets:3},
+    {id:'oh-tricep',     label:'OH Tricep Extension',      sets:3},
+  ],
+  d5: [
+    {id:'sl-hip-thrust', label:'Single-Leg Hip Thrust',   sets:3},
+    {id:'bss',           label:'Bulgarian Split Squat',   sets:3},
+    {id:'nordic',        label:'Nordic Curl',              sets:3},
+    {id:'clamshell',     label:'Banded Clamshell',         sets:3},
+    {id:'dead-bug',      label:'Dead Bug (Weighted)',      sets:3},
+    {id:'plank',         label:'Plank (Forearm)',          sets:3},
+  ],
+};
+
+const PHASE_MAP = {1:'Foundation',2:'Foundation',3:'Foundation',4:'Hypertrophy',5:'Hypertrophy',6:'Hypertrophy',7:'Intensification',8:'Intensification'};
+const PHASE_CLS = {Foundation:'p1', Hypertrophy:'p2', Intensification:'p3'};
+const DAY_LABELS = {d1:'Mon · Upper A', d2:'Tue · Lower A', d4:'Thu · Upper B', d5:'Fri · Lower B'};
+
+// ══════════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════════
+function sKey(w,day,ex,s) { return `wlog:w${w}:${day}:${ex}:s${s}`; }
+function saveSet(w,day,ex,s,weight,done) {
+  localStorage.setItem(sKey(w,day,ex,s), JSON.stringify({weight,done,ts:Date.now()}));
+}
+function loadSet(w,day,ex,s) {
+  try { const r=localStorage.getItem(sKey(w,day,ex,s)); return r?JSON.parse(r):{weight:'',done:false}; } catch(e){return {weight:'',done:false};}
+}
+function allLogKeys() {
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('wlog:'))keys.push(k);}
+  return keys;
+}
+function getActiveWeek() { return parseInt(document.getElementById('activeWeekSelect').value,10); }
+
+// ══════════════════════════════════════════════
+//  BUILD SET TRACKERS
+// ══════════════════════════════════════════════
+function buildTrackers() {
+  const week = getActiveWeek();
+  Object.keys(EXERCISES).forEach(day => {
+    EXERCISES[day].forEach(ex => {
+      const container = document.getElementById(`trk-${day}-${ex.id}`);
+      if (!container) return;
+      container.innerHTML = '';
+      for (let s=0; s<ex.sets; s++) {
+        const data = loadSet(week,day,ex.id,s);
+        const bubble = document.createElement('div');
+        bubble.className = 'set-bubble' + (data.done?' done':'');
+        const lbl = document.createElement('span'); lbl.className='set-label'; lbl.textContent=`S${s+1}`;
+        const inp = document.createElement('input');
+        inp.type='number'; inp.className='set-weight-input'; inp.placeholder='—';
+        inp.min=0; inp.step=2.5; inp.value=data.weight||''; inp.title='Weight used (lbs)';
+        inp.addEventListener('input', ()=>{ saveSet(week,day,ex.id,s,inp.value, bubble.classList.contains('done')); });
+        inp.addEventListener('click', e=>e.stopPropagation());
+        const unit = document.createElement('span'); unit.className='set-unit'; unit.textContent='lb';
+        const btn = document.createElement('button'); btn.className='set-done-btn'; btn.title='Mark complete'; btn.textContent='✓';
+        btn.addEventListener('click', e=>{
+          e.stopPropagation();
+          const done = !bubble.classList.contains('done');
+          bubble.classList.toggle('done', done);
+          saveSet(getActiveWeek(),day,ex.id,s,inp.value,done);
+        });
+        bubble.append(lbl,inp,unit,btn);
+        container.appendChild(bubble);
+      }
+      const hint=document.createElement('div'); hint.className='tracker-hint'; hint.textContent='Enter weight (lbs) · tap ✓ to mark set complete';
+      container.appendChild(hint);
+    });
+  });
+}
+
+function onWeekChange() {
+  const w=getActiveWeek(), phase=PHASE_MAP[w];
+  const b=document.getElementById('weekPhaseBadge');
+  b.textContent=`Phase ${w<=3?1:w<=6?2:3} · ${phase}`;
+  b.className='week-info-badge '+PHASE_CLS[phase];
+  buildTrackers();
+}
+
+// ══════════════════════════════════════════════
+//  LOG HISTORY
+// ══════════════════════════════════════════════
+function renderLogHistory() {
+  const container=document.getElementById('logHistoryContainer');
+  const wf=document.getElementById('logWeekFilter').value;
+  const df=document.getElementById('logDayFilter').value;
+  const grouped={};
+  allLogKeys().forEach(k=>{
+    const p=k.replace('wlog:','').split(':');
+    if(p.length<4)return;
+    const week=p[0].replace('w',''), day=p[1], exId=p[2], si=parseInt(p[3].replace('s',''));
+    if(wf&&week!==wf)return;
+    if(df&&day!==df)return;
+    let val; try{val=JSON.parse(localStorage.getItem(k)||'{}')}catch(e){return;}
+    if(!val.done&&!val.weight)return;
+    if(!grouped[week])grouped[week]={};
+    if(!grouped[week][day])grouped[week][day]={};
+    if(!grouped[week][day][exId])grouped[week][day][exId]=[];
+    grouped[week][day][exId][si]={weight:val.weight,done:val.done,ts:val.ts};
+  });
+  const weeks=Object.keys(grouped).sort((a,b)=>+a-+b);
+  if(!weeks.length){
+    container.innerHTML=`<div class="log-empty"><div class="log-empty-icon">📋</div><div>No workout data logged yet.<br>Head to <strong>Workouts</strong>, enter your weights, and mark sets complete!</div></div>`;
+    return;
+  }
+  let html='';
+  weeks.forEach(week=>{
+    Object.keys(grouped[week]).sort().forEach(day=>{
+      const exMap=grouped[week][day];
+      const allSets=Object.values(exMap).flatMap(sets=>sets.filter(Boolean));
+      const done=allSets.filter(s=>s.done).length;
+      const total=allSets.length;
+      const ts=allSets.map(s=>s.ts).filter(Boolean);
+      const dateStr=ts.length?new Date(Math.max(...ts)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+      const phase=PHASE_MAP[+week]||'';
+      html+=`<div class="log-session-card">
+        <div class="log-session-header">
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-bottom:4px;">WEEK ${week} &nbsp;·&nbsp; <span class="phase-badge ${PHASE_CLS[phase]}" style="display:inline-block;">${phase}</span></div>
+            <div class="log-session-title">${DAY_LABELS[day]||day}</div>
+          </div>
+          <div class="log-session-meta">${dateStr}</div>
+        </div>
+        <div class="log-session-stats">
+          <div class="log-stat"><div class="log-stat-val">${done}</div><div class="log-stat-lbl">Sets Done</div></div>
+          <div class="log-stat"><div class="log-stat-val">${total}</div><div class="log-stat-lbl">Logged</div></div>
+          <div class="log-stat"><div class="log-stat-val">${total>0?Math.round(done/total*100):0}%</div><div class="log-stat-lbl">Completion</div></div>
+        </div>
+        <div class="log-exercise-list">`;
+      Object.keys(exMap).forEach(exId=>{
+        const def=(EXERCISES[day]||[]).find(e=>e.id===exId);
+        const lbl=def?def.label:exId;
+        html+=`<div class="log-exercise-row"><div class="log-ex-name">${lbl}</div><div class="log-sets-line">`;
+        exMap[exId].forEach((s,i)=>{
+          if(!s)return;
+          const w=s.weight?`${s.weight} lbs`:'BW';
+          html+=`<span class="log-set-chip ${s.done?'completed':''}">S${i+1}: ${w}</span>`;
+        });
+        html+=`</div></div>`;
+      });
+      html+=`</div></div>`;
+    });
+  });
+  container.innerHTML=html;
+}
+
+function clearAllLogs() {
+  if(!confirm('Delete ALL logged workout data? This cannot be undone.'))return;
+  allLogKeys().forEach(k=>localStorage.removeItem(k));
+  renderLogHistory();
+  buildTrackers();
+}
+
+// ══════════════════════════════════════════════
+//  SCHEDULE TABLE
+// ══════════════════════════════════════════════
+const phases=[{weeks:[1,2,3],label:'Foundation',cls:'p1'},{weeks:[4,5,6],label:'Hypertrophy',cls:'p2'},{weeks:[7,8],label:'Intensification',cls:'p3'}];
+const dayPlans=['Upper A','Lower A','<span class="rest-badge">Rest / Active</span>','Upper B','Lower B','<span class="rest-badge">Optional</span>','<span class="rest-badge">Full Rest</span>'];
+const tbody=document.getElementById('scheduleBody');
+for(let w=1;w<=8;w++){
+  const ph=phases.find(p=>p.weeks.includes(w));
+  const tr=document.createElement('tr');
+  let h=`<td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">WK ${w}</td><td><span class="phase-badge ${ph.cls}">${ph.label}</span></td>`;
+  dayPlans.forEach(d=>{h+=`<td style="font-size:12px;">${d}</td>`;});
+  tr.innerHTML=h; tbody.appendChild(tr);
+}
+
+// ══════════════════════════════════════════════
+//  NAV, TABS, BLOCKS
+// ══════════════════════════════════════════════
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='loghistory')renderLogHistory();
+}
+function showDay(id,btn){
+  document.querySelectorAll('.day-panel').forEach(d=>d.classList.remove('active'));
+  document.querySelectorAll('.week-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+function toggleBlock(h){
+  const body=h.nextElementSibling, tog=h.querySelector('.block-toggle');
+  if(body.style.display==='none'||body.style.display===''){body.style.display='block';tog.classList.add('open');}
+  else{body.style.display='none';tog.classList.remove('open');}
+}
+document.querySelectorAll('.block-body').forEach(b=>{if(b.style.display!=='block')b.style.display='none';});
+function toggleCheck(item){item.classList.toggle('checked');}
+function resetChecklist(){document.querySelectorAll('.check-item').forEach(i=>i.classList.remove('checked'));}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+buildTrackers();
+</script>
+</body>
+</html>
