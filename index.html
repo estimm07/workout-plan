@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>8-Week Home Training Plan</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
     --bg: #0d0d0f; --bg2: #141417; --bg3: #1c1c21;
@@ -1260,7 +1259,10 @@ function allLogKeys() {
   for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('wlog:'))keys.push(k);}
   return keys;
 }
-function getActiveWeek() { return parseInt(document.getElementById('activeWeekSelect').value,10); }
+function getActiveWeek() {
+  const el = document.getElementById('activeWeekSelect');
+  return el ? parseInt(el.value, 10) || 1 : 1;
+}
 
 // ══════════════════════════════════════════════
 //  REST TIMER ENGINE
@@ -1843,7 +1845,16 @@ function showSection(id,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(btn)btn.classList.add('active');
-  if(id==='progress') renderProgress();
+  if(id==='progress') {
+    if (typeof Chart === 'undefined') {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+      s.onload = () => renderProgress();
+      document.head.appendChild(s);
+    } else {
+      renderProgress();
+    }
+  }
 }
 
 // Sub-sections accessed from the More tab
