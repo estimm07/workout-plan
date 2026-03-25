@@ -101,9 +101,11 @@
   .rec-tag.gun { background: rgba(180,100,255,0.1); color: #c084fc; border: 1px solid rgba(180,100,255,0.25); }
   .rec-tag.ball { background: rgba(255,200,50,0.1); color: #fcd34d; border: 1px solid rgba(255,200,50,0.25); }
   .rec-tag.optional { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
-  .block-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text); flex: 1; }
+  .block-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 20px; background: var(--bg3); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
+  .block-header-text { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .block-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text); }
   .block-meta { font-size: 11px; color: var(--muted); }
-  .block-toggle { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+  .block-toggle { font-size: 18px; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; margin-top: 2px; }
   .block-toggle.open { transform: rotate(180deg); }
   .block-body { padding: 16px 20px; }
 
@@ -209,16 +211,27 @@
   .safety-card ul li::before { content: '⚡'; flex-shrink: 0; }
 
   /* ── LOG HISTORY ── */
-  .log-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 24px; }
+  .log-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
   .log-filter { font-family: 'DM Mono', monospace; font-size: 12px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 7px 12px; border-radius: 6px; cursor: pointer; outline: none; }
   .log-filter:focus { border-color: var(--accent); }
-  .log-clear-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; background: none; border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s; margin-left: auto; }
-  .log-clear-btn:hover { border-color: #e84040; color: #e84040; }
+  .log-select-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; background: none; border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s; margin-left: auto; }
+  .log-select-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .log-select-btn:first-child { margin-left: 0; }
+  .log-delete-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; background: none; border: 1px solid rgba(232,60,60,0.4); color: #e84040; padding: 7px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s; margin-left: auto; }
+  .log-delete-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .log-delete-btn:not(:disabled):hover { background: rgba(232,60,60,0.1); }
+  .log-session-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; transition: border-color 0.15s; }
+  .log-session-card.log-selected { border-color: var(--accent); background: rgba(232,255,71,0.03); }
+  .log-session-card.log-selectable { cursor: pointer; }
+  .log-select-check { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; transition: all 0.15s; background: var(--bg3); }
+  .log-session-card.log-selected .log-select-check { background: var(--accent); border-color: var(--accent); color: var(--bg); }
   .log-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
   .log-empty-icon { font-size: 40px; margin-bottom: 12px; }
   .log-session-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-  .log-session-header { background: var(--bg3); padding: 14px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
-  .log-session-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); flex: 1; }
+  .log-session-header { background: var(--bg3); padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .log-session-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .log-session-header-left { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; }
+  .log-session-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); margin-top: 2px; }
   .log-session-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
   .log-session-stats { display: flex; gap: 20px; flex-wrap: wrap; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); }
   .log-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--accent); line-height: 1; }
@@ -411,6 +424,23 @@
     cursor: pointer; transition: all 0.15s;
   }
   .summary-done-btn:hover { border-color: var(--accent); color: var(--accent); }
+  /* ── WARM-UP & CARDIO ROWS ── */
+  .wu-list { padding: 4px 0; }
+  .wu-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .wu-row:last-child { border-bottom: none; }
+  .wu-row.wu-done { opacity: 0.5; }
+  .wu-check { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #333; background: none; color: #555; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; transition: all 0.15s; }
+  .wu-check:hover { border-color: var(--accent); color: var(--accent); }
+  .wu-check.done { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .wu-content { flex: 1; }
+  .wu-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .wu-cue { font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic; }
+  .wu-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; min-width: 64px; }
+  .wu-duration { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent2); }
+  .wu-timer-btn { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 4px 8px; border-radius: 5px; border: 1px solid rgba(78,205,196,0.4); background: rgba(78,205,196,0.08); color: var(--accent3); cursor: pointer; transition: all 0.15s; }
+  .wu-timer-btn:hover { background: rgba(78,205,196,0.18); }
+  .wu-countdown { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--accent3); line-height: 1; min-height: 24px; }
+
   .prog-subtabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
   .prog-subtab {
     font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px;
@@ -590,7 +620,7 @@
 
     <!-- PRE-WORKOUT RECOVERY -->
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Upper body focus</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-header-text"><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Upper body focus</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="recovery-item">
           <div class="rec-icon">🌡️</div>
@@ -607,7 +637,7 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Movement prep · Shoulder & thoracic</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-header-text"><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Movement prep · Shoulder & thoracic</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th><th>Notes</th></tr></thead><tbody>
           <tr><td><div class="ex-name">Arm Circles</div><div class="ex-cue">Small to large, forward & back</div></td><td>60 sec</td><td>Loosen shoulder capsule</td></tr>
@@ -619,7 +649,7 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-title">Main Workout — Upper A (Chest + Back + Biceps)</div><div class="block-meta">3 sets · 10–12 reps · Tempo 3-1-1</div><div class="block-toggle open">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-header-text"><div class="block-title">Main Workout — Upper A (Chest + Back + Biceps)</div><div class="block-meta">3 sets · 10–12 reps · Tempo 3-1-1</div></div><div class="block-toggle open">▾</div></div>
       <div class="block-body" style="display:block;">
         <table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th><th>Tempo</th></tr></thead><tbody>
           <tr><td><div class="ex-name">Dumbbell Bench Press</div><div class="ex-cue">Feet flat, arch natural, press straight up, don't let elbows flare past 45°</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">75s</td><td class="ex-tempo">3-1-1</td></tr>
@@ -639,7 +669,7 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Cardio Finisher — 10 min Incline Walk</div><div class="block-meta">Treadmill · Fat burn · Low impact</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-header-text"><div class="block-title">Cardio Finisher — 10 min Incline Walk</div><div class="block-meta">Treadmill · Fat burn · Low impact</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Interval</th><th>Grade</th><th>Speed</th><th>Duration</th></tr></thead><tbody>
         <tr><td>Ramp-up</td><td>5%</td><td>3.0 mph</td><td>2 min</td></tr>
         <tr><td>Work</td><td>8%</td><td>3.0 mph</td><td>6 min</td></tr>
@@ -647,7 +677,7 @@
       </tbody></table></div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Upper body + thoracic mobility</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-header-text"><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Upper body + thoracic mobility</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Stretch</th><th>Duration</th></tr></thead><tbody>
         <tr><td><div class="ex-name">Doorway Chest Stretch</div><div class="ex-cue">Arms at 90°, lean through doorway</div></td><td>45 sec/side</td></tr>
         <tr><td><div class="ex-name">Lat Stretch (bar hang)</div><div class="ex-cue">Passive dead hang on pull-up bar</div></td><td>30 sec × 2</td></tr>
@@ -658,7 +688,7 @@
 
     <!-- POST-WORKOUT RECOVERY -->
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Upper body</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-header-text"><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Upper body</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="recovery-item">
           <div class="rec-icon">🪣</div>
@@ -687,7 +717,7 @@
 
     <!-- PRE-WORKOUT RECOVERY -->
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Lower body & back focus</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-header-text"><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Lower body & back focus</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="recovery-item">
           <div class="rec-icon">🌡️</div>
@@ -708,7 +738,7 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Hip & glute activation · Back prep</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-header-text"><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Hip & glute activation · Back prep</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th><th>Notes</th></tr></thead><tbody>
         <tr><td><div class="ex-name">Glute Bridge (Bodyweight)</div><div class="ex-cue">Squeeze glutes at top, hold 2 sec</div></td><td>2 × 15</td><td>Activate glutes before loading</td></tr>
         <tr><td><div class="ex-name">Clamshells (Band)</div><div class="ex-cue">Keep hips stacked, rotate from hip not waist</div></td><td>15/side</td><td>Hip external rotator warmup</td></tr>
@@ -718,7 +748,7 @@
       </tbody></table></div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-title">Main Workout — Lower A (Glutes + Quads + Calves)</div><div class="block-meta">3 sets · 10–12 reps · Hip & back safe</div><div class="block-toggle open">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-header-text"><div class="block-title">Main Workout — Lower A (Glutes + Quads + Calves)</div><div class="block-meta">3 sets · 10–12 reps · Hip & back safe</div></div><div class="block-toggle open">▾</div></div>
       <div class="block-body" style="display:block;">
         <table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th><th>Tempo</th></tr></thead><tbody>
           <tr><td><div class="ex-name">Dumbbell Hip Thrust (bench)</div><div class="ex-cue">Upper back on bench, DB on hips, drive through heels, squeeze glutes at top. This replaces deadlifts — master it.</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">90s</td><td class="ex-tempo">2-2-1</td></tr>
@@ -736,7 +766,7 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Cardio Finisher — 12 min Incline Walk</div><div class="block-meta">Post-leg fat burn · Easy on joints</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-header-text"><div class="block-title">Cardio Finisher — 12 min Incline Walk</div><div class="block-meta">Post-leg fat burn · Easy on joints</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Interval</th><th>Grade</th><th>Speed</th><th>Duration</th></tr></thead><tbody>
         <tr><td>Ramp-up</td><td>6%</td><td>2.8 mph</td><td>2 min</td></tr>
         <tr><td>Work</td><td>8%</td><td>3.0 mph</td><td>8 min</td></tr>
@@ -744,7 +774,7 @@
       </tbody></table></div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Lower body · Hip flexors · Lower back</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-header-text"><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Lower body · Hip flexors · Lower back</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Stretch</th><th>Duration</th></tr></thead><tbody>
         <tr><td><div class="ex-name">Pigeon Pose</div><div class="ex-cue">Deep glute stretch — don't collapse to one side</div></td><td>60 sec/side</td></tr>
         <tr><td><div class="ex-name">Kneeling Hip Flexor Stretch</div><div class="ex-cue">Lunge position, back knee down, tuck pelvis</div></td><td>45 sec/side</td></tr>
@@ -755,7 +785,7 @@
 
     <!-- POST-WORKOUT RECOVERY -->
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Lower body & back</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-header-text"><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Lower body & back</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="recovery-item">
           <div class="rec-icon">🪣</div>
@@ -781,7 +811,7 @@
   <!-- DAY 3 REST -->
   <div id="d3" class="day-panel">
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">😴</div><div class="block-title">Wednesday — Rest or Active Recovery</div><div class="block-meta">Choose one option below</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">😴</div><div class="block-header-text"><div class="block-title">Wednesday — Rest or Active Recovery</div><div class="block-meta">Choose one option below</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="note-box"><strong>Complete Rest:</strong> No training. Prioritize sleep (7–9 hrs), hydration, and nutrition. This is where muscle is built — not during the workout.</div><br>
         <div class="note-box" style="border-color:var(--accent3);background:rgba(78,205,196,0.05);"><strong style="color:var(--accent3)">Active Recovery Option:</strong> 20–25 min gentle incline walk at 3–5% grade, 2.5 mph. Or 15 min of mobility work: hip 90/90, world's greatest stretch, thoracic rotations. Keep heart rate under 120 bpm.</div>
@@ -795,7 +825,7 @@
 
     <!-- PRE-WORKOUT RECOVERY -->
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Shoulder & upper body focus</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-header-text"><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Shoulder & upper body focus</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="recovery-item">
           <div class="rec-icon">🌡️</div>
@@ -812,7 +842,7 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Shoulder · Rotator cuff · Core</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-header-text"><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Shoulder · Rotator cuff · Core</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th></tr></thead><tbody>
         <tr><td><div class="ex-name">Band External Rotation</div><div class="ex-cue">Elbow at 90°, anchor band at elbow height, rotate out</div></td><td>15/side</td></tr>
         <tr><td><div class="ex-name">Scapular Push-Up</div><div class="ex-cue">In plank position, protract/retract scapulas only</div></td><td>12 reps</td></tr>
@@ -821,7 +851,7 @@
       </tbody></table></div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-title">Main Workout — Upper B (Shoulders + Triceps + Upper Back)</div><div class="block-meta">3 sets · 10–12 reps · Vertical push emphasis</div><div class="block-toggle open">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-header-text"><div class="block-title">Main Workout — Upper B (Shoulders + Triceps + Upper Back)</div><div class="block-meta">3 sets · 10–12 reps · Vertical push emphasis</div></div><div class="block-toggle open">▾</div></div>
       <div class="block-body" style="display:block;">
         <table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th><th>Tempo</th></tr></thead><tbody>
           <tr><td><div class="ex-name">Dumbbell Shoulder Press (seated)</div><div class="ex-cue">Neutral or pronated grip, do NOT lock out overhead, keep core braced</div></td><td class="ex-sets">3 × 10–12</td><td class="ex-rest">75s</td><td class="ex-tempo">3-1-1</td></tr>
@@ -840,11 +870,11 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Cardio Finisher — 10 min Incline Walk</div><div class="block-meta">Treadmill · 8% grade</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-header-text"><div class="block-title">Cardio Finisher — 10 min Incline Walk</div><div class="block-meta">Treadmill · 8% grade</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><p style="font-size:13px;color:var(--muted);">8% grade · 3.0 mph · 10 minutes continuous. No hands on rails. Engage core, swing arms naturally.</p></div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Shoulder · Chest · Tricep</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-header-text"><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Shoulder · Chest · Tricep</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Stretch</th><th>Duration</th></tr></thead><tbody>
         <tr><td><div class="ex-name">Cross-Body Shoulder Stretch</div></td><td>45 sec/side</td></tr>
         <tr><td><div class="ex-name">Overhead Tricep Stretch</div></td><td>45 sec/side</td></tr>
@@ -855,7 +885,7 @@
 
     <!-- POST-WORKOUT RECOVERY -->
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Shoulders & upper back</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-header-text"><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Shoulders & upper back</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="recovery-item">
           <div class="rec-icon">🔫</div>
@@ -884,7 +914,7 @@
 
     <!-- PRE-WORKOUT RECOVERY -->
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Posterior chain & hips</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-pre-rec">🔴</div><div class="block-header-text"><div class="block-title">Pre-Workout Recovery Prep</div><div class="block-meta">10 min before training · Posterior chain & hips</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="recovery-item">
           <div class="rec-icon">🌡️</div>
@@ -905,7 +935,7 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Glute & hip activation</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-warm">🔥</div><div class="block-header-text"><div class="block-title">Warm-Up — 8 min</div><div class="block-meta">Glute & hip activation</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Duration</th></tr></thead><tbody>
         <tr><td><div class="ex-name">Glute Bridge (BW, slow)</div></td><td>2 × 12</td></tr>
         <tr><td><div class="ex-name">Monster Walks (band)</div><div class="ex-cue">Band around ankles, stay low, shuffle side to side</div></td><td>2 × 10/direction</td></tr>
@@ -914,7 +944,7 @@
       </tbody></table></div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-title">Main Workout — Lower B (Hamstrings + Hips + Core)</div><div class="block-meta">3 sets · 10–12 reps · Posterior chain focus</div><div class="block-toggle open">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-main">💪</div><div class="block-header-text"><div class="block-title">Main Workout — Lower B (Hamstrings + Hips + Core)</div><div class="block-meta">3 sets · 10–12 reps · Posterior chain focus</div></div><div class="block-toggle open">▾</div></div>
       <div class="block-body" style="display:block;">
         <table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th><th>Tempo</th></tr></thead><tbody>
           <tr><td><div class="ex-name">Single-Leg Hip Thrust (bench)</div><div class="ex-cue">One leg extended, drive through heel, level hips at top</div></td><td class="ex-sets">3 × 10/side</td><td class="ex-rest">75s</td><td class="ex-tempo">2-2-1</td></tr>
@@ -934,11 +964,11 @@
       </div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Cardio Finisher — 12 min Incline Walk</div><div class="block-meta">Higher grade · End strong</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-header-text"><div class="block-title">Cardio Finisher — 12 min Incline Walk</div><div class="block-meta">Higher grade · End strong</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><p style="font-size:13px;color:var(--muted);">10% grade · 3.0 mph · 12 minutes. Arms pumping, no holding rails. Push rate of perceived exertion to about 6/10.</p></div>
     </div>
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Hamstrings · Glutes · Hip flexors</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">🧘</div><div class="block-header-text"><div class="block-title">Cool-Down — 7 min</div><div class="block-meta">Hamstrings · Glutes · Hip flexors</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><table class="exercise-table"><thead><tr><th>Stretch</th><th>Duration</th></tr></thead><tbody>
         <tr><td><div class="ex-name">Supine Hamstring Stretch (band)</div></td><td>60 sec/side</td></tr>
         <tr><td><div class="ex-name">Figure-4 Glute Stretch</div><div class="ex-cue">Lying on back, ankle on opposite knee, pull</div></td><td>60 sec/side</td></tr>
@@ -949,7 +979,7 @@
 
     <!-- POST-WORKOUT RECOVERY -->
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Posterior chain priority</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-post-rec">🔵</div><div class="block-header-text"><div class="block-title">Post-Workout Recovery</div><div class="block-meta">After cool-down · Posterior chain priority</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="recovery-item">
           <div class="rec-icon">⚾</div>
@@ -975,7 +1005,7 @@
   <!-- DAY 6 -->
   <div id="d6" class="day-panel">
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-title">Saturday — Optional 5th Day</div><div class="block-meta">Only do if you feel recovered</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-header-text"><div class="block-title">Saturday — Optional 5th Day</div><div class="block-meta">Only do if you feel recovered</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
         <div class="note-box"><strong>Option A — Cardio Only:</strong> 20–30 min incline walk. 8–10% grade, 3.0 mph. Use this if your muscles feel fatigued but you want to stay active.</div><br>
         <div class="note-box" style="border-color:var(--accent2);background:rgba(255,107,53,0.05);"><strong style="color:var(--accent2)">Option B — Arms & Core:</strong> Light pump session, 30 min. Bicep curls, hammer curls, tricep pushdowns (band), face pulls, dead bugs, planks. No lower back loading. RPE 6/10 max.</div><br>
@@ -987,7 +1017,7 @@
   <!-- DAY 7 -->
   <div id="d7" class="day-panel">
     <div class="workout-block">
-      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">😴</div><div class="block-title">Sunday — Full Rest</div><div class="block-meta">Non-negotiable recovery</div><div class="block-toggle">▾</div></div>
+      <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">😴</div><div class="block-header-text"><div class="block-title">Sunday — Full Rest</div><div class="block-meta">Non-negotiable recovery</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><div class="note-box"><strong>Rest day priorities:</strong> 7–9 hrs sleep, 3+ liters water, high-protein meals (target 0.8–1g protein per pound of bodyweight = ~130–165g/day), light walking if desired. No structured exercise.</div></div>
     </div>
   </div>
@@ -1128,7 +1158,7 @@
 
   <!-- RAW LOG TAB -->
   <div id="prog-rawlog" class="prog-tab">
-    <div class="log-controls">
+    <div class="log-controls" id="logControlsNormal">
       <select class="log-filter" id="logWeekFilter" onchange="renderLogHistory()">
         <option value="">All Weeks</option>
         <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option>
@@ -1142,7 +1172,12 @@
         <option value="d4">Thu · Upper B</option>
         <option value="d5">Fri · Lower B</option>
       </select>
-      <button class="log-clear-btn" onclick="clearAllLogs()">🗑 Clear All</button>
+      <button class="log-select-btn" onclick="enterLogSelectMode()">Select</button>
+    </div>
+    <div class="log-controls log-controls-select" id="logControlsSelect" style="display:none;">
+      <button class="log-select-btn" onclick="selectAllLogs()">Select All</button>
+      <button class="log-select-btn" onclick="exitLogSelectMode()">Cancel</button>
+      <button class="log-delete-btn" id="logDeleteBtn" onclick="deleteSelectedLogs()" disabled>Delete (0)</button>
     </div>
     <div id="logHistoryContainer"></div>
   </div>
@@ -1588,11 +1623,75 @@ function renderMuscles(){
   }).join('');
 }
 
-function renderLogHistory(){
-  var container=document.getElementById('logHistoryContainer');
-  if(!container)return;
+var logSelectMode=false;
+var logSelectedKeys={};
+
+function enterLogSelectMode(){
+  logSelectMode=true;logSelectedKeys={};
+  var n=document.getElementById('logControlsNormal');
+  var s=document.getElementById('logControlsSelect');
+  if(n)n.style.display='none';if(s)s.style.display='flex';
+  renderLogHistory();
+}
+
+function exitLogSelectMode(){
+  logSelectMode=false;logSelectedKeys={};
+  var n=document.getElementById('logControlsNormal');
+  var s=document.getElementById('logControlsSelect');
+  if(n)n.style.display='flex';if(s)s.style.display='none';
+  renderLogHistory();
+}
+
+function selectAllLogs(){
   var wf=document.getElementById('logWeekFilter');var wfv=wf?wf.value:'';
   var df=document.getElementById('logDayFilter');var dfv=df?df.value:'';
+  var grouped=buildLogGroups(wfv,dfv);
+  Object.keys(grouped).forEach(function(week){
+    Object.keys(grouped[week]).forEach(function(day){
+      logSelectedKeys[week+'|'+day]=true;
+    });
+  });
+  updateDeleteBtn();renderLogHistory();
+}
+
+function toggleLogSelect(week,day){
+  var k=week+'|'+day;
+  if(logSelectedKeys[k])delete logSelectedKeys[k];
+  else logSelectedKeys[k]=true;
+  updateDeleteBtn();
+  var card=document.getElementById('logcard-'+week+'-'+day);
+  if(card){
+    card.classList.toggle('log-selected',!!logSelectedKeys[k]);
+    var chk=card.querySelector('.log-select-check');
+    if(chk)chk.textContent=logSelectedKeys[k]?'✓':'';
+  }
+}
+
+function updateDeleteBtn(){
+  var btn=document.getElementById('logDeleteBtn');if(!btn)return;
+  var count=Object.keys(logSelectedKeys).length;
+  btn.textContent='Delete ('+count+')';
+  btn.disabled=count===0;
+}
+
+function deleteSelectedLogs(){
+  Object.keys(logSelectedKeys).forEach(function(k){
+    var parts=k.split('|');var week=parts[0];var day=parts[1];
+    allLogKeys().forEach(function(lk){
+      if(lk.indexOf('wlog:w'+week+':'+day+':')===0){try{localStorage.removeItem(lk);}catch(e){}}
+    });
+  });
+  logSelectedKeys={};
+  updateDeleteBtn();
+  renderLogHistory();renderProgress();buildTrackers();
+}
+
+function clearAllLogs(){
+  allLogKeys().forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
+  renderLogHistory();buildTrackers();renderProgress();
+}
+
+function buildLogGroups(wfv,dfv){
   var grouped={};
   allLogKeys().forEach(function(k){
     var p=k.replace('wlog:','').split(':');
@@ -1607,8 +1706,20 @@ function renderLogHistory(){
     if(!grouped[week][day][exId])grouped[week][day][exId]=[];
     grouped[week][day][exId][si]={weight:val.weight,done:val.done,ts:val.ts};
   });
+  return grouped;
+}
+
+function renderLogHistory(){
+  var container=document.getElementById('logHistoryContainer');
+  if(!container)return;
+  var wf=document.getElementById('logWeekFilter');var wfv=wf?wf.value:'';
+  var df=document.getElementById('logDayFilter');var dfv=df?df.value:'';
+  var grouped=buildLogGroups(wfv,dfv);
   var weeks=Object.keys(grouped).sort(function(a,b){return +a-+b;});
-  if(!weeks.length){container.innerHTML='<div class="log-empty"><div class="log-empty-icon">📋</div><div>No workout data logged yet.<br>Head to <strong>Workouts</strong>, enter your weights, and mark sets complete!</div></div>';return;}
+  if(!weeks.length){
+    container.innerHTML='<div class="log-empty"><div class="log-empty-icon">📋</div><div>No workout data logged yet.<br>Head to <strong>Workouts</strong>, enter your weights, and mark sets complete!</div></div>';
+    return;
+  }
   var html='';
   weeks.forEach(function(week){
     Object.keys(grouped[week]).sort().forEach(function(day){
@@ -1619,9 +1730,26 @@ function renderLogHistory(){
       var ts=allSets.map(function(s){return s.ts;}).filter(Boolean);
       var dateStr=ts.length?new Date(Math.max.apply(null,ts)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
       var phase=PHASE_MAP[+week]||'';
-      html+='<div class="log-session-card"><div class="log-session-header"><div><div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-bottom:4px;">WEEK '+week+' &nbsp;·&nbsp; <span class="phase-badge '+(PHASE_CLS[phase]||'')+'" style="display:inline-block;">'+phase+'</span></div><div class="log-session-title">'+(DAY_LABELS[day]||day)+'</div></div><div class="log-session-meta">'+dateStr+'</div></div><div class="log-session-stats"><div class="log-stat"><div class="log-stat-val">'+done+'</div><div class="log-stat-lbl">Sets Done</div></div><div class="log-stat"><div class="log-stat-val">'+total+'</div><div class="log-stat-lbl">Logged</div></div><div class="log-stat"><div class="log-stat-val">'+(total>0?Math.round(done/total*100):0)+'%</div><div class="log-stat-lbl">Completion</div></div></div><div class="log-exercise-list">';
+      var selKey=week+'|'+day;
+      var isSelected=logSelectedKeys[selKey]?true:false;
+      var cardClass='log-session-card'+(logSelectMode?' log-selectable':'')+(isSelected?' log-selected':'');
+      var onclickAttr=logSelectMode?' onclick="toggleLogSelect(\''+week+'\',\''+day+'\')"':'';
+      var checkHtml=logSelectMode?'<div class="log-select-check">'+(isSelected?'✓':'')+'</div>':'';
+
+      html+='<div class="'+cardClass+'" id="logcard-'+week+'-'+day+'"'+onclickAttr+'>';
+      html+='<div class="log-session-header"><div class="log-session-header-top">';
+      html+=checkHtml;
+      html+='<div class="log-session-header-left">WEEK '+week+' &nbsp;·&nbsp; '+dateStr+'</div>';
+      html+='<span class="phase-badge '+(PHASE_CLS[phase]||'')+'" style="display:inline-block;">'+phase+'</span>';
+      html+='</div><div class="log-session-title">'+(DAY_LABELS[day]||day)+'</div></div>';
+      html+='<div class="log-session-stats">';
+      html+='<div class="log-stat"><div class="log-stat-val">'+done+'</div><div class="log-stat-lbl">Sets Done</div></div>';
+      html+='<div class="log-stat"><div class="log-stat-val">'+total+'</div><div class="log-stat-lbl">Logged</div></div>';
+      html+='<div class="log-stat"><div class="log-stat-val">'+(total>0?Math.round(done/total*100):0)+'%</div><div class="log-stat-lbl">Completion</div></div>';
+      html+='</div><div class="log-exercise-list">';
       Object.keys(exMap).forEach(function(exId){
-        var def=null;var dayExs=EXERCISES[day]||[];for(var i=0;i<dayExs.length;i++){if(dayExs[i].id===exId){def=dayExs[i];break;}}
+        var def=null;var dayExs=EXERCISES[day]||[];
+        for(var i=0;i<dayExs.length;i++){if(dayExs[i].id===exId){def=dayExs[i];break;}}
         var lbl=def?def.label:exId;
         html+='<div class="log-exercise-row"><div class="log-ex-name">'+lbl+'</div><div class="log-sets-line">';
         exMap[exId].forEach(function(s,i){if(!s)return;var w=s.weight?s.weight+' lbs':'BW';html+='<span class="log-set-chip '+(s.done?'completed':'')+'">S'+(i+1)+': '+w+'</span>';});
@@ -1631,12 +1759,7 @@ function renderLogHistory(){
     });
   });
   container.innerHTML=html;
-}
-
-function clearAllLogs(){
-  if(!confirm('Delete ALL logged workout data? This cannot be undone.'))return;
-  allLogKeys().forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
-  renderLogHistory();buildTrackers();renderProgress();
+  updateDeleteBtn();
 }
 
 function showProgTab(id,btn){
@@ -1678,12 +1801,73 @@ function loadAndRenderProgress(){
 var DAY_TITLES={d1:'UPPER A',d2:'LOWER A',d4:'UPPER B',d5:'LOWER B'};
 var EX_PRESCRIPTIONS={'bench-press':'3 × 10–12 · Tempo 3-1-1','pullups':'3 × 6–8 · Tempo 2-1-2','incline-press':'3 × 10–12 · Tempo 3-1-1','bent-row':'3 × 10–12 · Tempo 2-1-2','db-curl':'3 × 10/side · Tempo 2-1-2','chest-row':'3 × 12 · Tempo 2-1-2','hip-thrust':'3 × 10–12 · Tempo 2-2-1','goblet-squat':'3 × 12 · Tempo 3-1-1','rdl':'3 × 12 · Tempo 3-1-1','rev-lunge':'3 × 10/side · Tempo 2-1-2','calf-raise':'3 × 15 · Tempo 2-1-2','shoulder-press':'3 × 10–12 · Tempo 3-1-1','chinups':'3 × 6–8 · Tempo 2-1-2','lat-raise':'3 × 12–15 · Tempo 2-1-3','skull-crusher':'3 × 10–12 · Tempo 3-1-1','face-pull':'3 × 15 · Tempo 2-1-2','oh-tricep':'3 × 12 · Tempo 3-1-1','sl-hip-thrust':'3 × 10/side · Tempo 2-2-1','bss':'3 × 8–10/side · Tempo 3-1-1','nordic':'3 × 5–6 · Tempo 4-0-1','clamshell':'3 × 15/side · Tempo 2-1-2','dead-bug':'3 × 8/side · Tempo 3-1-1','plank':'3 × 30–45 sec'};
 
-var session={day:null,week:null,exercises:[],currentExIdx:0,startTime:null,elapsedInterval:null,restInterval:null,restRemaining:0,restTotal:0};
+// Warm-up activities per day: {name, cue, duration, secs (null = reps only)}
+var WARMUP_DATA = {
+  d1: [
+    {name:'Arm Circles', cue:'Small to large, forward & back', duration:'60 sec', secs:60},
+    {name:'Band Pull-Aparts', cue:'Keep arms straight, squeeze scapulas', duration:'2×15 reps', secs:null},
+    {name:'Cat-Cow', cue:'Slow, full spinal range', duration:'10 reps', secs:null},
+    {name:'Dead Bug', cue:'Lower back pressed to floor the entire time', duration:'6 reps/side', secs:null},
+    {name:'Incline Treadmill Walk', cue:'5% grade, 2.8 mph', duration:'3 min', secs:180}
+  ],
+  d2: [
+    {name:'Glute Bridge (Bodyweight)', cue:'Squeeze glutes at top, hold 2 sec', duration:'2×15 reps', secs:null},
+    {name:'Clamshells (Band)', cue:'Keep hips stacked, rotate from hip', duration:'15/side', secs:null},
+    {name:'Hip 90/90 Stretch', cue:'Sit on floor, both knees at 90°', duration:'60 sec', secs:60},
+    {name:'Leg Swing (front-back)', cue:'Hold wall, keep torso still', duration:'10/side', secs:null},
+    {name:'Bodyweight Squat', cue:'Sit back and down, knees track toes', duration:'15 reps', secs:null}
+  ],
+  d4: [
+    {name:'Band External Rotation', cue:'Elbow at 90°, anchor band at elbow height', duration:'15/side', secs:null},
+    {name:'Scapular Push-Up', cue:'In plank, protract/retract scapulas only', duration:'12 reps', secs:null},
+    {name:'Inchworm', cue:'Walk hands out to plank and back, slow', duration:'6 reps', secs:null},
+    {name:'Dead Bug', cue:'Opposite arm/leg, back flat', duration:'8/side', secs:null}
+  ],
+  d5: [
+    {name:'Glute Bridge (BW, slow)', cue:'Squeeze at top, controlled', duration:'2×12 reps', secs:null},
+    {name:'Monster Walks (band)', cue:'Band around ankles, stay low', duration:'2×10/direction', secs:null},
+    {name:'Hip 90/90 Transitions', cue:'Controlled, both sides', duration:'8/side', secs:null},
+    {name:'BW Squat to Box (pause)', cue:'Sit to box, pause 2 sec, stand', duration:'10 reps', secs:null}
+  ]
+};
+
+// Cardio finisher intervals per day: {name, detail, duration, secs}
+var CARDIO_DATA = {
+  d1: [
+    {name:'Ramp-up', detail:'5% grade · 3.0 mph', duration:'2 min', secs:120},
+    {name:'Work', detail:'8% grade · 3.0 mph', duration:'6 min', secs:360},
+    {name:'Cool-down', detail:'3% grade · 2.5 mph', duration:'2 min', secs:120}
+  ],
+  d2: [
+    {name:'Ramp-up', detail:'6% grade · 2.8 mph', duration:'2 min', secs:120},
+    {name:'Work', detail:'8% grade · 3.0 mph', duration:'8 min', secs:480},
+    {name:'Cool-down', detail:'2% grade · 2.5 mph', duration:'2 min', secs:120}
+  ],
+  d4: [
+    {name:'Continuous Walk', detail:'8% grade · 3.0 mph', duration:'10 min', secs:600}
+  ],
+  d5: [
+    {name:'Ramp-up', detail:'8% grade · 2.8 mph', duration:'2 min', secs:120},
+    {name:'Work', detail:'10% grade · 3.0 mph', duration:'8 min', secs:480},
+    {name:'Cool-down', detail:'3% grade · 2.5 mph', duration:'2 min', secs:120}
+  ]
+};
+
+var session={day:null,week:null,exercises:[],currentExIdx:0,startTime:null,elapsedInterval:null,restInterval:null,restRemaining:0,restTotal:0,cardioInterval:null,warmupStates:{},cardioStates:{}};
+
+// ── NAV INDICES: 0=warmup, 1..N=exercises, N+1=cardio ──
+function sessionNavCount(){ return session.exercises.length + 2; }
+function isWarmupIdx(i){ return i===0; }
+function isCardioIdx(i){ return i===session.exercises.length+1; }
+function exIdx(navIdx){ return navIdx-1; } // convert nav index to exercises array index
 
 function startSession(day){
   try{
     session.day=day;session.week=getActiveWeek();
-    session.exercises=EXERCISES[day]||[];session.currentExIdx=0;session.startTime=Date.now();
+    session.exercises=EXERCISES[day]||[];
+    session.currentExIdx=0;session.startTime=Date.now();
+    session.warmupStates={};session.cardioStates={};
+    clearInterval(session.cardioInterval);session.cardioInterval=null;
     var nameEl=document.getElementById('sessionDayName');
     if(nameEl)nameEl.textContent=DAY_TITLES[day]||day;
     clearInterval(session.elapsedInterval);
@@ -1694,7 +1878,8 @@ function startSession(day){
       if(el)el.textContent=m+':'+(s<10?'0':'')+s;
       updateSessionVolume();
     },1000);
-    buildSessionNav();renderSessionExercise(0);
+    buildSessionNav();
+    renderSessionNav(0); // start on warm-up
     var modal=document.getElementById('sessionModal');
     if(modal)modal.classList.add('open');
     document.body.style.overflow='hidden';
@@ -1704,13 +1889,212 @@ function startSession(day){
 function buildSessionNav(){
   var nav=document.getElementById('sessionExNav');
   if(!nav)return;
-  nav.innerHTML=session.exercises.map(function(ex,i){
+  var pills='';
+  // Warm-up pill
+  var warmupDone=isWarmupComplete();
+  pills+='<button class="session-ex-pill'+(warmupDone?' done':'')+'" onclick="renderSessionNav(0)">🔥 Warm-Up</button>';
+  // Exercise pills
+  session.exercises.forEach(function(ex,i){
     var allDone=isExerciseDone(ex);
     var shortLabel=ex.label.replace('Dumbbell ','DB ').replace(' (bench)','').replace(' (DB)','').replace(' (Alternating)','').replace(' (LIGHT)','');
-    return '<button class="session-ex-pill'+(i===0?' active':'')+(allDone?' done':'')+'" onclick="renderSessionExercise('+i+')">'+shortLabel+'</button>';
-  }).join('');
+    pills+='<button class="session-ex-pill'+(allDone?' done':'')+'" onclick="renderSessionNav('+(i+1)+')">'+shortLabel+'</button>';
+  });
+  // Cardio pill
+  var cardioDone=isCardioComplete();
+  pills+='<button class="session-ex-pill'+(cardioDone?' done':'')+'" onclick="renderSessionNav('+(session.exercises.length+1)+')">🚶 Cardio</button>';
+  nav.innerHTML=pills;
 }
 
+function renderSessionNav(navIdx){
+  session.currentExIdx=navIdx;
+  // Highlight active pill
+  var pills=document.querySelectorAll('.session-ex-pill');
+  pills.forEach(function(p,i){p.classList.toggle('active',i===navIdx);});
+  if(isWarmupIdx(navIdx)) renderWarmup();
+  else if(isCardioIdx(navIdx)) renderCardio();
+  else renderSessionExercise(exIdx(navIdx));
+}
+
+// ── WARM-UP CARD ──
+function isWarmupComplete(){
+  var activities=WARMUP_DATA[session.day]||[];
+  if(!activities.length)return false;
+  for(var i=0;i<activities.length;i++){if(!session.warmupStates[i])return false;}
+  return true;
+}
+
+function renderWarmup(){
+  try{
+    var activities=WARMUP_DATA[session.day]||[];
+    var body=document.getElementById('sessionBody');
+    if(!body)return;
+    var rows='';
+    activities.forEach(function(act,i){
+      var done=session.warmupStates[i]?true:false;
+      var timerId='wu-timer-'+i;
+      var rowId='wu-row-'+i;
+      var timerBtn=act.secs?'<button class="wu-timer-btn" id="wubtn-'+i+'" onclick="startWarmupTimer('+i+','+act.secs+')">START</button>':'';
+      rows+='<div class="wu-row'+(done?' wu-done':'')+'" id="'+rowId+'">'+
+        '<button class="wu-check'+(done?' done':'')+'" onclick="toggleWarmupItem('+i+')">✓</button>'+
+        '<div class="wu-content">'+
+          '<div class="wu-name">'+act.name+'</div>'+
+          '<div class="wu-cue">'+act.cue+'</div>'+
+        '</div>'+
+        '<div class="wu-right">'+
+          '<div class="wu-duration">'+act.duration+'</div>'+
+          timerBtn+
+          (act.secs?'<div class="wu-countdown" id="'+timerId+'"></div>':'')+
+        '</div>'+
+      '</div>';
+    });
+    var allDone=isWarmupComplete();
+    body.innerHTML='<div class="session-ex-card">'+
+      '<div class="session-ex-header">'+
+        '<div class="session-ex-nav-row">'+
+          '<button class="session-ex-arrow disabled" disabled>←</button>'+
+          '<div class="session-ex-count">Warm-Up</div>'+
+          '<button class="session-ex-arrow" onclick="renderSessionNav(1)">→</button>'+
+        '</div>'+
+        '<div class="session-ex-name">WARM-UP</div>'+
+        '<div class="session-ex-prescription">Complete each activity before training</div>'+
+      '</div>'+
+      '<div class="wu-list">'+rows+'</div>'+
+    '</div>'+
+    (allDone?'<div class="session-next-preview"><div class="session-next-label">Up next</div><div class="session-next-name">'+session.exercises[0].label+'</div></div>':'');
+  }catch(e){console.error('renderWarmup error:',e);}
+}
+
+function toggleWarmupItem(idx){
+  session.warmupStates[idx]=!session.warmupStates[idx];
+  buildSessionNav();
+  renderWarmup();
+  if(isWarmupComplete())setTimeout(function(){renderSessionNav(1);},400);
+}
+
+function startWarmupTimer(idx,totalSecs){
+  var display=document.getElementById('wu-timer-'+idx);
+  var btn=document.getElementById('wubtn-'+idx);
+  if(!display)return;
+  // If already running, cancel
+  if(btn&&btn.dataset.running==='1'){
+    clearInterval(btn._interval);
+    btn.dataset.running='0';btn.textContent='START';
+    return;
+  }
+  var remaining=totalSecs;
+  if(btn){btn.dataset.running='1';btn.textContent='STOP';}
+  function fmt(s){return s>=60?Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60:'0:'+(s<10?'0':'')+s;}
+  display.textContent=fmt(remaining);
+  var interval=setInterval(function(){
+    remaining--;
+    var d=document.getElementById('wu-timer-'+idx);
+    if(!d){clearInterval(interval);return;}
+    d.textContent=remaining>0?fmt(remaining):'Done!';
+    if(remaining<=0){
+      clearInterval(interval);
+      try{if(navigator.vibrate)navigator.vibrate([200,100,200]);}catch(e){}
+      session.warmupStates[idx]=true;
+      buildSessionNav();
+      renderWarmup();
+      if(isWarmupComplete())setTimeout(function(){renderSessionNav(1);},400);
+    }
+  },1000);
+  if(btn)btn._interval=interval;
+}
+
+// ── CARDIO FINISHER CARD ──
+function isCardioComplete(){
+  var intervals=CARDIO_DATA[session.day]||[];
+  if(!intervals.length)return false;
+  for(var i=0;i<intervals.length;i++){if(!session.cardioStates[i])return false;}
+  return true;
+}
+
+function renderCardio(){
+  try{
+    var intervals=CARDIO_DATA[session.day]||[];
+    var body=document.getElementById('sessionBody');
+    if(!body)return;
+    var rows='';
+    intervals.forEach(function(iv,i){
+      var done=session.cardioStates[i]?true:false;
+      rows+='<div class="wu-row'+(done?' wu-done':'')+'" id="cd-row-'+i+'">'+
+        '<button class="wu-check'+(done?' done':'')+'" onclick="toggleCardioItem('+i+')">✓</button>'+
+        '<div class="wu-content">'+
+          '<div class="wu-name">'+iv.name+'</div>'+
+          '<div class="wu-cue">'+iv.detail+'</div>'+
+        '</div>'+
+        '<div class="wu-right">'+
+          '<div class="wu-duration">'+iv.duration+'</div>'+
+          '<div class="wu-countdown" id="cd-timer-'+i+'"></div>'+
+        '</div>'+
+      '</div>';
+    });
+    var totalExs=session.exercises.length;
+    body.innerHTML='<div class="session-ex-card">'+
+      '<div class="session-ex-header">'+
+        '<div class="session-ex-nav-row">'+
+          '<button class="session-ex-arrow" onclick="renderSessionNav('+totalExs+')">←</button>'+
+          '<div class="session-ex-count">Cardio Finisher</div>'+
+          '<button class="session-ex-arrow disabled" disabled>→</button>'+
+        '</div>'+
+        '<div class="session-ex-name">CARDIO FINISHER</div>'+
+        '<div class="session-ex-prescription">Incline treadmill · Intervals auto-chain</div>'+
+      '</div>'+
+      '<div class="wu-list">'+rows+'</div>'+
+      '<div style="margin-top:12px;">'+
+        '<button class="session-rest-skip" style="font-size:11px;padding:8px 16px;" onclick="startCardioChain(0)">▶ Start All Intervals</button>'+
+      '</div>'+
+    '</div>';
+  }catch(e){console.error('renderCardio error:',e);}
+}
+
+function toggleCardioItem(idx){
+  var wasComplete=session.cardioStates[idx]?true:false;
+  session.cardioStates[idx]=!wasComplete;
+  clearInterval(session.cardioInterval);
+  buildSessionNav();
+  renderCardio();
+  // If marking complete, auto-start next interval's timer
+  if(!wasComplete){
+    var intervals=CARDIO_DATA[session.day]||[];
+    var nextIdx=idx+1;
+    if(nextIdx<intervals.length&&!session.cardioStates[nextIdx]){
+      setTimeout(function(){startCardioChain(nextIdx);},300);
+    }
+  }
+}
+
+function startCardioChain(idx){
+  var intervals=CARDIO_DATA[session.day]||[];
+  if(idx>=intervals.length)return;
+  clearInterval(session.cardioInterval);
+  var iv=intervals[idx];
+  var remaining=iv.secs;
+  function fmt(s){return s>=60?Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60:'0:'+(s<10?'0':'')+s;}
+  // Update display immediately
+  var d=document.getElementById('cd-timer-'+idx);
+  if(d)d.textContent=fmt(remaining);
+  session.cardioInterval=setInterval(function(){
+    remaining--;
+    var el=document.getElementById('cd-timer-'+idx);
+    if(!el){clearInterval(session.cardioInterval);return;}
+    el.textContent=remaining>0?fmt(remaining):'Done!';
+    if(remaining<=0){
+      clearInterval(session.cardioInterval);
+      try{if(navigator.vibrate)navigator.vibrate([200,100,200]);}catch(e){}
+      session.cardioStates[idx]=true;
+      buildSessionNav();renderCardio();
+      // Auto-chain to next interval
+      var nextIdx=idx+1;
+      if(nextIdx<intervals.length){
+        setTimeout(function(){startCardioChain(nextIdx);},800);
+      }
+    }
+  },1000);
+}
+
+// ── EXERCISES ──
 function isExerciseDone(ex){
   for(var s=0;s<ex.sets;s++){var d=loadSet(session.week,session.day,ex.id,s);if(!d.done)return false;}
   return ex.sets>0;
@@ -1718,30 +2102,38 @@ function isExerciseDone(ex){
 
 function renderSessionExercise(idx){
   try{
-    session.currentExIdx=idx;
     var ex=session.exercises[idx];if(!ex)return;
     var week=session.week,day=session.day;
     var prevWeek=Math.max(1,week-1);
-
-    // Update nav pills
-    document.querySelectorAll('.session-ex-pill').forEach(function(p,i){
-      p.classList.toggle('active',i===idx);
-      p.classList.toggle('done',isExerciseDone(session.exercises[i]));
-    });
+    var navIdx=idx+1; // nav index (0=warmup, 1..N=exercises)
 
     var setsHTML='<div class="session-set-cols"><div class="session-col-label">Set</div><div class="session-col-label">Last Wk</div><div class="session-col-label">Weight</div><div class="session-col-label"></div></div>';
     for(var s=0;s<ex.sets;s++){
       var cur=loadSet(week,day,ex.id,s);
       var prev=loadSet(prevWeek,day,ex.id,s);
       var prevDisplay=prev.weight?prev.weight+'lb':'—';
-      setsHTML+='<div class="session-set-row'+(cur.done?' done-row':'')+'" id="srow-'+ex.id+'-'+s+'"><div class="session-set-num">'+(s+1)+'</div><div class="session-prev-val'+(prev.weight?' has-val':'')+'">'+prevDisplay+'</div><input type="number" class="session-weight-input" id="sinp-'+ex.id+'-'+s+'" placeholder="lbs" min="0" step="2.5" value="'+(cur.weight||'')+'" oninput="saveSessionSet(\''+day+'\',\''+ex.id+'\','+s+',this.value,document.getElementById(\'sdone-'+ex.id+'-'+s+'\').classList.contains(\'done\'))"/><button class="session-done-btn'+(cur.done?' done':'')+'" id="sdone-'+ex.id+'-'+s+'" onclick="toggleSessionSet(\''+day+'\',\''+ex.id+'\','+s+','+( ex.rest||60)+','+(s<ex.sets-1)+')">✓</button></div>';
+      setsHTML+='<div class="session-set-row'+(cur.done?' done-row':'')+'" id="srow-'+ex.id+'-'+s+'">'+
+        '<div class="session-set-num">'+(s+1)+'</div>'+
+        '<div class="session-prev-val'+(prev.weight?' has-val':'')+'">'+prevDisplay+'</div>'+
+        '<input type="number" class="session-weight-input" id="sinp-'+ex.id+'-'+s+'" placeholder="lbs" min="0" step="2.5" value="'+(cur.weight||'')+'" oninput="saveSessionSet(\''+day+'\',\''+ex.id+'\','+s+',this.value,document.getElementById(\'sdone-'+ex.id+'-'+s+'\').classList.contains(\'done\'))"/>'+
+        '<button class="session-done-btn'+(cur.done?' done':'')+'" id="sdone-'+ex.id+'-'+s+'" onclick="toggleSessionSet(\''+day+'\',\''+ex.id+'\','+s+','+(ex.rest||60)+','+(s<ex.sets-1)+')">✓</button>'+
+      '</div>';
     }
 
-    var nextEx=session.exercises[idx+1];
-    var nextHTML=nextEx?'<div class="session-next-preview"><div class="session-next-label">Up next</div><div class="session-next-name">'+nextEx.label+' · '+(EX_PRESCRIPTIONS[nextEx.id]||'')+'</div></div>':'<div class="session-next-preview"><div class="session-next-label">Last exercise</div><div class="session-next-name" style="color:var(--accent)">Almost done! 💪</div></div>';
+    var isFirst=navIdx===1; // first exercise (warmup is before)
+    var isLast=navIdx===session.exercises.length; // last exercise (cardio is after)
+    var prevNav=navIdx-1; var nextNav=navIdx+1;
+    var nextLabel='';
+    if(!isLast){nextLabel=session.exercises[idx+1].label;}
+    var nextHTML=!isLast?
+      '<div class="session-next-preview"><div class="session-next-label">Up next</div><div class="session-next-name">'+session.exercises[idx+1].label+' · '+(EX_PRESCRIPTIONS[session.exercises[idx+1].id]||'')+'</div></div>':
+      '<div class="session-next-preview"><div class="session-next-label">Up next</div><div class="session-next-name" style="color:var(--accent3)">🚶 Cardio Finisher</div></div>';
 
-    var isFirst=idx===0,isLast=idx===session.exercises.length-1;
-    var navRow='<div class="session-ex-nav-row"><button class="session-ex-arrow'+(isFirst?' disabled':'')+'"'+(isFirst?' disabled':' onclick="renderSessionExercise('+(idx-1)+')"')+'>←</button><div class="session-ex-count">Exercise '+(idx+1)+' of '+session.exercises.length+'</div><button class="session-ex-arrow'+(isLast?' disabled':'')+'"'+(isLast?' disabled':' onclick="renderSessionExercise('+(idx+1)+')"')+'>→</button></div>';
+    var navRow='<div class="session-ex-nav-row">'+
+      '<button class="session-ex-arrow" onclick="renderSessionNav('+prevNav+')">←</button>'+
+      '<div class="session-ex-count">Exercise '+(idx+1)+' of '+session.exercises.length+'</div>'+
+      '<button class="session-ex-arrow" onclick="renderSessionNav('+nextNav+')">→</button>'+
+    '</div>';
 
     var body=document.getElementById('sessionBody');
     if(body)body.innerHTML='<div class="session-ex-card"><div class="session-ex-header">'+navRow+'<div class="session-ex-name">'+ex.label+'</div><div class="session-ex-prescription">'+(EX_PRESCRIPTIONS[ex.id]||'')+' · Rest '+(ex.rest||60)+'s</div></div>'+setsHTML+'</div><div id="sessionRestZone"></div>'+nextHTML;
@@ -1764,7 +2156,9 @@ function toggleSessionSet(day,exId,setIdx,restSecs,hasNextSet){
   saveSet(session.week,day,exId,setIdx,inp?inp.value:'',done);
   updateSessionVolume();
   buildSessionNav();
-  document.querySelectorAll('.session-ex-pill')[session.currentExIdx].classList.add('active');
+  // Re-highlight correct pill
+  var pills=document.querySelectorAll('.session-ex-pill');
+  if(pills[session.currentExIdx])pills[session.currentExIdx].classList.add('active');
   if(done&&hasNextSet)startSessionRest(restSecs);
 }
 
@@ -1809,7 +2203,7 @@ function updateSessionVolume(){
 }
 
 function endSession(){
-  clearInterval(session.elapsedInterval);clearInterval(session.restInterval);
+  clearInterval(session.elapsedInterval);clearInterval(session.restInterval);clearInterval(session.cardioInterval);
   var secs=Math.floor((Date.now()-session.startTime)/1000);
   var duration=Math.floor(secs/60)+':'+(secs%60<10?'0':'')+secs%60;
   var totalVol=0,setsDone=0,newPRs=[];
@@ -1834,7 +2228,7 @@ function endSession(){
 }
 
 function closeSession(){
-  clearInterval(session.elapsedInterval);clearInterval(session.restInterval);
+  clearInterval(session.elapsedInterval);clearInterval(session.restInterval);clearInterval(session.cardioInterval);
   var modal=document.getElementById('sessionModal');if(modal)modal.classList.remove('open');
   document.body.style.overflow='';
   var nav=document.getElementById('sessionExNav');if(nav)nav.style.display='';
