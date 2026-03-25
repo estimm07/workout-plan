@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>8-Week Home Training Plan</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
     --bg: #0d0d0f; --bg2: #141417; --bg3: #1c1c21;
@@ -244,6 +245,72 @@
     .exercise-table th:nth-child(3), .exercise-table td:nth-child(3) { display: none; }
     .set-bubble { min-width: 100px; }
   }
+
+  /* ── PROGRESS TAB ── */
+  .prog-subtabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .prog-subtab {
+    font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px;
+    padding: 8px 18px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg3); color: var(--muted); cursor: pointer; transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .prog-subtab:hover { border-color: var(--accent); color: var(--accent); }
+  .prog-subtab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+
+  .prog-tab { display: none; }
+  .prog-tab.active { display: block; }
+
+  .prog-range-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
+  .range-btn {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
+    padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg3); color: var(--muted); cursor: pointer; transition: all 0.15s;
+  }
+  .range-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(232,255,71,0.06); }
+
+  .prog-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 16px;
+  }
+  .prog-card-label {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .prog-big-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--text); line-height: 1; margin-bottom: 4px;
+  }
+  .prog-big-num span { font-size: 18px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+  .prog-delta { font-size: 13px; color: var(--accent); margin-bottom: 16px; }
+  .prog-delta.down { color: var(--accent2); }
+  .prog-delta.neutral { color: var(--muted); }
+
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* PR CARDS */
+  .pr-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 8px;
+  }
+  .pr-card.new-pr { border-color: rgba(232,255,71,0.4); background: rgba(232,255,71,0.04); }
+  .pr-ex-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+  .pr-ex-day { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: 0.5px; }
+  .pr-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); line-height: 1; text-align: right; }
+  .pr-val span { font-size: 12px; color: var(--muted); font-family: 'DM Sans', sans-serif; display: block; }
+  .pr-new-badge {
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px;
+    padding: 3px 7px; border-radius: 4px; background: var(--accent); color: var(--bg);
+    font-weight: 700; flex-shrink: 0;
+  }
+
+  /* MUSCLE BARS */
+  .muscle-row { margin-bottom: 12px; }
+  .muscle-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .muscle-name { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text); letter-spacing: 0.5px; }
+  .muscle-pct { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .muscle-track { height: 8px; background: #1e1e24; border-radius: 4px; overflow: hidden; }
+  .muscle-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
 </style>
 </head>
 <body>
@@ -267,7 +334,7 @@
   <button class="nav-btn" onclick="showSection('progression',this)">Progression</button>
   <button class="nav-btn" onclick="showSection('checklist',this)">Pre-Session</button>
   <button class="nav-btn" onclick="showSection('safety',this)">Safety</button>
-  <button class="nav-btn" onclick="showSection('loghistory',this)">Log History</button>
+  <button class="nav-btn" onclick="showSection('progress',this)">Progress</button>
 </nav>
 
 <div class="main">
@@ -816,27 +883,81 @@
   </div>
 </div>
 
-<!-- ===== LOG HISTORY ===== -->
-<div id="loghistory" class="section">
-  <div class="section-title">Workout Log History</div>
-  <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">All logged sets are saved to your browser and persist between sessions. Filter by week or day, or view everything at once.</p>
-  <div class="log-controls">
-    <select class="log-filter" id="logWeekFilter" onchange="renderLogHistory()">
-      <option value="">All Weeks</option>
-      <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option>
-      <option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option>
-      <option value="7">Week 7</option><option value="8">Week 8</option>
-    </select>
-    <select class="log-filter" id="logDayFilter" onchange="renderLogHistory()">
-      <option value="">All Days</option>
-      <option value="d1">Mon · Upper A</option>
-      <option value="d2">Tue · Lower A</option>
-      <option value="d4">Thu · Upper B</option>
-      <option value="d5">Fri · Lower B</option>
-    </select>
-    <button class="log-clear-btn" onclick="clearAllLogs()">🗑 Clear All Logs</button>
+
+<!-- ===== PROGRESS ===== -->
+<div id="progress" class="section">
+  <div class="section-title">Progress</div>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Built from your logged workout data. The more you log, the richer this gets.</p>
+
+  <!-- PROGRESS SUB-TABS -->
+  <div class="prog-subtabs">
+    <button class="prog-subtab active" onclick="showProgTab('volume',this)">Volume</button>
+    <button class="prog-subtab" onclick="showProgTab('prs',this)">PRs</button>
+    <button class="prog-subtab" onclick="showProgTab('muscles',this)">Muscles</button>
+    <button class="prog-subtab" onclick="showProgTab('rawlog',this)">Log</button>
   </div>
-  <div id="logHistoryContainer"></div>
+
+  <!-- VOLUME TAB -->
+  <div id="prog-volume" class="prog-tab active">
+    <div class="prog-range-toggle">
+      <button class="range-btn active" onclick="setRange(4,this)">Last 4 Weeks</button>
+      <button class="range-btn" onclick="setRange(8,this)">All 8 Weeks</button>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-label">Weekly Volume</div>
+      <div id="vol-total" class="prog-big-num">— <span>lbs</span></div>
+      <div id="vol-delta" class="prog-delta">Log workouts to see your trend</div>
+      <div class="chart-wrap">
+        <canvas id="volBarChart" height="120"></canvas>
+      </div>
+    </div>
+    <div class="prog-card" style="margin-top:12px;">
+      <div class="prog-card-label">Volume Trend</div>
+      <div class="chart-wrap">
+        <canvas id="volLineChart" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRs TAB -->
+  <div id="prog-prs" class="prog-tab">
+    <div id="prsContainer">
+      <div class="log-empty"><div class="log-empty-icon">🏆</div><div>No sets logged yet.<br>Complete some workouts and your PRs will appear here.</div></div>
+    </div>
+  </div>
+
+  <!-- MUSCLES TAB -->
+  <div id="prog-muscles" class="prog-tab">
+    <div class="prog-range-toggle">
+      <button class="range-btn active" onclick="setMuscleRange('week',this)">This Week</button>
+      <button class="range-btn" onclick="setMuscleRange('all',this)">All Time</button>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-label">Volume by Muscle Group</div>
+      <div id="muscleContainer"><div style="color:var(--muted);font-size:13px;padding:12px 0;">Log workouts to see your muscle breakdown.</div></div>
+    </div>
+  </div>
+
+  <!-- RAW LOG TAB -->
+  <div id="prog-rawlog" class="prog-tab">
+    <div class="log-controls">
+      <select class="log-filter" id="logWeekFilter" onchange="renderLogHistory()">
+        <option value="">All Weeks</option>
+        <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option>
+        <option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option>
+        <option value="7">Week 7</option><option value="8">Week 8</option>
+      </select>
+      <select class="log-filter" id="logDayFilter" onchange="renderLogHistory()">
+        <option value="">All Days</option>
+        <option value="d1">Mon · Upper A</option>
+        <option value="d2">Tue · Lower A</option>
+        <option value="d4">Thu · Upper B</option>
+        <option value="d5">Fri · Lower B</option>
+      </select>
+      <button class="log-clear-btn" onclick="clearAllLogs()">🗑 Clear All</button>
+    </div>
+    <div id="logHistoryContainer"></div>
+  </div>
 </div>
 
 </div><!-- /main -->
@@ -1077,8 +1198,274 @@ function onWeekChange() {
 }
 
 // ══════════════════════════════════════════════
-//  LOG HISTORY
+//  PROGRESS ENGINE
 // ══════════════════════════════════════════════
+
+// Muscle group mapping for each exercise
+const MUSCLE_MAP = {
+  'bench-press':    'Chest',
+  'incline-press':  'Chest',
+  'pullups':        'Back',
+  'bent-row':       'Back',
+  'chest-row':      'Back',
+  'chinups':        'Back',
+  'face-pull':      'Back',
+  'db-curl':        'Arms',
+  'shoulder-press': 'Shoulders',
+  'lat-raise':      'Shoulders',
+  'skull-crusher':  'Arms',
+  'oh-tricep':      'Arms',
+  'hip-thrust':     'Glutes',
+  'goblet-squat':   'Quads',
+  'rdl':            'Hamstrings',
+  'rev-lunge':      'Quads',
+  'calf-raise':     'Quads',
+  'sl-hip-thrust':  'Glutes',
+  'bss':            'Quads',
+  'nordic':         'Hamstrings',
+  'clamshell':      'Glutes',
+  'dead-bug':       'Core',
+  'plank':          'Core',
+};
+
+const MUSCLE_COLORS = {
+  'Chest':      '#e8ff47',
+  'Back':       '#4ecdc4',
+  'Shoulders':  '#ff6b35',
+  'Arms':       '#a78bfa',
+  'Glutes':     '#f472b6',
+  'Quads':      '#34d399',
+  'Hamstrings': '#fb923c',
+  'Core':       '#60a5fa',
+};
+
+// BW-only exercises (track reps not weight)
+const BW_EXERCISES = new Set(['pullups','chinups','nordic']);
+
+let volRange = 4;
+let muscleRange = 'week';
+let volBarChartInst = null;
+let volLineChartInst = null;
+
+// ── Data helpers ──
+function getWeekVolume(week) {
+  let total = 0;
+  ['d1','d2','d4','d5'].forEach(day => {
+    (EXERCISES[day]||[]).forEach(ex => {
+      for (let s=0; s<ex.sets+2; s++) {
+        const d = loadSet(week, day, ex.id, s);
+        if (d.done && d.weight && !BW_EXERCISES.has(ex.id)) {
+          total += parseFloat(d.weight) || 0;
+        }
+      }
+    });
+  });
+  return total;
+}
+
+function getAllPRs() {
+  // Returns {exId: {label, day, weight, reps, week, isNew}}
+  const prs = {};
+  const currentWeek = getActiveWeek();
+
+  Object.keys(EXERCISES).forEach(day => {
+    EXERCISES[day].forEach(ex => {
+      for (let w = 1; w <= 8; w++) {
+        for (let s = 0; s < ex.sets + 2; s++) {
+          const d = loadSet(w, day, ex.id, s);
+          if (!d.done) continue;
+          const isBW = BW_EXERCISES.has(ex.id);
+          const val = isBW ? (parseFloat(d.reps)||0) : (parseFloat(d.weight)||0);
+          if (!val) continue;
+
+          if (!prs[ex.id] || val > prs[ex.id].val) {
+            prs[ex.id] = {
+              label: ex.label,
+              day: DAY_LABELS[day]||day,
+              val,
+              isBW,
+              week: w,
+              isNew: w === currentWeek
+            };
+          }
+        }
+      }
+    });
+  });
+  return prs;
+}
+
+function getMuscleVolume(rangeMode) {
+  const muscles = {};
+  const currentWeek = getActiveWeek();
+
+  Object.keys(EXERCISES).forEach(day => {
+    EXERCISES[day].forEach(ex => {
+      const muscle = MUSCLE_MAP[ex.id] || 'Other';
+      const weeks = rangeMode === 'week' ? [currentWeek] : Array.from({length:8},(_,i)=>i+1);
+      weeks.forEach(w => {
+        for (let s = 0; s < ex.sets + 2; s++) {
+          const d = loadSet(w, day, ex.id, s);
+          if (d.done) {
+            muscles[muscle] = (muscles[muscle]||0) + 1;
+          }
+        }
+      });
+    });
+  });
+  return muscles;
+}
+
+// ── Render Volume ──
+function renderVolume() {
+  const labels = [];
+  const data = [];
+  const startWeek = Math.max(1, 9 - volRange);
+
+  for (let w = startWeek; w <= 8; w++) {
+    labels.push(`Wk ${w}`);
+    data.push(getWeekVolume(w));
+  }
+
+  const hasData = data.some(v => v > 0);
+  const currentVol = data[data.length-1] || 0;
+  const prevVol = data[data.length-2] || 0;
+  const delta = currentVol - prevVol;
+
+  document.getElementById('vol-total').innerHTML = hasData
+    ? `${currentVol.toLocaleString()} <span>lbs this week</span>`
+    : `— <span>lbs</span>`;
+
+  const deltaEl = document.getElementById('vol-delta');
+  if (!hasData) {
+    deltaEl.textContent = 'Log workouts to see your trend';
+    deltaEl.className = 'prog-delta neutral';
+  } else if (delta > 0) {
+    deltaEl.textContent = `↑ +${delta.toLocaleString()} lbs vs last week`;
+    deltaEl.className = 'prog-delta';
+  } else if (delta < 0) {
+    deltaEl.textContent = `↓ ${delta.toLocaleString()} lbs vs last week`;
+    deltaEl.className = 'prog-delta down';
+  } else {
+    deltaEl.textContent = `→ Same volume as last week`;
+    deltaEl.className = 'prog-delta neutral';
+  }
+
+  const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#1c1c21',
+      titleColor: '#e8ff47',
+      bodyColor: '#888',
+      borderColor: '#2a2a30',
+      borderWidth: 1,
+      callbacks: { label: ctx => ` ${ctx.parsed.y.toLocaleString()} lbs` }
+    }},
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#666', font: { family: 'DM Mono', size: 10 } } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#666', font: { family: 'DM Mono', size: 10 }, callback: v => v > 0 ? `${(v/1000).toFixed(0)}k` : '0' }, beginAtZero: true }
+    }
+  };
+
+  // Bar chart
+  if (volBarChartInst) volBarChartInst.destroy();
+  const barCtx = document.getElementById('volBarChart').getContext('2d');
+  volBarChartInst = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: data.map((v,i) => i === data.length-1 ? '#e8ff47' : 'rgba(232,255,71,0.25)'),
+        borderRadius: 5,
+        borderSkipped: false,
+      }]
+    },
+    options: { ...chartDefaults }
+  });
+
+  // Line chart
+  if (volLineChartInst) volLineChartInst.destroy();
+  const lineCtx = document.getElementById('volLineChart').getContext('2d');
+  volLineChartInst = new Chart(lineCtx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderColor: '#e8ff47',
+        backgroundColor: 'rgba(232,255,71,0.07)',
+        borderWidth: 2,
+        pointBackgroundColor: '#e8ff47',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true,
+        tension: 0.35,
+      }]
+    },
+    options: { ...chartDefaults }
+  });
+}
+
+// ── Render PRs ──
+function renderPRs() {
+  const prs = getAllPRs();
+  const container = document.getElementById('prsContainer');
+  const entries = Object.values(prs);
+
+  if (!entries.length) {
+    container.innerHTML = `<div class="log-empty"><div class="log-empty-icon">🏆</div><div>No sets logged yet.<br>Complete some workouts and your PRs will appear here.</div></div>`;
+    return;
+  }
+
+  // Sort: new PRs first, then by value desc
+  entries.sort((a,b) => (b.isNew - a.isNew) || (b.val - a.val));
+
+  container.innerHTML = entries.map(pr => `
+    <div class="pr-card ${pr.isNew ? 'new-pr' : ''}">
+      <div style="flex:1;">
+        <div class="pr-ex-name">${pr.label}</div>
+        <div class="pr-ex-day">${pr.day} · Week ${pr.week}</div>
+      </div>
+      <div class="pr-val">
+        ${pr.val}
+        <span>${pr.isBW ? 'reps' : 'lbs'}</span>
+      </div>
+      ${pr.isNew ? '<div class="pr-new-badge">NEW PR</div>' : ''}
+    </div>
+  `).join('');
+}
+
+// ── Render Muscles ──
+function renderMuscles() {
+  const muscles = getMuscleVolume(muscleRange);
+  const container = document.getElementById('muscleContainer');
+  const entries = Object.entries(muscles).sort((a,b) => b[1]-a[1]);
+  const max = entries[0]?.[1] || 1;
+
+  if (!entries.length) {
+    container.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px 0;">Log workouts to see your muscle breakdown.</div>`;
+    return;
+  }
+
+  container.innerHTML = entries.map(([name, count]) => {
+    const pct = Math.round((count/max)*100);
+    const color = MUSCLE_COLORS[name] || '#888';
+    return `
+      <div class="muscle-row">
+        <div class="muscle-header">
+          <span class="muscle-name">${name}</span>
+          <span class="muscle-pct">${count} set${count!==1?'s':''}</span>
+        </div>
+        <div class="muscle-track">
+          <div class="muscle-fill" style="width:${pct}%;background:${color};"></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Render Raw Log ──
 function renderLogHistory() {
   const container=document.getElementById('logHistoryContainer');
   const wf=document.getElementById('logWeekFilter').value;
@@ -1148,6 +1535,36 @@ function clearAllLogs() {
   allLogKeys().forEach(k=>localStorage.removeItem(k));
   renderLogHistory();
   buildTrackers();
+  renderProgress();
+}
+
+// ── Tab switching ──
+function showProgTab(id, btn) {
+  document.querySelectorAll('.prog-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.prog-subtab').forEach(b => b.classList.remove('active'));
+  document.getElementById('prog-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'rawlog') renderLogHistory();
+}
+
+function setRange(weeks, btn) {
+  volRange = weeks;
+  document.querySelectorAll('.prog-range-toggle .range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderVolume();
+}
+
+function setMuscleRange(mode, btn) {
+  muscleRange = mode;
+  btn.closest('.prog-range-toggle').querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMuscles();
+}
+
+function renderProgress() {
+  renderVolume();
+  renderPRs();
+  renderMuscles();
 }
 
 // ══════════════════════════════════════════════
@@ -1172,7 +1589,7 @@ function showSection(id,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(btn)btn.classList.add('active');
-  if(id==='loghistory')renderLogHistory();
+  if(id==='progress') renderProgress();
 }
 function showDay(id,btn){
   document.querySelectorAll('.day-panel').forEach(d=>d.classList.remove('active'));
@@ -1193,6 +1610,7 @@ function resetChecklist(){document.querySelectorAll('.check-item').forEach(i=>i.
 //  INIT
 // ══════════════════════════════════════════════
 buildTrackers();
+
 </script>
 </body>
 </html>
