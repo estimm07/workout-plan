@@ -1814,20 +1814,26 @@ function renderProgress() {
 const phases=[{weeks:[1,2,3],label:'Foundation',cls:'p1'},{weeks:[4,5,6],label:'Hypertrophy',cls:'p2'},{weeks:[7,8],label:'Intensification',cls:'p3'}];
 const dayPlans=['Upper A','Lower A','<span class="rest-badge">Rest / Active</span>','Upper B','Lower B','<span class="rest-badge">Optional</span>','<span class="rest-badge">Full Rest</span>'];
 
-document.addEventListener('DOMContentLoaded', () => {
-  const tbody=document.getElementById('scheduleBody');
+function initApp() {
+  const tbody = document.getElementById('scheduleBody');
   if (tbody) {
-    for(let w=1;w<=8;w++){
-      const ph=phases.find(p=>p.weeks.includes(w));
-      const tr=document.createElement('tr');
-      let h=`<td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">WK ${w}</td><td><span class="phase-badge ${ph.cls}">${ph.label}</span></td>`;
-      dayPlans.forEach(d=>{h+=`<td style="font-size:12px;">${d}</td>`;});
-      tr.innerHTML=h; tbody.appendChild(tr);
+    for (let w = 1; w <= 8; w++) {
+      const ph = phases.find(p => p.weeks.includes(w));
+      const tr = document.createElement('tr');
+      let h = `<td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">WK ${w}</td><td><span class="phase-badge ${ph.cls}">${ph.label}</span></td>`;
+      dayPlans.forEach(d => { h += `<td style="font-size:12px;">${d}</td>`; });
+      tr.innerHTML = h;
+      tbody.appendChild(tr);
     }
   }
-  document.querySelectorAll('.block-body').forEach(b=>{if(b.style.display!=='block')b.style.display='none';});
+  document.querySelectorAll('.block-body').forEach(b => {
+    if (b.style.display !== 'block') b.style.display = 'none';
+  });
   buildTrackers();
-});
+}
+
+// Script is at bottom of <body> so DOM is ready — call directly
+initApp();
 
 // ══════════════════════════════════════════════
 //  NAV, TABS, BLOCKS
