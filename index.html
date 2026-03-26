@@ -605,18 +605,18 @@
   <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Select your current week above. Enter weight used per set and tap <strong style="color:var(--accent)">✓</strong> to mark it complete — all data is <strong style="color:var(--text)">auto-saved</strong> to your browser. Or tap <strong style="color:var(--accent)">Start Workout</strong> for the focused session mode.</p>
 
   <div class="week-tabs">
-    <button class="week-tab active" onclick="showDay('d1',this)">Mon · Upper A</button>
-    <button class="week-tab" onclick="showDay('d2',this)">Tue · Lower A</button>
-    <button class="week-tab" onclick="showDay('d3',this)">Wed · Rest</button>
-    <button class="week-tab" onclick="showDay('d4',this)">Thu · Upper B</button>
-    <button class="week-tab" onclick="showDay('d5',this)">Fri · Lower B</button>
-    <button class="week-tab" onclick="showDay('d6',this)">Sat · Optional</button>
-    <button class="week-tab" onclick="showDay('d7',this)">Sun · Rest</button>
+    <button class="week-tab active" onclick="showDay('d1',this)">Day 1 · Upper A</button>
+    <button class="week-tab" onclick="showDay('d2',this)">Day 2 · Lower A</button>
+    <button class="week-tab" onclick="showDay('d3',this)">Day 3 · Rest</button>
+    <button class="week-tab" onclick="showDay('d4',this)">Day 4 · Upper B</button>
+    <button class="week-tab" onclick="showDay('d5',this)">Day 5 · Lower B</button>
+    <button class="week-tab" onclick="showDay('d6',this)">Day 6 · Optional</button>
+    <button class="week-tab" onclick="showDay('d7',this)">Day 7 · Rest</button>
   </div>
 
   <!-- DAY 1 -->
   <div id="d1" class="day-panel active">
-    <button class="start-session-btn" onclick="startSession('d1')">▶ &nbsp;START WORKOUT — UPPER A</button>
+    <button class="start-session-btn" onclick="startSession('d1')">▶ &nbsp;START WORKOUT — DAY 1 · UPPER A</button>
 
     <!-- PRE-WORKOUT RECOVERY -->
     <div class="workout-block">
@@ -713,7 +713,7 @@
 
   <!-- DAY 2 -->
   <div id="d2" class="day-panel">
-    <button class="start-session-btn" onclick="startSession('d2')">▶ &nbsp;START WORKOUT — LOWER A</button>
+    <button class="start-session-btn" onclick="startSession('d2')">▶ &nbsp;START WORKOUT — DAY 2 · LOWER A</button>
 
     <!-- PRE-WORKOUT RECOVERY -->
     <div class="workout-block">
@@ -821,7 +821,7 @@
 
   <!-- DAY 4 -->
   <div id="d4" class="day-panel">
-    <button class="start-session-btn" onclick="startSession('d4')">▶ &nbsp;START WORKOUT — UPPER B</button>
+    <button class="start-session-btn" onclick="startSession('d4')">▶ &nbsp;START WORKOUT — DAY 4 · UPPER B</button>
 
     <!-- PRE-WORKOUT RECOVERY -->
     <div class="workout-block">
@@ -910,7 +910,7 @@
 
   <!-- DAY 5 -->
   <div id="d5" class="day-panel">
-    <button class="start-session-btn" onclick="startSession('d5')">▶ &nbsp;START WORKOUT — LOWER B</button>
+    <button class="start-session-btn" onclick="startSession('d5')">▶ &nbsp;START WORKOUT — DAY 5 · LOWER B</button>
 
     <!-- PRE-WORKOUT RECOVERY -->
     <div class="workout-block">
@@ -1167,10 +1167,10 @@
       </select>
       <select class="log-filter" id="logDayFilter" onchange="renderLogHistory()">
         <option value="">All Days</option>
-        <option value="d1">Mon · Upper A</option>
-        <option value="d2">Tue · Lower A</option>
-        <option value="d4">Thu · Upper B</option>
-        <option value="d5">Fri · Lower B</option>
+        <option value="d1">Day 1 · Upper A</option>
+        <option value="d2">Day 2 · Lower A</option>
+        <option value="d4">Day 4 · Upper B</option>
+        <option value="d5">Day 5 · Lower B</option>
       </select>
       <button class="log-select-btn" onclick="enterLogSelectMode()">Select</button>
     </div>
@@ -1222,7 +1222,7 @@
 
   <!-- TOP BAR -->
   <div class="session-topbar">
-    <div class="session-day-name" id="sessionDayName">UPPER A</div>
+    <div class="session-day-name" id="sessionDayName">DAY 1 · UPPER A</div>
     <div class="session-meta">
       <div class="session-elapsed" id="sessionElapsed">0:00</div>
       <div class="session-volume" id="sessionVol">0 lbs</div>
@@ -1278,7 +1278,7 @@ const EXERCISES = {
 
 const PHASE_MAP = {1:'Foundation',2:'Foundation',3:'Foundation',4:'Hypertrophy',5:'Hypertrophy',6:'Hypertrophy',7:'Intensification',8:'Intensification'};
 const PHASE_CLS = {Foundation:'p1',Hypertrophy:'p2',Intensification:'p3'};
-const DAY_LABELS = {d1:'Mon · Upper A',d2:'Tue · Lower A',d4:'Thu · Upper B',d5:'Fri · Lower B'};
+const DAY_LABELS = {d1:'Day 1 · Upper A',d2:'Day 2 · Lower A',d4:'Day 4 · Upper B',d5:'Day 5 · Lower B'};
 const BW_EXERCISES = new Set(['pullups','chinups','nordic']);
 
 // ═══════════════════════════════════════════════════════
@@ -1798,7 +1798,7 @@ function loadAndRenderProgress(){
 // ═══════════════════════════════════════════════════════
 //  SESSION MODE
 // ═══════════════════════════════════════════════════════
-var DAY_TITLES={d1:'UPPER A',d2:'LOWER A',d4:'UPPER B',d5:'LOWER B'};
+var DAY_TITLES={d1:'DAY 1 · UPPER A',d2:'DAY 2 · LOWER A',d4:'DAY 4 · UPPER B',d5:'DAY 5 · LOWER B'};
 var EX_PRESCRIPTIONS={'bench-press':'3 × 10–12 · Tempo 3-1-1','pullups':'3 × 6–8 · Tempo 2-1-2','incline-press':'3 × 10–12 · Tempo 3-1-1','bent-row':'3 × 10–12 · Tempo 2-1-2','db-curl':'3 × 10/side · Tempo 2-1-2','chest-row':'3 × 12 · Tempo 2-1-2','hip-thrust':'3 × 10–12 · Tempo 2-2-1','goblet-squat':'3 × 12 · Tempo 3-1-1','rdl':'3 × 12 · Tempo 3-1-1','rev-lunge':'3 × 10/side · Tempo 2-1-2','calf-raise':'3 × 15 · Tempo 2-1-2','shoulder-press':'3 × 10–12 · Tempo 3-1-1','chinups':'3 × 6–8 · Tempo 2-1-2','lat-raise':'3 × 12–15 · Tempo 2-1-3','skull-crusher':'3 × 10–12 · Tempo 3-1-1','face-pull':'3 × 15 · Tempo 2-1-2','oh-tricep':'3 × 12 · Tempo 3-1-1','sl-hip-thrust':'3 × 10/side · Tempo 2-2-1','bss':'3 × 8–10/side · Tempo 3-1-1','nordic':'3 × 5–6 · Tempo 4-0-1','clamshell':'3 × 15/side · Tempo 2-1-2','dead-bug':'3 × 8/side · Tempo 3-1-1','plank':'3 × 30–45 sec'};
 
 // Warm-up activities per day: {name, cue, duration, secs (null = reps only)}
@@ -2041,9 +2041,12 @@ function renderCardio(){
         '<div class="session-ex-name">CARDIO FINISHER</div>'+
         '<div class="session-ex-prescription">Incline treadmill · Intervals auto-chain</div>'+
       '</div>'+
+      '<div style="padding:12px 0 4px;">'+
+        '<button class="session-rest-skip" style="font-size:11px;padding:8px 16px;" onclick="startCardioChain(0)">▶ Start Cardio</button>'+
+      '</div>'+
       '<div class="wu-list">'+rows+'</div>'+
-      '<div style="margin-top:12px;">'+
-        '<button class="session-rest-skip" style="font-size:11px;padding:8px 16px;" onclick="startCardioChain(0)">▶ Start All Intervals</button>'+
+      '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">'+
+        '<button class="session-end-btn" style="width:100%;justify-content:center;font-size:13px;padding:12px;" onclick="endSession()">Finish Workout</button>'+
       '</div>'+
     '</div>';
   }catch(e){console.error('renderCardio error:',e);}
