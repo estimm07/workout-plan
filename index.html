@@ -332,19 +332,52 @@
   .session-ex-arrow:hover:not(.disabled) { background: rgba(232,255,71,0.18); }
   .session-ex-arrow.disabled { color: #333; border-color: #222; background: transparent; cursor: default; }
   .session-ex-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; flex: 1; text-align: center; }
-  .session-ex-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text); line-height: 1; margin-bottom: 2px; }
+  .session-ex-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+  .session-ex-info-btn {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    border: 1px solid var(--border); background: var(--bg3);
+    color: var(--muted); font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-family: 'DM Mono', monospace;
+  }
+  .session-ex-info-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+
+  /* INFO MODAL */
+  .info-modal-overlay {
+    position: fixed; inset: 0; z-index: 1100;
+    background: rgba(0,0,0,0.6);
+    display: flex; align-items: flex-end;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .info-modal-overlay.open { opacity: 1; pointer-events: all; }
+  .info-modal {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    border-radius: 18px 18px 0 0; padding: 20px 20px 36px;
+    width: 100%; max-height: 75vh; overflow-y: auto;
+    transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+  }
+  .info-modal-overlay.open .info-modal { transform: translateY(0); }
+  .info-modal-handle { width: 36px; height: 4px; background: #333; border-radius: 2px; margin: 0 auto 16px; }
+  .info-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--text); margin-bottom: 4px; }
+  .info-modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+  .info-section { margin-top: 14px; }
+  .info-section-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+  .info-section-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .info-section-body li { margin-bottom: 4px; padding-left: 12px; position: relative; }
+  .info-section-body li::before { content: '·'; position: absolute; left: 0; color: var(--accent); }
+  .info-back-flag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); margin-top: 8px; }
   .session-ex-prescription { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent2); letter-spacing: 1px; }
 
   .session-set-cols {
-    display: grid; grid-template-columns: 32px 70px 1fr 36px;
-    gap: 6px; margin-bottom: 6px; padding-bottom: 6px;
+    display: grid; grid-template-columns: 28px 56px 1fr 1fr 36px;
+    gap: 5px; margin-bottom: 6px; padding-bottom: 6px;
     border-bottom: 1px solid var(--border);
   }
   .session-col-label { font-family: 'DM Mono', monospace; font-size: 9px; color: #555; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
 
   .session-set-row {
-    display: grid; grid-template-columns: 32px 70px 1fr 36px;
-    gap: 6px; align-items: center; padding: 8px 0;
+    display: grid; grid-template-columns: 28px 56px 1fr 1fr 36px;
+    gap: 5px; align-items: center; padding: 8px 0;
     border-bottom: 1px solid rgba(255,255,255,0.03);
     transition: background 0.15s;
   }
@@ -393,11 +426,11 @@
   .session-rest-skip:hover { border-color: var(--accent3); color: var(--accent3); }
 
   .session-next-preview {
-    background: var(--bg3); border: 1px solid var(--border);
+    background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.4);
     border-radius: 10px; padding: 12px 14px;
   }
-  .session-next-label { font-family: 'DM Mono', monospace; font-size: 9px; color: #555; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
-  .session-next-name { font-size: 13px; color: var(--muted); }
+  .session-next-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .session-next-name { font-size: 13px; color: var(--text); }
 
   /* START WORKOUT BUTTON */
   .start-session-btn {
@@ -1247,6 +1280,18 @@
   <div class="session-body" id="sessionBody"></div>
 </div>
 
+<!-- ===== EXERCISE INFO MODAL ===== -->
+<div class="info-modal-overlay" id="exInfoOverlay" onclick="closeExInfo(event)">
+  <div class="info-modal" id="exInfoModal">
+    <div class="info-modal-handle"></div>
+    <div style="position:relative;">
+      <div class="info-modal-title" id="exInfoTitle"></div>
+      <button class="info-modal-close" onclick="closeExInfo()">✕</button>
+    </div>
+    <div id="exInfoBody"></div>
+  </div>
+</div>
+
 
 <script>
 // ═══════════════════════════════════════════════════════
@@ -1295,8 +1340,9 @@ const BW_EXERCISES = new Set(['pullups','chinups','nordic']);
 //  STORAGE
 // ═══════════════════════════════════════════════════════
 function sKey(w,day,ex,s){return 'wlog:w'+w+':'+day+':'+ex+':s'+s;}
-function saveSet(w,day,ex,s,weight,done){try{localStorage.setItem(sKey(w,day,ex,s),JSON.stringify({weight:weight,done:done,ts:Date.now()}));}catch(e){}}
-function loadSet(w,day,ex,s){try{var r=localStorage.getItem(sKey(w,day,ex,s));return r?JSON.parse(r):{weight:'',done:false};}catch(e){return{weight:'',done:false};}}
+function saveSet(w,day,ex,s,weight,done,reps){try{localStorage.setItem(sKey(w,day,ex,s),JSON.stringify({weight:weight,done:done,reps:reps||'',ts:Date.now()}));}catch(e){}}
+function loadSet(w,day,ex,s){try{var r=localStorage.getItem(sKey(w,day,ex,s));return r?JSON.parse(r):{weight:'',done:false,reps:''};}catch(e){return{weight:'',done:false,reps:''};}}
+
 function allLogKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wlog:')==0)keys.push(k);}}catch(e){}return keys;}
 function getActiveWeek(){var el=document.getElementById('activeWeekSelect');return el?parseInt(el.value,10)||1:1;}
 
@@ -2138,31 +2184,183 @@ function isExerciseDone(ex){
   return ex.sets>0;
 }
 
+// ── Exercise info content ──
+var EX_INFO = {
+  'bench-press': {
+    cues: ['Plant feet flat on floor throughout','Retract and depress shoulder blades into bench','Lower to lower chest — bar path slightly diagonal','Press in a slight arc back toward the rack','Keep wrists stacked over elbows'],
+    notes: 'Dumbbells allow a more natural arc than barbell. Squeeze the chest at the top — don\'t just lock the elbows.',
+    back: null
+  },
+  'incline-press': {
+    cues: ['Set bench at 30° — no higher or you shift load to shoulders','Shoulder blades pinched and pulled down before you unrack','Lower to upper chest, elbows at roughly 45° from torso','You should feel this in your upper chest, NOT your front delts','If shoulders are taking over — drop the weight and reset your setup'],
+    notes: '⚠️ Shoulder check: at the bottom of the rep, if you feel it primarily in the front of your shoulder rather than upper chest, your bench angle is likely too steep or your elbows are flaring too wide. Drop to 25–30° and keep elbows at 45°.',
+    back: null
+  },
+  'pullups': {
+    cues: ['Dead hang to start — full shoulder elevation','Initiate by depressing the shoulder blades, then pull','Drive elbows down and back toward your hips','Chin clears bar at top — no neck craning','Lower with control — 2–3 second descent'],
+    notes: 'Think "elbows to back pockets" rather than pulling with your hands. This shifts the work from biceps to lats where it belongs.',
+    back: 'Keep your core slightly braced — don\'t hyperextend the lower back at the bottom of each rep.'
+  },
+  'chinups': {
+    cues: ['Supinated grip (palms toward you), shoulder-width','Initiate from shoulder blades, not biceps curl','Drive elbows down to your sides','Full range — dead hang to chin over bar','Control the descent — resist gravity'],
+    notes: 'Chin-ups bias the biceps more than pull-ups. If your biceps fatigue before your back, try widening your grip slightly.',
+    back: 'Same as pull-ups — brace your core at the bottom to prevent lower back arching.'
+  },
+  'bent-row': {
+    cues: ['Hip hinge to about 45° torso angle — not a squat','Neutral spine throughout — no rounding','Pull elbows back and up toward hips','Row to lower ribcage, not upper chest','Squeeze shoulder blades together at top'],
+    notes: 'The weight should travel in a straight vertical line. If it\'s swinging forward, you\'re using too much momentum.',
+    back: 'This is a hinge pattern — keep your lower back in neutral. If you feel any strain in the lumbar, reduce weight and focus on bracing the core before each rep.'
+  },
+  'chest-row': {
+    cues: ['Chest firmly on the bench — take lower back out of the equation','Let arms hang fully at the bottom','Pull elbows back past the torso','Squeeze shoulder blades hard at the top','Lower slowly — 2–3 seconds down'],
+    notes: 'This is one of the safest rowing variations for your back. Use it to go heavy without worrying about form breakdown.',
+    back: null
+  },
+  'db-curl': {
+    cues: ['Start with palms facing each other, rotate to supinated as you curl','Keep upper arm pinned to your side — don\'t let elbows drift forward','Full extension at the bottom — don\'t bounce','Slow lowering phase is where the growth happens','Alternate arms with control'],
+    notes: 'The supination (rotation) during the curl increases bicep peak activation. Don\'t skip it.',
+    back: null
+  },
+  'shoulder-press': {
+    cues: ['Start at ear height, palms forward','Press in a slight inward arc — not straight up','Lock out at top without shrugging','Lower slowly to ear height — full range','Keep core braced — don\'t arch lower back to grind out reps'],
+    notes: 'Seated is safer for your back than standing. If you feel it in your neck or upper traps, your weights are too heavy.',
+    back: 'Do not hyperextend the lower back to get the weight up. If you\'re leaning back significantly, drop the weight.'
+  },
+  'lat-raise': {
+    cues: ['Slight forward lean from the hips','Lead with your elbows — not your hands','Raise to shoulder height only — no higher','Pinky slightly higher than thumb at the top','Lower with control — 2–3 seconds'],
+    notes: 'Go lighter than you think. Most people use 30–40% too much weight on laterals and compensate with momentum, hitting traps instead of lateral deltoids.',
+    back: null
+  },
+  'skull-crusher': {
+    cues: ['Upper arms vertical and stationary throughout','Hinge only at the elbow — nothing else moves','Lower to just above forehead — not behind the head','Press back up keeping upper arms locked','Keep wrists neutral — don\'t bend them back'],
+    notes: 'If you feel elbow pain, angle your upper arms very slightly back (5–10°). This reduces stress on the elbow joint.',
+    back: null
+  },
+  'face-pull': {
+    cues: ['Anchor band at face height or above','Pull to your face — not your neck or chest','Elbows high and out to the sides','External rotate at the end — hands finish by your ears','Control the return — resist the band'],
+    notes: 'This is a health exercise as much as a strength exercise. It counters the internal rotation from pressing and rowing. Don\'t skip it.',
+    back: null
+  },
+  'oh-tricep': {
+    cues: ['Upper arms stay vertical and close to your head','Hinge only at the elbows','Full stretch at the bottom — feel the long head of the tricep','Press until arms are fully extended overhead','Keep core braced — don\'t rib-flare'],
+    notes: 'Overhead position puts the long head of the tricep in a stretched position, making this one of the best tricep exercises for mass.',
+    back: 'Don\'t arch the lower back to get the elbows higher. If you feel lumbar pressure, engage your core and reduce range of motion slightly.'
+  },
+  'hip-thrust': {
+    cues: ['Upper back against bench — shoulder blades on the edge','Drive through heels — not the balls of your feet','Squeeze glutes hard at the top','Hips fully extended at top — body forms a straight line','Chin tucked — don\'t hyperextend the neck'],
+    notes: 'This is your deadlift replacement and the most important exercise in your lower program. Own the glute squeeze at the top — hold for 1 second.',
+    back: 'No spinal loading. This is designed to be back-safe. If you feel it in your lower back, you\'re likely using your lumbar extensors instead of your glutes — reset and drive through the heels.'
+  },
+  'sl-hip-thrust': {
+    cues: ['Non-working leg either bent or straight — your preference','Drive through the heel of the working leg only','Keep hips level — don\'t let one side drop','Full extension at the top, then controlled descent','Use a lighter weight than bilateral — this is hard'],
+    notes: 'Unilateral hip thrust exposes left-right imbalances. If one side is noticeably weaker, always start with that side and match the reps.',
+    back: null
+  },
+  'goblet-squat': {
+    cues: ['Hold DB vertically at chest height','Feet shoulder-width, toes slightly out','Sit between your knees — not behind them','Keep chest tall throughout','Drive through the full foot to stand'],
+    notes: 'The goblet position acts as a counterbalance, making it easier to sit upright. This is a great teaching pattern for lower body mechanics.',
+    back: 'Keep the torso upright. Forward lean means the weight is too heavy or you need more hip mobility work.'
+  },
+  'rdl': {
+    cues: ['Soft bend in the knees throughout — don\'t lock or squat','Push hips back — the movement is a hip hinge not a squat','Lower until you feel a hamstring stretch (usually shin level)','Keep the dumbbells close to your legs throughout','Drive hips forward to return to standing'],
+    notes: 'THIS IS PROGRAMMED LIGHT FOR A REASON. The RDL is included as a hamstring stretch and posterior chain primer — not a max effort lift. Keep it controlled.',
+    back: '⚠️ Back safety priority. Neutral spine is non-negotiable. At the first sign of lower back rounding — stop, reset, reduce weight. If you feel any discomfort in your lumbar, skip this exercise and substitute a lying hamstring curl.'
+  },
+  'rev-lunge': {
+    cues: ['Step back — not forward — reduces knee stress','Front shin stays vertical','Back knee tracks to just above the floor','Drive through the front heel to return','Keep torso upright throughout'],
+    notes: 'Reverse lunges are safer for the knees than forward lunges and easier on the lower back than many lower body patterns.',
+    back: null
+  },
+  'calf-raise': {
+    cues: ['Full range — heel below the step at the bottom','Rise to the very top — don\'t cut the range short','Pause briefly at the top','Control the descent — calves respond to slow tempo','Both legs equally weighted'],
+    notes: 'Calves adapt quickly. If these feel easy, slow the tempo to 3 seconds up, 3 seconds down before adding weight.',
+    back: null
+  },
+  'bss': {
+    cues: ['Rear foot elevated on bench — top of the foot down','Front foot far enough forward that your shin stays vertical','Lower until rear knee nearly touches floor','Drive through front heel to stand','Keep torso upright — slight forward lean is OK'],
+    notes: 'One of the hardest exercises in this program. Start light — the balance challenge adds difficulty beyond what the weight alone suggests.',
+    back: 'Bracing your core throughout protects the lower back from the rotational stress of unilateral loading.'
+  },
+  'nordic': {
+    cues: ['Anchor feet firmly under bench or DB','Start kneeling upright — core braced','Lower your body toward the floor as slowly as possible','Catch yourself with hands before you hit the floor','Use arms to push back to start — don\'t yank with hamstrings'],
+    notes: 'This is extremely difficult. 5–6 slow reps is genuinely hard. It\'s one of the best hamstring injury prevention exercises in existence — trust the process.',
+    back: null
+  },
+  'clamshell': {
+    cues: ['Side-lying, hips stacked, knees bent at 90°','Keep feet together throughout','Rotate the top knee up like a clamshell opening','Don\'t let your hips roll back to get more range','Pause at the top — feel the glute medius'],
+    notes: 'This is a glute medius and hip external rotator exercise. It directly supports the hip stability needed for all your lower body work.',
+    back: null
+  },
+  'dead-bug': {
+    cues: ['Lower back pressed flat into the floor — non-negotiable','Opposite arm and leg extend simultaneously','Move slowly — 3 seconds out, 3 seconds back','Never let your lower back lift off the floor','Breathe out as you extend'],
+    notes: 'If your lower back lifts, reduce the range of motion — don\'t extend as far. Quality over range here.',
+    back: 'This exercise is specifically designed to protect the lower back by training deep spinal stabilisers. Take it seriously.'
+  },
+  'plank': {
+    cues: ['Forearms on floor, elbows under shoulders','Body in a straight line from head to heels','Squeeze glutes and quads — don\'t just hang in your spine','Breathe steadily — don\'t hold your breath','If hips drop or pike, stop the set'],
+    notes: 'A quality 30-second plank beats a sagging 60-second one. Stop when form breaks.',
+    back: 'This is a core stability exercise that directly supports back health. Keep the spine neutral — no sagging.'
+  }
+};
+
+function showExInfo(exId, label){
+  var info=EX_INFO[exId];
+  var overlay=document.getElementById('exInfoOverlay');
+  var titleEl=document.getElementById('exInfoTitle');
+  var bodyEl=document.getElementById('exInfoBody');
+  if(!overlay||!titleEl||!bodyEl)return;
+  titleEl.textContent=label;
+  if(!info){bodyEl.innerHTML='<div class="info-section"><div class="info-section-body">No additional notes for this exercise.</div></div>';} 
+  else {
+    var html='';
+    html+='<div class="info-section"><div class="info-section-label">Form Cues</div><ul class="info-section-body">';
+    info.cues.forEach(function(c){html+='<li>'+c+'</li>';});
+    html+='</ul></div>';
+    if(info.notes){html+='<div class="info-section"><div class="info-section-label">Coaching Notes</div><div class="info-section-body">'+info.notes+'</div></div>';}
+    if(info.back){html+='<div class="info-section"><div class="info-section-label">Back Safety</div><div class="info-section-body">'+info.back+'</div><div class="info-back-flag">⚠️ Back Safety Note</div></div>';}
+    bodyEl.innerHTML=html;
+  }
+  overlay.classList.add('open');
+}
+
+function closeExInfo(e){
+  if(e&&e.target!==document.getElementById('exInfoOverlay'))return;
+  var overlay=document.getElementById('exInfoOverlay');
+  if(overlay)overlay.classList.remove('open');
+}
+
 function renderSessionExercise(idx){
   try{
     var ex=session.exercises[idx];if(!ex)return;
     var week=session.week,day=session.day;
     var prevWeek=Math.max(1,week-1);
-    var navIdx=idx+1; // nav index (0=warmup, 1..N=exercises)
+    var navIdx=idx+1;
 
-    var setsHTML='<div class="session-set-cols"><div class="session-col-label">Set</div><div class="session-col-label">Last Wk</div><div class="session-col-label">Weight</div><div class="session-col-label"></div></div>';
+    var setsHTML='<div class="session-set-cols">'+
+      '<div class="session-col-label">Set</div>'+
+      '<div class="session-col-label">Last Wk</div>'+
+      '<div class="session-col-label">Reps</div>'+
+      '<div class="session-col-label">Weight</div>'+
+      '<div class="session-col-label"></div>'+
+    '</div>';
+
     for(var s=0;s<ex.sets;s++){
       var cur=loadSet(week,day,ex.id,s);
       var prev=loadSet(prevWeek,day,ex.id,s);
       var prevDisplay=prev.weight?prev.weight+'lb':'—';
-      setsHTML+='<div class="session-set-row'+(cur.done?' done-row':'')+'" id="srow-'+ex.id+'-'+s+'">'+
-        '<div class="session-set-num">'+(s+1)+'</div>'+
-        '<div class="session-prev-val'+(prev.weight?' has-val':'')+'">'+prevDisplay+'</div>'+
-        '<input type="number" class="session-weight-input" id="sinp-'+ex.id+'-'+s+'" placeholder="lbs" min="0" step="2.5" value="'+(cur.weight||'')+'" oninput="saveSessionSet(\''+day+'\',\''+ex.id+'\','+s+',this.value,document.getElementById(\'sdone-'+ex.id+'-'+s+'\').classList.contains(\'done\'))"/>'+
-        '<button class="session-done-btn'+(cur.done?' done':'')+'" id="sdone-'+ex.id+'-'+s+'" onclick="toggleSessionSet(\''+day+'\',\''+ex.id+'\','+s+','+(ex.rest||60)+','+(s<ex.sets-1)+')">✓</button>'+
-      '</div>';
+      setsHTML+=
+        '<div class="session-set-row'+(cur.done?' done-row':'')+'" id="srow-'+ex.id+'-'+s+'">'+
+          '<div class="session-set-num">'+(s+1)+'</div>'+
+          '<div class="session-prev-val'+(prev.weight?' has-val':'')+'">'+prevDisplay+'</div>'+
+          '<input type="number" class="session-weight-input" id="sreps-'+ex.id+'-'+s+'" placeholder="reps" min="0" step="1" value="'+(cur.reps||'')+'" oninput="saveSessionReps(\''+day+'\',\''+ex.id+'\','+s+',this.value)"/>'+
+          '<input type="number" class="session-weight-input" id="sinp-'+ex.id+'-'+s+'" placeholder="lbs" min="0" step="2.5" value="'+(cur.weight||'')+'" oninput="saveSessionSet(\''+day+'\',\''+ex.id+'\','+s+',this.value,document.getElementById(\'sdone-'+ex.id+'-'+s+'\').classList.contains(\'done\'))"/>'+
+          '<button class="session-done-btn'+(cur.done?' done':'')+'" id="sdone-'+ex.id+'-'+s+'" onclick="toggleSessionSet(\''+day+'\',\''+ex.id+'\','+s+','+(ex.rest||60)+','+(s<ex.sets-1)+')">✓</button>'+
+        '</div>';
     }
 
-    var isFirst=navIdx===1; // first exercise (warmup is before)
-    var isLast=navIdx===session.exercises.length; // last exercise (cardio is after)
+    var isFirst=navIdx===1;
+    var isLast=navIdx===session.exercises.length;
     var prevNav=navIdx-1; var nextNav=navIdx+1;
-    var nextLabel='';
-    if(!isLast){nextLabel=session.exercises[idx+1].label;}
     var nextHTML=!isLast?
       '<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(navIdx+1)+')"><div class="session-next-label">Up next →</div><div class="session-next-name">'+session.exercises[idx+1].label+' · '+(EX_PRESCRIPTIONS[session.exercises[idx+1].id]||'')+'</div></div>':
       '<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(session.exercises.length+1)+')"><div class="session-next-label">Up next →</div><div class="session-next-name" style="color:var(--accent3)">🚶 Cardio Finisher</div></div>';
@@ -2173,28 +2371,47 @@ function renderSessionExercise(idx){
       '<button class="session-ex-arrow" onclick="renderSessionNav('+nextNav+')">→</button>'+
     '</div>';
 
+    var exNameRow='<div class="session-ex-name-row">'+
+      '<div class="session-ex-name">'+ex.label+'</div>'+
+      '<button class="session-ex-info-btn" onclick="showExInfo(\''+ex.id+'\',\''+ex.label+'\')">ℹ</button>'+
+    '</div>';
+
     var body=document.getElementById('sessionBody');
-    if(body)body.innerHTML='<div class="session-ex-card"><div class="session-ex-header">'+navRow+'<div class="session-ex-name">'+ex.label+'</div><div class="session-ex-prescription">'+(EX_PRESCRIPTIONS[ex.id]||'')+' · Rest '+(ex.rest||60)+'s</div></div>'+setsHTML+'</div><div id="sessionRestZone"></div>'+nextHTML;
+    if(body)body.innerHTML=
+      '<div class="session-ex-card">'+
+        '<div class="session-ex-header">'+navRow+exNameRow+
+          '<div class="session-ex-prescription">'+(EX_PRESCRIPTIONS[ex.id]||'')+' · Rest '+(ex.rest||60)+'s</div>'+
+        '</div>'+
+        setsHTML+
+      '</div>'+
+      '<div id="sessionRestZone"></div>'+
+      nextHTML;
   }catch(e){console.error('renderSessionExercise error:',e);}
 }
 
+function saveSessionReps(day,exId,setIdx,reps){
+  var cur=loadSet(session.week,day,exId,setIdx);
+  saveSet(session.week,day,exId,setIdx,cur.weight,cur.done,reps);
+}
+
 function saveSessionSet(day,exId,setIdx,weight,done){
-  saveSet(session.week,day,exId,setIdx,weight,done);
+  var cur=loadSet(session.week,day,exId,setIdx);
+  saveSet(session.week,day,exId,setIdx,weight,done,cur.reps);
   updateSessionVolume();
 }
 
 function toggleSessionSet(day,exId,setIdx,restSecs,hasNextSet){
   var inp=document.getElementById('sinp-'+exId+'-'+setIdx);
+  var repsInp=document.getElementById('sreps-'+exId+'-'+setIdx);
   var btn=document.getElementById('sdone-'+exId+'-'+setIdx);
   var row=document.getElementById('srow-'+exId+'-'+setIdx);
   if(!btn)return;
   var done=!btn.classList.contains('done');
   btn.classList.toggle('done',done);
   if(row)row.classList.toggle('done-row',done);
-  saveSet(session.week,day,exId,setIdx,inp?inp.value:'',done);
+  saveSet(session.week,day,exId,setIdx,inp?inp.value:'',done,repsInp?repsInp.value:'');
   updateSessionVolume();
   buildSessionNav();
-  // Re-highlight correct pill
   var pills=document.querySelectorAll('.session-ex-pill');
   if(pills[session.currentExIdx])pills[session.currentExIdx].classList.add('active');
   if(done&&hasNextSet)startSessionRest(restSecs);
