@@ -333,6 +333,14 @@
   .session-ex-arrow.disabled { color: #333; border-color: #222; background: transparent; cursor: default; }
   .session-ex-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; flex: 1; text-align: center; }
   .session-ex-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+  .session-ex-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text); line-height: 1; }
+  .session-suggestion {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--accent3); letter-spacing: 0.5px;
+    padding: 6px 18px 10px; margin-top: -4px;
+  }
+  .summary-dur-stat { cursor: pointer; }
+  .summary-dur-stat:hover .summary-stat-val { color: var(--accent3); }
   .session-ex-info-btn {
     width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
     border: 1px solid var(--border); background: var(--bg3);
@@ -363,7 +371,8 @@
   .info-section { margin-top: 14px; }
   .info-section-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
   .info-section-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
-  .info-section-body li { margin-bottom: 4px; padding-left: 12px; position: relative; }
+  .info-section-body ul { list-style: none; padding: 0; margin: 0; }
+  .info-section-body li { margin-bottom: 4px; padding-left: 14px; position: relative; }
   .info-section-body li::before { content: '·'; position: absolute; left: 0; color: var(--accent); }
   .info-back-flag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); margin-top: 8px; }
   .session-ex-prescription { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent2); letter-spacing: 1px; }
@@ -1786,6 +1795,8 @@ function renderLogHistory(){
       var ts=allSets.map(function(s){return s.ts;}).filter(Boolean);
       var dateStr=ts.length?new Date(Math.max.apply(null,ts)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
       var phase=PHASE_MAP[+week]||'';
+      var savedDur=loadDuration(+week,day);
+      var durDisplay=savedDur?savedDur+' min':'—';
       var selKey=week+'|'+day;
       var isSelected=logSelectedKeys[selKey]?true:false;
       var cardClass='log-session-card'+(logSelectMode?' log-selectable':'')+(isSelected?' log-selected':'');
@@ -1802,6 +1813,7 @@ function renderLogHistory(){
       html+='<div class="log-stat"><div class="log-stat-val">'+done+'</div><div class="log-stat-lbl">Sets Done</div></div>';
       html+='<div class="log-stat"><div class="log-stat-val">'+total+'</div><div class="log-stat-lbl">Logged</div></div>';
       html+='<div class="log-stat"><div class="log-stat-val">'+(total>0?Math.round(done/total*100):0)+'%</div><div class="log-stat-lbl">Completion</div></div>';
+      html+='<div class="log-stat" style="cursor:pointer;" onclick="editLogDuration(\''+week+'\',\''+day+'\',this)"><div class="log-stat-val" id="logdur-'+week+'-'+day+'">'+durDisplay+'</div><div class="log-stat-lbl">Duration <span style="font-size:8px;color:#555;">✎</span></div></div>';
       html+='</div><div class="log-exercise-list">';
       Object.keys(exMap).forEach(function(exId){
         var def=null;var dayExs=EXERCISES[day]||[];
@@ -2329,12 +2341,49 @@ function closeExInfo(e){
   if(overlay)overlay.classList.remove('open');
 }
 
+// ── Duration storage ──
+function dKey(w,day){return 'wdur:w'+w+':'+day;}
+function saveDuration(w,day,mins){try{localStorage.setItem(dKey(w,day),String(mins));}catch(e){}}
+function loadDuration(w,day){try{var v=localStorage.getItem(dKey(w,day));return v?parseInt(v,10):null;}catch(e){return null;}}
+
+// ── Suggested weight per exercise ──
+function getSuggestedWeight(day,exId,numSets,week){
+  if(BW_EXERCISES.has(exId))return null;
+  var prevWeek=week-1;
+  if(prevWeek<1)return null;
+  // Check if all sets were completed last week
+  var allDone=true;
+  var totalWeight=0;
+  var setCount=0;
+  for(var s=0;s<numSets+2;s++){
+    var d=loadSet(prevWeek,day,exId,s);
+    if(d.weight&&parseFloat(d.weight)>0){
+      if(!d.done)allDone=false;
+      totalWeight+=parseFloat(d.weight)||0;
+      setCount++;
+    }
+  }
+  if(!setCount)return null;
+  var avgWeight=Math.round(totalWeight/setCount);
+  // Progressive overload increment
+  var increment=week<=3?2.5:5;
+  if(allDone){
+    return {weight:avgWeight+increment,label:'Try '+( avgWeight+increment)+' lbs (+'+increment+')'};
+  } else {
+    return {weight:avgWeight,label:'Repeat '+avgWeight+' lbs'};
+  }
+}
+
 function renderSessionExercise(idx){
   try{
     var ex=session.exercises[idx];if(!ex)return;
     var week=session.week,day=session.day;
     var prevWeek=Math.max(1,week-1);
     var navIdx=idx+1;
+
+    // Suggested weight
+    var suggestion=getSuggestedWeight(day,ex.id,ex.sets,week);
+    var suggHTML=suggestion?'<div class="session-suggestion">'+suggestion.label+'</div>':'';
 
     var setsHTML='<div class="session-set-cols">'+
       '<div class="session-col-label">Set</div>'+
@@ -2382,6 +2431,7 @@ function renderSessionExercise(idx){
         '<div class="session-ex-header">'+navRow+exNameRow+
           '<div class="session-ex-prescription">'+(EX_PRESCRIPTIONS[ex.id]||'')+' · Rest '+(ex.rest||60)+'s</div>'+
         '</div>'+
+        suggHTML+
         setsHTML+
       '</div>'+
       '<div id="sessionRestZone"></div>'+
@@ -2460,7 +2510,9 @@ function updateSessionVolume(){
 function endSession(){
   clearInterval(session.elapsedInterval);clearInterval(session.restInterval);clearInterval(session.cardioInterval);
   var secs=Math.floor((Date.now()-session.startTime)/1000);
-  var duration=Math.floor(secs/60)+':'+(secs%60<10?'0':'')+secs%60;
+  var mins=Math.round(secs/60)||1;
+  // Save duration to localStorage
+  saveDuration(session.week,session.day,mins);
   var totalVol=0,setsDone=0,newPRs=[];
   session.exercises.forEach(function(ex){
     for(var s=0;s<ex.sets+2;s++){
@@ -2479,7 +2531,26 @@ function endSession(){
   var prsHTML=newPRs.length?'<div class="summary-prs"><div class="summary-prs-title">🏆 New Personal Records</div>'+newPRs.map(function(pr){return '<div class="summary-pr-row"><div class="summary-pr-name">'+pr.label+'</div><div class="summary-pr-val">'+pr.val+' lbs</div></div>';}).join('')+'</div>':'';
   var nav=document.getElementById('sessionExNav');if(nav)nav.style.display='none';
   var body=document.getElementById('sessionBody');
-  if(body)body.innerHTML='<div class="session-summary"><div class="summary-title">SESSION<span>COMPLETE ✓</span></div><div class="summary-stats"><div class="summary-stat"><div class="summary-stat-val">'+totalVol.toLocaleString()+'</div><div class="summary-stat-lbl">Total lbs</div></div><div class="summary-stat"><div class="summary-stat-val">'+setsDone+'</div><div class="summary-stat-lbl">Sets Done</div></div><div class="summary-stat"><div class="summary-stat-val">'+session.exercises.length+'</div><div class="summary-stat-lbl">Exercises</div></div><div class="summary-stat"><div class="summary-stat-val">'+duration+'</div><div class="summary-stat-lbl">Duration</div></div></div>'+prsHTML+'<button class="summary-done-btn" onclick="closeSession()">Done</button></div>';
+  var durHTML='<div class="summary-stat summary-dur-stat" onclick="editSummaryDuration('+session.week+',\''+session.day+'\')">'+
+    '<div class="summary-stat-val" id="summaryDurVal">'+mins+'</div>'+
+    '<div class="summary-stat-lbl">Min <span style="font-size:8px;color:#555;">✎</span></div>'+
+  '</div>';
+  if(body)body.innerHTML='<div class="session-summary"><div class="summary-title">SESSION<span>COMPLETE ✓</span></div><div class="summary-stats"><div class="summary-stat"><div class="summary-stat-val">'+totalVol.toLocaleString()+'</div><div class="summary-stat-lbl">Total lbs</div></div><div class="summary-stat"><div class="summary-stat-val">'+setsDone+'</div><div class="summary-stat-lbl">Sets Done</div></div><div class="summary-stat"><div class="summary-stat-val">'+session.exercises.length+'</div><div class="summary-stat-lbl">Exercises</div></div>'+durHTML+'</div>'+prsHTML+'<button class="summary-done-btn" onclick="closeSession()">Done</button></div>';
+}
+
+function editSummaryDuration(week,day){
+  var valEl=document.getElementById('summaryDurVal');if(!valEl)return;
+  var current=loadDuration(week,day)||0;
+  valEl.innerHTML='<input type="number" class="dur-edit-input" id="durEditInp" value="'+current+'" min="1" max="300" style="width:56px;font-family:\'Bebas Neue\',sans-serif;font-size:28px;background:transparent;border:none;border-bottom:1px solid var(--accent);color:var(--accent);text-align:center;outline:none;" onblur="saveSummaryDuration('+week+',\''+day+'\')" onkeydown="if(event.key===\'Enter\')saveSummaryDuration('+week+',\''+day+'\')"/>';
+  var inp=document.getElementById('durEditInp');if(inp){inp.focus();inp.select();}
+}
+
+function saveSummaryDuration(week,day){
+  var inp=document.getElementById('durEditInp');if(!inp)return;
+  var val=parseInt(inp.value,10)||1;
+  saveDuration(week,day,val);
+  var valEl=document.getElementById('summaryDurVal');
+  if(valEl)valEl.textContent=val;
 }
 
 function closeSession(){
@@ -2492,9 +2563,21 @@ function closeSession(){
   buildTrackers();
 }
 
-// ═══════════════════════════════════════════════════════
-//  INIT — runs after all functions are defined
-// ═══════════════════════════════════════════════════════
+function editLogDuration(week,day,statEl){
+  var valEl=document.getElementById('logdur-'+week+'-'+day);if(!valEl)return;
+  var current=loadDuration(+week,day)||0;
+  valEl.innerHTML='<input type="number" value="'+current+'" min="1" max="300" style="width:44px;font-family:\'Bebas Neue\',sans-serif;font-size:20px;background:transparent;border:none;border-bottom:1px solid var(--accent);color:var(--accent);text-align:center;outline:none;" onblur="saveLogDuration(\''+week+'\',\''+day+'\')" onkeydown="if(event.key===\'Enter\')saveLogDuration(\''+week+'\',\''+day+'\')" id="logdurInp-'+week+'-'+day+'"/>';
+  var inp=document.getElementById('logdurInp-'+week+'-'+day);if(inp){inp.focus();inp.select();}
+  if(statEl)statEl.onclick=null;
+}
+
+function saveLogDuration(week,day){
+  var inp=document.getElementById('logdurInp-'+week+'-'+day);if(!inp)return;
+  var val=parseInt(inp.value,10)||1;
+  saveDuration(+week,day,val);
+  var valEl=document.getElementById('logdur-'+week+'-'+day);
+  if(valEl)valEl.textContent=val+' min';
+}
 buildSchedule();
 document.querySelectorAll('.block-body').forEach(function(b){if(b.style.display!=='block')b.style.display='none';});
 buildTrackers();
