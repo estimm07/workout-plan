@@ -1778,7 +1778,7 @@ function buildLogGroups(wfv,dfv){
     if(!grouped[week])grouped[week]={};
     if(!grouped[week][day])grouped[week][day]={};
     if(!grouped[week][day][exId])grouped[week][day][exId]=[];
-    grouped[week][day][exId][si]={weight:val.weight,done:val.done,ts:val.ts};
+    grouped[week][day][exId][si]={weight:val.weight,done:val.done,reps:val.reps||'',ts:val.ts};
   });
   return grouped;
 }
@@ -1838,7 +1838,7 @@ function renderLogHistory(){
           if(!s)return;
           var chipId='chip-'+week+'-'+day+'-'+exId+'-'+si;
           var wDisplay=s.weight?s.weight+' lbs':'BW';
-          var rDisplay=s.reps?(' · '+s.reps+' reps'):'';
+          var rDisplay=' · '+(s.reps?s.reps+' reps':'— reps');
           var chipLabel='S'+(si+1)+': '+wDisplay+rDisplay;
           var completedClass=s.done?'completed':'';
           html+='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+si+')">'+chipLabel+'</span>';
@@ -2622,11 +2622,13 @@ function saveChipEdit(week,day,exId,setIdx){
   var editEl=document.getElementById(chipId);
   if(!editEl)return;
   var wDisplay=newW?newW+' lbs':'BW';
-  var rDisplay=newR?(' · '+newR+' reps'):'';
+  var rDisplay=' · '+(newR?newR+' reps':'— reps');
   var completedClass=cur.done?'completed':'';
   editEl.outerHTML='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+setIdx+')">S'+(setIdx+1)+': '+wDisplay+rDisplay+'</span>';
   renderProgress();
 }
+
+function editLogDuration(week,day,statEl){
   var valEl=document.getElementById('logdur-'+week+'-'+day);if(!valEl)return;
   var current=loadDuration(+week,day)||0;
   valEl.innerHTML='<input type="number" value="'+current+'" min="1" max="300" style="width:44px;font-family:\'Bebas Neue\',sans-serif;font-size:20px;background:transparent;border:none;border-bottom:1px solid var(--accent);color:var(--accent);text-align:center;outline:none;" onblur="saveLogDuration(\''+week+'\',\''+day+'\')" onkeydown="if(event.key===\'Enter\')saveLogDuration(\''+week+'\',\''+day+'\')" id="logdurInp-'+week+'-'+day+'"/>';
