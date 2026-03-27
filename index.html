@@ -228,21 +228,30 @@
   .log-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
   .log-empty-icon { font-size: 40px; margin-bottom: 12px; }
   .log-session-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-  .log-session-header { background: var(--bg3); padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .log-session-header { background: var(--bg3); padding: 14px 20px; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
   .log-session-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
   .log-session-header-left { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; }
   .log-session-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); margin-top: 2px; }
   .log-session-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
-  .log-session-stats { display: flex; gap: 20px; flex-wrap: wrap; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .log-session-stats { display: flex; gap: 20px; flex-wrap: wrap; padding: 12px 20px; }
   .log-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--accent); line-height: 1; }
   .log-stat-lbl { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-  .log-exercise-list { padding: 4px 0; }
+  .log-expand-btn { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; padding: 8px 20px; border-top: 1px solid rgba(255,255,255,0.04); cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; transition: color 0.15s; }
+  .log-expand-btn:hover { color: var(--accent); }
+  .log-exercise-list { padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.04); display: none; }
+  .log-exercise-list.expanded { display: block; }
   .log-exercise-row { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
   .log-exercise-row:last-child { border-bottom: none; }
   .log-ex-name { font-size: 13px; font-weight: 500; min-width: 180px; flex: 1; }
   .log-sets-line { display: flex; flex-wrap: wrap; gap: 6px; }
-  .log-set-chip { font-family: 'DM Mono', monospace; font-size: 11px; padding: 3px 9px; border-radius: 5px; border: 1px solid var(--border); color: #555; }
+  .log-set-chip { font-family: 'DM Mono', monospace; font-size: 11px; padding: 5px 10px; border-radius: 5px; border: 1px solid var(--border); color: #555; cursor: pointer; transition: all 0.15s; }
   .log-set-chip.completed { border-color: rgba(232,255,71,0.4); color: var(--accent); background: rgba(232,255,71,0.07); }
+  .log-set-chip.completed:hover { border-color: var(--accent); background: rgba(232,255,71,0.15); }
+  .log-chip-edit { display: inline-flex; align-items: center; gap: 5px; background: var(--bg3); border: 1px solid var(--accent); border-radius: 6px; padding: 4px 8px; }
+  .log-chip-inp { font-family: 'DM Mono', monospace; font-size: 12px; width: 40px; background: transparent; border: none; border-bottom: 1px solid #444; color: var(--text); text-align: center; outline: none; padding: 1px 2px; }
+  .log-chip-inp:focus { border-bottom-color: var(--accent); }
+  .log-chip-sep { font-family: 'DM Mono', monospace; font-size: 10px; color: #555; }
+  .log-chip-save { font-family: 'DM Mono', monospace; font-size: 9px; padding: 3px 7px; border-radius: 4px; border: 1px solid var(--accent); background: rgba(232,255,71,0.1); color: var(--accent); cursor: pointer; white-space: nowrap; }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -1800,11 +1809,11 @@ function renderLogHistory(){
       var selKey=week+'|'+day;
       var isSelected=logSelectedKeys[selKey]?true:false;
       var cardClass='log-session-card'+(logSelectMode?' log-selectable':'')+(isSelected?' log-selected':'');
-      var onclickAttr=logSelectMode?' onclick="toggleLogSelect(\''+week+'\',\''+day+'\')"':'';
       var checkHtml=logSelectMode?'<div class="log-select-check">'+(isSelected?'✓':'')+'</div>':'';
-
-      html+='<div class="'+cardClass+'" id="logcard-'+week+'-'+day+'"'+onclickAttr+'>';
-      html+='<div class="log-session-header"><div class="log-session-header-top">';
+      var cardOnclick=logSelectMode?' onclick="toggleLogSelect(\''+week+'\',\''+day+'\')"':'';
+      html+='<div class="'+cardClass+'" id="logcard-'+week+'-'+day+'"'+cardOnclick+'>';
+      html+='<div class="log-session-header"'+(logSelectMode?'':' onclick="toggleLogCard(\''+week+'\',\''+day+'\')"')+'>';
+      html+='<div class="log-session-header-top">';
       html+=checkHtml;
       html+='<div class="log-session-header-left">WEEK '+week+' &nbsp;·&nbsp; '+dateStr+'</div>';
       html+='<span class="phase-badge '+(PHASE_CLS[phase]||'')+'" style="display:inline-block;">'+phase+'</span>';
@@ -1814,13 +1823,26 @@ function renderLogHistory(){
       html+='<div class="log-stat"><div class="log-stat-val">'+total+'</div><div class="log-stat-lbl">Logged</div></div>';
       html+='<div class="log-stat"><div class="log-stat-val">'+(total>0?Math.round(done/total*100):0)+'%</div><div class="log-stat-lbl">Completion</div></div>';
       html+='<div class="log-stat" style="cursor:pointer;" onclick="editLogDuration(\''+week+'\',\''+day+'\',this)"><div class="log-stat-val" id="logdur-'+week+'-'+day+'">'+durDisplay+'</div><div class="log-stat-lbl">Duration <span style="font-size:8px;color:#555;">✎</span></div></div>';
-      html+='</div><div class="log-exercise-list">';
+      html+='</div>';
+      // Expand toggle button
+      html+='<div class="log-expand-btn" id="logexpandbtn-'+week+'-'+day+'" onclick="toggleLogCard(\''+week+'\',\''+day+'\')">';
+      html+='<span>SHOW DETAILS</span><span>▾</span></div>';
+      // Exercise list - hidden by default
+      html+='<div class="log-exercise-list" id="logdetail-'+week+'-'+day+'">';
       Object.keys(exMap).forEach(function(exId){
         var def=null;var dayExs=EXERCISES[day]||[];
         for(var i=0;i<dayExs.length;i++){if(dayExs[i].id===exId){def=dayExs[i];break;}}
         var lbl=def?def.label:exId;
         html+='<div class="log-exercise-row"><div class="log-ex-name">'+lbl+'</div><div class="log-sets-line">';
-        exMap[exId].forEach(function(s,i){if(!s)return;var w=s.weight?s.weight+' lbs':'BW';html+='<span class="log-set-chip '+(s.done?'completed':'')+'">S'+(i+1)+': '+w+'</span>';});
+        exMap[exId].forEach(function(s,si){
+          if(!s)return;
+          var chipId='chip-'+week+'-'+day+'-'+exId+'-'+si;
+          var wDisplay=s.weight?s.weight+' lbs':'BW';
+          var rDisplay=s.reps?(' · '+s.reps+' reps'):'';
+          var chipLabel='S'+(si+1)+': '+wDisplay+rDisplay;
+          var completedClass=s.done?'completed':'';
+          html+='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+si+')">'+chipLabel+'</span>';
+        });
         html+='</div></div>';
       });
       html+='</div></div>';
@@ -2563,7 +2585,48 @@ function closeSession(){
   buildTrackers();
 }
 
-function editLogDuration(week,day,statEl){
+function toggleLogCard(week,day){
+  var detail=document.getElementById('logdetail-'+week+'-'+day);
+  var btn=document.getElementById('logexpandbtn-'+week+'-'+day);
+  if(!detail)return;
+  var expanded=detail.classList.contains('expanded');
+  detail.classList.toggle('expanded',!expanded);
+  if(btn)btn.innerHTML=(expanded?'<span>SHOW DETAILS</span><span>▾</span>':'<span>HIDE DETAILS</span><span>▴</span>');
+}
+
+function openChipEdit(week,day,exId,setIdx){
+  var chipId='chip-'+week+'-'+day+'-'+exId+'-'+setIdx;
+  var chip=document.getElementById(chipId);
+  if(!chip)return;
+  var d=loadSet(+week,day,exId,setIdx);
+  var wVal=d.weight||'';
+  var rVal=d.reps||'';
+  chip.outerHTML='<span class="log-chip-edit" id="'+chipId+'">'+
+    '<input class="log-chip-inp" id="chipw-'+chipId+'" type="number" value="'+wVal+'" placeholder="lbs" min="0" step="2.5"/>'+
+    '<span class="log-chip-sep">·</span>'+
+    '<input class="log-chip-inp" id="chipr-'+chipId+'" type="number" value="'+rVal+'" placeholder="reps" min="0" step="1"/>'+
+    '<button class="log-chip-save" onclick="saveChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+setIdx+')">✓</button>'+
+  '</span>';
+  var wi=document.getElementById('chipw-'+chipId);if(wi){wi.focus();wi.select();}
+}
+
+function saveChipEdit(week,day,exId,setIdx){
+  var chipId='chip-'+week+'-'+day+'-'+exId+'-'+setIdx;
+  var wi=document.getElementById('chipw-'+chipId);
+  var ri=document.getElementById('chipr-'+chipId);
+  var newW=wi?wi.value:'';
+  var newR=ri?ri.value:'';
+  var cur=loadSet(+week,day,exId,setIdx);
+  saveSet(+week,day,exId,setIdx,newW,cur.done,newR);
+  // Rebuild chip display
+  var editEl=document.getElementById(chipId);
+  if(!editEl)return;
+  var wDisplay=newW?newW+' lbs':'BW';
+  var rDisplay=newR?(' · '+newR+' reps'):'';
+  var completedClass=cur.done?'completed':'';
+  editEl.outerHTML='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+setIdx+')">S'+(setIdx+1)+': '+wDisplay+rDisplay+'</span>';
+  renderProgress();
+}
   var valEl=document.getElementById('logdur-'+week+'-'+day);if(!valEl)return;
   var current=loadDuration(+week,day)||0;
   valEl.innerHTML='<input type="number" value="'+current+'" min="1" max="300" style="width:44px;font-family:\'Bebas Neue\',sans-serif;font-size:20px;background:transparent;border:none;border-bottom:1px solid var(--accent);color:var(--accent);text-align:center;outline:none;" onblur="saveLogDuration(\''+week+'\',\''+day+'\')" onkeydown="if(event.key===\'Enter\')saveLogDuration(\''+week+'\',\''+day+'\')" id="logdurInp-'+week+'-'+day+'"/>';
