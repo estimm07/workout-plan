@@ -598,6 +598,40 @@
   .theme-color-picker { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; padding: 2px; background: none; flex-shrink: 0; }
   .theme-reset-btn { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; transition: all 0.15s; width: 100%; }
   .theme-reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── NUTRITION ── */
+  .nutr-block { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+  .nutr-block-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .nutr-toggle { font-size: 16px; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+  .nutr-toggle.open { transform: rotate(180deg); }
+  .nutr-block-icon { font-size: 22px; flex-shrink: 0; }
+  .nutr-block-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--text); line-height: 1; }
+  .nutr-block-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .nutr-block-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .nutr-stat-row { display: flex; gap: 10px; }
+  .nutr-stat { flex: 1; background: var(--bg3); border-radius: 10px; padding: 12px 10px; text-align: center; }
+  .nutr-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--accent); line-height: 1; }
+  .nutr-stat-lbl { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+  .nutr-divider { height: 1px; background: var(--border); margin: 4px 0; }
+  .nutr-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: -4px; }
+  .nutr-text { font-size: 14px; color: var(--muted); line-height: 1.65; }
+  .nutr-tip { background: rgba(232,255,71,0.06); border: 1px solid rgba(232,255,71,0.2); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .nutr-food-grid { display: flex; flex-direction: column; gap: 6px; }
+  .nutr-food-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg3); border-radius: 8px; }
+  .nutr-food-name { font-size: 13px; color: var(--text); }
+  .nutr-food-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent2); }
+  .nutr-supp-card { background: var(--bg3); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .nutr-supp-header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .nutr-supp-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .nutr-supp-dose { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); flex-shrink: 0; }
+  .nutr-supp-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent3); letter-spacing: 0.5px; }
+  .nutr-timing-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--accent2); text-transform: uppercase; margin-bottom: 6px; }
+  .nutr-timing-table { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .nutr-timing-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .nutr-timing-row:last-child { border-bottom: none; }
+  .nutr-timing-time { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); white-space: nowrap; min-width: 90px; padding-top: 2px; }
+  .nutr-timing-items { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
   .more-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -632,6 +666,7 @@
 
 <nav class="nav-bar">
   <button class="nav-btn active" onclick="showSection('workouts',this)">Workouts</button>
+  <button class="nav-btn" onclick="showSection('nutrition',this)">Nutrition</button>
   <button class="nav-btn" onclick="showSection('progress',this)">Progress</button>
   <button class="nav-btn" onclick="showSection('more',this)">More</button>
 </nav>
@@ -1283,6 +1318,11 @@
       <div class="more-card-title">Overview</div>
       <div class="more-card-desc">Goals, split structure & equipment</div>
     </div>
+    <div class="more-card" onclick="showSubSection('nutrition')">
+      <div class="more-card-icon">🥩</div>
+      <div class="more-card-title">Nutrition</div>
+      <div class="more-card-desc">Protein targets, supplements & timing</div>
+    </div>
     <div class="more-card" onclick="showSubSection('schedule')">
       <div class="more-card-icon">📅</div>
       <div class="more-card-title">Schedule</div>
@@ -1346,6 +1386,143 @@
   </div>
 
   <button class="theme-reset-btn" onclick="applyTheme('default')">↺ Reset to Default</button>
+</div>
+
+<!-- ===== NUTRITION ===== -->
+<div id="nutrition" class="section">
+  <div class="section-title">Nutrition</div>
+  <p style="color:var(--muted);font-size:15px;margin-bottom:28px;">Your personal nutrition framework built around your goals, body weight, and training schedule.</p>
+
+  <!-- DAILY TIMING (first) -->
+  <div class="nutr-block">
+    <div class="nutr-block-header" onclick="toggleNutrBlock(this)" style="cursor:pointer;">
+      <span class="nutr-block-icon">⏰</span>
+      <div style="flex:1;">
+        <div class="nutr-block-title">Daily Timing</div>
+        <div class="nutr-block-sub">What to take when</div>
+      </div>
+      <span class="nutr-toggle">▾</span>
+    </div>
+    <div class="nutr-block-body" style="display:none;">
+      <div class="nutr-timing-label">Training Days</div>
+      <div class="nutr-timing-table">
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Breakfast</div><div class="nutr-timing-items">Multivitamin · Fish oil (1) · Collagen peptides (if not pre-workout)</div></div>
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Pre-workout</div><div class="nutr-timing-items">⅓ scoop pre-workout · Collagen peptides (30–60 min before training)</div></div>
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Post-workout</div><div class="nutr-timing-items">Kirkland protein shake (30–40g protein within 1–2 hrs)</div></div>
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Dinner</div><div class="nutr-timing-items">Fish oil (1)</div></div>
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Before bed</div><div class="nutr-timing-items">Magnesium glycinate (200–400mg)</div></div>
+      </div>
+      <div class="nutr-timing-label" style="margin-top:16px;">Rest Days</div>
+      <div class="nutr-timing-table">
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Breakfast</div><div class="nutr-timing-items">Multivitamin · Fish oil (1) · Creatine (5g)</div></div>
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Dinner</div><div class="nutr-timing-items">Fish oil (1) · Collagen peptides</div></div>
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Before bed</div><div class="nutr-timing-items">Magnesium glycinate (200–400mg)</div></div>
+      </div>
+      <div class="nutr-tip" style="margin-top:16px;">💡 Don't stack creatine on training days — your pre-workout already contains it. Take Orgain creatine on rest days only.</div>
+    </div>
+  </div>
+
+  <!-- SUPPLEMENTS -->
+  <div class="nutr-block">
+    <div class="nutr-block-header" onclick="toggleNutrBlock(this)" style="cursor:pointer;">
+      <span class="nutr-block-icon">💊</span>
+      <div style="flex:1;">
+        <div class="nutr-block-title">Supplements</div>
+        <div class="nutr-block-sub">What you take & why</div>
+      </div>
+      <span class="nutr-toggle">▾</span>
+    </div>
+    <div class="nutr-block-body" style="display:none;">
+      <div class="nutr-supp-card">
+        <div class="nutr-supp-header"><span class="nutr-supp-name">Creatine Monohydrate</span><span class="nutr-supp-dose">5g / day</span></div>
+        <p class="nutr-text">One of the most researched supplements in existence. Increases phosphocreatine stores in muscle, directly improving performance on high-intensity sets. Takes 2–4 weeks of consistent daily use to fully saturate. Skip on training days since your pre-workout already contains 5g — take Orgain on rest days only.</p>
+        <div class="nutr-supp-meta">Orgain (Costco) · Rest days only</div>
+      </div>
+      <div class="nutr-supp-card">
+        <div class="nutr-supp-header"><span class="nutr-supp-name">Pre-Workout (1st Phorm)</span><span class="nutr-supp-dose">⅓ scoop</span></div>
+        <p class="nutr-text">At ⅓ scoop you're getting ~1.7g creatine, ~1g beta alanine, and modest amounts of the other compounds. Contains 5g creatine at full dose — so don't stack with Orgain creatine on training days. Take 20–30 min before training.</p>
+        <div class="nutr-supp-meta">Training days only · 20–30 min pre-workout</div>
+      </div>
+      <div class="nutr-supp-card">
+        <div class="nutr-supp-header"><span class="nutr-supp-name">Fish Oil</span><span class="nutr-supp-dose">2 softgels / day</span></div>
+        <p class="nutr-text">Provides 500mg EPA+DHA (250mg per softgel). Supports inflammation management and joint health. Take one with breakfast, one with dinner, always with food. Consider upgrading to 3–4 softgels for more anti-inflammatory benefit.</p>
+        <div class="nutr-supp-meta">Kirkland (Costco) · 1 with breakfast, 1 with dinner</div>
+      </div>
+      <div class="nutr-supp-card">
+        <div class="nutr-supp-header"><span class="nutr-supp-name">Multivitamin</span><span class="nutr-supp-dose">2 gummies / day</span></div>
+        <p class="nutr-text">Men's formula covers key micronutrients including 800 IU Vitamin D, B6, B12, folate, biotin, and more. Fat-soluble vitamins (A, D, E) absorb best with a meal containing fat. Take with breakfast or lunch — not on an empty stomach.</p>
+        <div class="nutr-supp-meta">Kirkland Men's Gummies (Costco) · With breakfast or lunch</div>
+      </div>
+      <div class="nutr-supp-card">
+        <div class="nutr-supp-header"><span class="nutr-supp-name">Magnesium Glycinate</span><span class="nutr-supp-dose">200–400mg / day</span></div>
+        <p class="nutr-text">The most impactful addition to your stack. Supports sleep quality, muscle recovery, and reduces soreness. Start at 200mg and increase to 400mg after a week if needed.</p>
+        <div class="nutr-supp-meta">Pure Encapsulations (recommended) · 30–60 min before bed</div>
+      </div>
+      <div class="nutr-supp-card">
+        <div class="nutr-supp-header"><span class="nutr-supp-name">Collagen Peptides</span><span class="nutr-supp-dose">10–15g / day</span></div>
+        <p class="nutr-text">Specifically recommended given your lower back history. Supports connective tissue — tendons, ligaments, spinal fascia — which bears the load of hip thrusts, RDLs, and split squats. Must be taken with vitamin C (your multi covers this). Take 30–60 min before training or before bed on rest days.</p>
+        <div class="nutr-supp-meta">Momentous (recommended, contains FORTIGEL) · Pre-workout or before bed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROTEIN -->
+  <div class="nutr-block">
+    <div class="nutr-block-header" onclick="toggleNutrBlock(this)" style="cursor:pointer;">
+      <span class="nutr-block-icon">🥩</span>
+      <div style="flex:1;">
+        <div class="nutr-block-title">Protein</div>
+        <div class="nutr-block-sub">Daily target & food strategy</div>
+      </div>
+      <span class="nutr-toggle">▾</span>
+    </div>
+    <div class="nutr-block-body" style="display:none;">
+      <div class="nutr-stat-row">
+        <div class="nutr-stat"><div class="nutr-stat-val">165g</div><div class="nutr-stat-lbl">Daily Target</div></div>
+        <div class="nutr-stat"><div class="nutr-stat-val">~1g</div><div class="nutr-stat-lbl">Per lb bodyweight</div></div>
+        <div class="nutr-stat"><div class="nutr-stat-val">30–40g</div><div class="nutr-stat-lbl">Per meal (ideal)</div></div>
+      </div>
+      <div class="nutr-divider"></div>
+      <div class="nutr-label">Why this target</div>
+      <p class="nutr-text">At 165 lbs with a goal of building muscle, 1g per pound of bodyweight is the well-supported standard for active individuals in a hypertrophy phase. Your body can effectively use roughly 30–40g per meal for muscle protein synthesis — spreading intake across 4–5 meals is more effective than loading it into 1–2 large ones.</p>
+      <div class="nutr-label">Best protein sources from your current diet</div>
+      <div class="nutr-food-grid">
+        <div class="nutr-food-item"><span class="nutr-food-name">Kirkland Protein Shake</span><span class="nutr-food-val">26g / scoop</span></div>
+        <div class="nutr-food-item"><span class="nutr-food-name">Oikos Triple Zero Yogurt</span><span class="nutr-food-val">15g / cup</span></div>
+        <div class="nutr-food-item"><span class="nutr-food-name">Pure Protein Bar</span><span class="nutr-food-val">20g / bar</span></div>
+        <div class="nutr-food-item"><span class="nutr-food-name">Ground Beef (4oz)</span><span class="nutr-food-val">~22g</span></div>
+        <div class="nutr-food-item"><span class="nutr-food-name">Eggs (2 large)</span><span class="nutr-food-val">12g</span></div>
+        <div class="nutr-food-item"><span class="nutr-food-name">Whole Milk (8oz)</span><span class="nutr-food-val">8g</span></div>
+      </div>
+      <div class="nutr-label">Gaps to close</div>
+      <p class="nutr-text">Your typical day lands around 140g — about 25g short. Easiest fixes: add a Greek yogurt or cottage cheese snack (+15–17g), increase beef portion at dinner, or have a second protein shake on training days post-workout.</p>
+      <div class="nutr-tip">💡 Post-workout timing matters — get 30–40g within 1–2 hours of training. Your Kirkland shake is perfectly placed here.</div>
+    </div>
+  </div>
+
+  <!-- RECOVERY NUTRITION -->
+  <div class="nutr-block">
+    <div class="nutr-block-header" onclick="toggleNutrBlock(this)" style="cursor:pointer;">
+      <span class="nutr-block-icon">🔄</span>
+      <div style="flex:1;">
+        <div class="nutr-block-title">Recovery Nutrition</div>
+        <div class="nutr-block-sub">Supporting muscle repair between sessions</div>
+      </div>
+      <span class="nutr-toggle">▾</span>
+    </div>
+    <div class="nutr-block-body" style="display:none;">
+      <div class="nutr-label">Post-workout priority (within 2 hours)</div>
+      <p class="nutr-text">Get 30–40g protein within 1–2 hours of finishing your session. Your Kirkland shake handles this well. Add simple carbohydrates alongside it — fruit, rice, or a banana — to replenish glycogen and support protein uptake.</p>
+      <div class="nutr-label">Hydration</div>
+      <p class="nutr-text">Minimum 3 liters of water on training days. Dehydration worsens DOMS and slows recovery. Your fish oil and magnesium both absorb better when you're well hydrated.</p>
+      <div class="nutr-label">Soreness days</div>
+      <p class="nutr-text">When you're sore, maintain your protein target — your muscle tissue is actively repairing and needs the raw material. Light movement helps flush the area more than full rest. Massage gun before stretching, heat before the massage gun if you have time.</p>
+      <div class="nutr-label">Vegetables</div>
+      <p class="nutr-text">Your current diet is light on vegetables. Micronutrient density from vegetables supports recovery in ways your multi can't fully replace. Aim for at least 2 servings per day. Easiest additions: spinach in your protein shake (undetectable), frozen broccoli as a side, or salad with lunch.</p>
+      <div class="nutr-tip">💡 Sleep is the most underrated recovery tool. Magnesium glycinate before bed directly supports sleep quality — which is when 90% of muscle repair actually happens.</div>
+    </div>
+  </div>
+
 </div>
 
 </div><!-- /main -->
@@ -1481,6 +1658,17 @@ function toggleBlock(header){
   } else {
     body.style.display='none';
     if(tog)tog.classList.remove('open');
+  }
+}
+
+function toggleNutrBlock(header){
+  var body=header.nextElementSibling;
+  var tog=header.querySelector('.nutr-toggle');
+  if(!body)return;
+  if(body.style.display==='none'||body.style.display===''){
+    body.style.display='flex';if(tog)tog.classList.add('open');
+  } else {
+    body.style.display='none';if(tog)tog.classList.remove('open');
   }
 }
 
