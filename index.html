@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>8-Week Home Training Plan</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #0d0d0f; --bg2: #141417; --bg3: #1c1c21;
@@ -697,11 +698,55 @@
     text-transform: uppercase;
   }
   .section-back-btn:hover { color: var(--accent); }
-  .section-back-btn::before { content: '←'; font-size: 14px; }</style>
+  .section-back-btn::before { content: '←'; font-size: 14px; }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .login-wrap { width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .login-logo { font-size: 48px; margin-bottom: 4px; }
+  .login-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; color: var(--text); }
+  .login-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 8px; }
+  .login-card { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .login-msg { padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; }
+  .login-msg.error { background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.3); color: #ff6b6b; }
+  .login-msg.success { background: rgba(78,205,196,0.1); border: 1px solid rgba(78,205,196,0.3); color: var(--accent3); }
+  .login-field { display: flex; flex-direction: column; gap: 6px; }
+  .login-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+  .login-input { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 15px; outline: none; width: 100%; }
+  .login-input:focus { border-color: var(--accent); }
+  .login-btn { width: 100%; padding: 14px; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; border: none; transition: all 0.15s; }
+  .login-btn:first-of-type, #loginBtn { background: var(--accent); color: var(--bg); }
+  .login-btn-secondary { background: var(--bg3); border: 1px solid var(--border) !important; color: var(--text); border: none; }
+  .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .sync-indicator { position: fixed; bottom: 20px; right: 16px; background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); z-index: 1000; display: none; letter-spacing: 1px; }
+</style>
 </head>
 <body>
 
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" style="display:none;">
+  <div class="login-wrap">
+    <div class="login-logo">💪</div>
+    <div class="login-title">WORKOUT PLAN</div>
+    <div class="login-sub">Sign in to sync your data across all devices</div>
+    <div class="login-card">
+      <div id="loginMsg" class="login-msg" style="display:none;"></div>
+      <div class="login-field">
+        <label class="login-label">EMAIL</label>
+        <input type="email" id="loginEmail" class="login-input" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="login-field">
+        <label class="login-label">PASSWORD</label>
+        <input type="password" id="loginPassword" class="login-input" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button class="login-btn" id="loginBtn" onclick="handleLogin()">Sign In</button>
+      <button class="login-btn login-btn-secondary" id="signupBtn" onclick="handleSignup()">Create Account</button>
+    </div>
+  </div>
+</div>
+
 <nav class="nav-bar">
+  <div id="syncIndicator" class="sync-indicator">↑ syncing</div>
   <button class="nav-btn active" onclick="showSection('workouts',this)">Workouts</button>
   <button class="nav-btn" onclick="showSection('nutrition',this)">Nutrition</button>
   <button class="nav-btn" onclick="showSection('progress',this)">Progress</button>
@@ -1675,14 +1720,21 @@ const BW_EXERCISES = new Set(['pullups','chinups','nordic']);
 //  STORAGE
 // ═══════════════════════════════════════════════════════
 function sKey(w,day,ex,s){return 'wlog:w'+w+':'+day+':'+ex+':s'+s;}
-function saveSet(w,day,ex,s,weight,done,reps,rpe){try{localStorage.setItem(sKey(w,day,ex,s),JSON.stringify({weight:weight,done:done,reps:reps||'',rpe:rpe||'',ts:Date.now()}));}catch(e){}}
+function saveSet(w,day,ex,s,weight,done,reps,rpe){
+  var data={weight:weight,done:done,reps:reps||'',rpe:rpe||'',ts:Date.now()};
+  try{localStorage.setItem(sKey(w,day,ex,s),JSON.stringify(data));}catch(e){}
+  pushSetToSupabase(w,day,ex,s,data);
+}
 function loadSet(w,day,ex,s){try{var r=localStorage.getItem(sKey(w,day,ex,s));return r?JSON.parse(r):{weight:'',done:false,reps:'',rpe:''};}catch(e){return{weight:'',done:false,reps:'',rpe:''};}}
 
 function allLogKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wlog:')==0)keys.push(k);}}catch(e){}return keys;}
 function getActiveWeek(){var el=document.getElementById('activeWeekSelect');return el?parseInt(el.value,10)||1:1;}
 
 // Body weight storage
-function saveBW(dateStr,val){try{localStorage.setItem('bw:'+dateStr,val);}catch(e){}}
+function saveBW(dateStr,val){
+  try{localStorage.setItem('bw:'+dateStr,val);}catch(e){}
+  pushBWToSupabase(dateStr,val);
+}
 function loadBW(dateStr){try{var v=localStorage.getItem('bw:'+dateStr);return v?parseFloat(v):null;}catch(e){return null;}}
 function allBWKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('bw:')==0)keys.push(k);}}catch(e){}return keys;}
 
@@ -2161,10 +2213,16 @@ function updateDeleteBtn(){
 
 function deleteSelectedLogs(){
   Object.keys(logSelectedKeys).forEach(function(k){
-    var parts=k.split('|');var week=parts[0];var day=parts[1];
+    var parts=k.split('|');var week=parseInt(parts[0],10);var day=parts[1];
     allLogKeys().forEach(function(lk){
-      if(lk.indexOf('wlog:w'+week+':'+day+':')===0){try{localStorage.removeItem(lk);}catch(e){}}
+      if(lk.indexOf('wlog:w'+week+':'+day+':')===0){
+        try{localStorage.removeItem(lk);}catch(e){}
+      }
     });
+    if(supaClient&&currentUser){
+      supaClient.from('workout_sets').delete()
+        .eq('user_id',currentUser.id).eq('week',week).eq('day',day).then(function(){});
+    }
   });
   logSelectedKeys={};
   updateDeleteBtn();
@@ -2173,6 +2231,9 @@ function deleteSelectedLogs(){
 
 function clearAllLogs(){
   allLogKeys().forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
+  if(supaClient&&currentUser){
+    supaClient.from('workout_sets').delete().eq('user_id',currentUser.id).then(function(){});
+  }
   renderLogHistory();buildTrackers();renderProgress();
 }
 
@@ -3360,6 +3421,7 @@ function applyTheme(themeId){
   root.style.setProperty('--text',t.text);
   root.style.setProperty('--muted',t.muted);
   try{localStorage.setItem('appTheme',themeId);}catch(e){}
+  pushPrefToSupabase('appTheme',themeId);
   var ap=document.getElementById('customAccent');if(ap)ap.value=t.accent;
   var bp=document.getElementById('customBg');if(bp)bp.value=t.bg;
   var sp=document.getElementById('customSurface');if(sp)sp.value=t.bg3;
@@ -3413,6 +3475,8 @@ function applyCustomColor(type,value){
     cur.isCustom=true;
     localStorage.setItem('appThemeCustom',JSON.stringify(cur));
     localStorage.setItem('appTheme','custom');
+    pushPrefToSupabase('appTheme','custom');
+    pushPrefToSupabase('appThemeCustom',JSON.stringify(cur));
   }catch(e){}
 }
 
@@ -3458,12 +3522,241 @@ showSubSection=function(id){
   if(id==='themes')buildThemePresets();
 };
 
-buildSchedule();
-document.querySelectorAll('.block-body').forEach(function(b){if(b.style.display!=='block')b.style.display='none';});
-buildTrackers();
-updateDayPillStates();
-renderStreakBanner();
-loadSavedTheme();
+// ═══════════════════════════════════════════════════════
+//  SUPABASE ENGINE
+// ═══════════════════════════════════════════════════════
+var SUPA_URL='https://zvcpzvxngfijqzluwyxc.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Y3B6dnhuZ2ZpanF6bHV3eXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODA2MzQsImV4cCI6MjA5MDQ1NjYzNH0.zFXTkKPTcmJgal1KoPtSr_7Q6dk7Bd6OZT--KyBoa4I';
+var supaClient=null;
+var currentUser=null;
+var syncPending=false;
+
+function initSupabase(){
+  try{
+    supaClient=supabase.createClient(SUPA_URL,SUPA_KEY);
+  }catch(e){console.error('Supabase init failed:',e);}
+}
+
+function showSyncIndicator(msg){
+  var el=document.getElementById('syncIndicator');
+  if(el){el.textContent=msg||'↑ syncing';el.style.display='block';}
+}
+function hideSyncIndicator(){
+  var el=document.getElementById('syncIndicator');
+  if(el)el.style.display='none';
+}
+
+// ── AUTH ──
+function showLoginScreen(){
+  var ls=document.getElementById('loginScreen');
+  if(ls)ls.style.display='flex';
+  var nav=document.querySelector('.nav-bar');
+  var main=document.querySelector('.main');
+  if(nav)nav.style.display='none';
+  if(main)main.style.display='none';
+}
+
+function hideLoginScreen(){
+  var ls=document.getElementById('loginScreen');
+  if(ls)ls.style.display='none';
+  var nav=document.querySelector('.nav-bar');
+  var main=document.querySelector('.main');
+  if(nav)nav.style.display='';
+  if(main)main.style.display='';
+}
+
+function setLoginMsg(msg,type){
+  var el=document.getElementById('loginMsg');
+  if(!el)return;
+  el.textContent=msg;
+  el.className='login-msg '+(type||'error');
+  el.style.display=msg?'block':'none';
+}
+
+function handleLogin(){
+  var email=document.getElementById('loginEmail').value.trim();
+  var pass=document.getElementById('loginPassword').value;
+  if(!email||!pass){setLoginMsg('Please enter email and password.');return;}
+  var btn=document.getElementById('loginBtn');
+  btn.disabled=true;btn.textContent='Signing in...';
+  supaClient.auth.signInWithPassword({email:email,password:pass}).then(function(res){
+    btn.disabled=false;btn.textContent='Sign In';
+    if(res.error){setLoginMsg(res.error.message);return;}
+    currentUser=res.data.user;
+    setLoginMsg('');
+    onAuthSuccess();
+  });
+}
+
+function handleSignup(){
+  var email=document.getElementById('loginEmail').value.trim();
+  var pass=document.getElementById('loginPassword').value;
+  if(!email||!pass){setLoginMsg('Please enter email and password.');return;}
+  if(pass.length<6){setLoginMsg('Password must be at least 6 characters.');return;}
+  var btn=document.getElementById('signupBtn');
+  btn.disabled=true;btn.textContent='Creating account...';
+  supaClient.auth.signUp({email:email,password:pass}).then(function(res){
+    btn.disabled=false;btn.textContent='Create Account';
+    if(res.error){setLoginMsg(res.error.message);return;}
+    if(res.data&&res.data.user&&res.data.user.id){
+      currentUser=res.data.user;
+      setLoginMsg('');
+      onAuthSuccess();
+    } else {
+      setLoginMsg('Account created! Check your email to confirm, then sign in.','success');
+    }
+  });
+}
+
+function onAuthSuccess(){
+  hideLoginScreen();
+  initApp();
+  // Run migration then pull from cloud
+  migrateLocalToSupabase(function(){
+    pullFromSupabase(function(){
+      buildTrackers();
+      updateDayPillStates();
+      renderStreakBanner();
+    });
+  });
+}
+
+// ── MIGRATION: push all localStorage data to Supabase once ──
+function migrateLocalToSupabase(cb){
+  if(!currentUser)return cb&&cb();
+  var migrated=localStorage.getItem('supa_migrated');
+  if(migrated){return cb&&cb();}
+  showSyncIndicator('↑ migrating data...');
+  var sets=[];
+  allLogKeys().forEach(function(k){
+    try{
+      var val=JSON.parse(localStorage.getItem(k)||'{}');
+      var p=k.replace('wlog:','').split(':');
+      if(p.length<4)return;
+      sets.push({
+        user_id:currentUser.id,
+        week:parseInt(p[0].replace('w',''),10),
+        day:p[1],exercise_id:p[2],
+        set_index:parseInt(p[3].replace('s',''),10),
+        weight:val.weight||'',reps:val.reps||'',
+        done:val.done||false,rpe:val.rpe||'',
+        ts:val.ts||Date.now()
+      });
+    }catch(e){}
+  });
+  var bwEntries=[];
+  allBWKeys().forEach(function(k){
+    var val=loadBW(k.replace('bw:',''));
+    if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});
+  });
+  var prefKeys=['appTheme','appThemeCustom'];
+  var prefs=[];
+  prefKeys.forEach(function(k){
+    var v=localStorage.getItem(k);
+    if(v)prefs.push({user_id:currentUser.id,key:k,value:v});
+  });
+
+  var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)||1;
+  function checkDone(){done++;if(done>=total){localStorage.setItem('supa_migrated','1');hideSyncIndicator();cb&&cb();}}
+
+  if(sets.length){
+    supaClient.from('workout_sets').upsert(sets,{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(){checkDone();});
+  } else checkDone();
+  if(bwEntries.length){
+    supaClient.from('body_weight').upsert(bwEntries,{onConflict:'user_id,date'}).then(function(){checkDone();});
+  } else if(total>1) checkDone();
+  if(prefs.length){
+    supaClient.from('user_preferences').upsert(prefs,{onConflict:'user_id,key'}).then(function(){checkDone();});
+  } else if(total>2) checkDone();
+}
+
+// ── PULL: load all cloud data into localStorage ──
+function pullFromSupabase(cb){
+  if(!supaClient||!currentUser){cb&&cb();return;}
+  showSyncIndicator('↓ syncing...');
+  var done=0;
+  function checkDone(){done++;if(done>=3){hideSyncIndicator();cb&&cb();}}
+
+  supaClient.from('workout_sets').select('*').eq('user_id',currentUser.id).then(function(res){
+    if(res.data){
+      res.data.forEach(function(r){
+        var k=sKey(r.week,r.day,r.exercise_id,r.set_index);
+        var existing=null;
+        try{existing=JSON.parse(localStorage.getItem(k));}catch(e){}
+        if(!existing||(r.ts&&(!existing.ts||r.ts>existing.ts))){
+          try{localStorage.setItem(k,JSON.stringify({weight:r.weight,done:r.done,reps:r.reps,rpe:r.rpe,ts:r.ts}));}catch(e){}
+        }
+      });
+    }
+    checkDone();
+  });
+
+  supaClient.from('body_weight').select('*').eq('user_id',currentUser.id).then(function(res){
+    if(res.data){
+      res.data.forEach(function(r){saveBW(r.date,r.value);});
+    }
+    checkDone();
+  });
+
+  supaClient.from('user_preferences').select('*').eq('user_id',currentUser.id).then(function(res){
+    if(res.data){
+      res.data.forEach(function(r){try{localStorage.setItem(r.key,r.value);}catch(e){}});
+    }
+    checkDone();
+  });
+}
+
+// ── PUSH: sync a single set to Supabase ──
+function pushSetToSupabase(w,day,exId,setIdx,data){
+  if(!supaClient||!currentUser)return;
+  supaClient.from('workout_sets').upsert({
+    user_id:currentUser.id,week:w,day:day,exercise_id:exId,set_index:setIdx,
+    weight:data.weight||'',reps:data.reps||'',done:data.done||false,
+    rpe:data.rpe||'',ts:data.ts||Date.now()
+  },{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(){});
+}
+
+function pushBWToSupabase(dateStr,val){
+  if(!supaClient||!currentUser)return;
+  supaClient.from('body_weight').upsert({
+    user_id:currentUser.id,date:dateStr,value:val
+  },{onConflict:'user_id,date'}).then(function(){});
+}
+
+function pushPrefToSupabase(key,value){
+  if(!supaClient||!currentUser)return;
+  supaClient.from('user_preferences').upsert({
+    user_id:currentUser.id,key:key,value:value
+  },{onConflict:'user_id,key'}).then(function(){});
+}
+
+// ── INIT ──
+function initApp(){
+  buildSchedule();
+  document.querySelectorAll('.block-body').forEach(function(b){if(b.style.display!=='block')b.style.display='none';});
+  buildTrackers();
+  updateDayPillStates();
+  renderStreakBanner();
+  loadSavedTheme();
+}
+
+initSupabase();
+
+// Check for existing session
+supaClient.auth.getSession().then(function(res){
+  if(res.data&&res.data.session&&res.data.session.user){
+    currentUser=res.data.session.user;
+    hideLoginScreen();
+    initApp();
+    pullFromSupabase(function(){
+      buildTrackers();
+      updateDayPillStates();
+      renderStreakBanner();
+    });
+  } else {
+    showLoginScreen();
+  }
+});
 
 </script>
 </body>
