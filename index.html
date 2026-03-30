@@ -505,6 +505,29 @@
   .summary-cooldown-meta { text-align: right; flex-shrink: 0; }
   .summary-cooldown-dur { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent2); display: block; margin-bottom: 2px; }
   .summary-cooldown-cue { font-size: 11px; color: var(--muted); font-style: italic; }
+
+  /* ── RPE POPUP ── */
+  .rpe-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; display: flex; align-items: flex-end; justify-content: center; padding-bottom: env(safe-area-inset-bottom, 0); }
+  .rpe-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 18px 18px 0 0; padding: 24px 20px 28px; width: 100%; max-width: 480px; }
+  .rpe-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); letter-spacing: 2px; text-align: center; }
+  .rpe-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-align: center; margin-bottom: 18px; }
+  .rpe-btns { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .rpe-btn { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); cursor: pointer; text-align: left; transition: all 0.15s; }
+  .rpe-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .rpe-skip { width: 100%; padding: 10px; background: none; border: none; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); cursor: pointer; letter-spacing: 1px; }
+
+  /* ── BODY WEIGHT ── */
+  .bw-input-row { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+  .bw-date-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  .bw-input { font-family: 'DM Mono', monospace; font-size: 18px; padding: 10px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; color: var(--text); width: 100px; text-align: center; outline: none; }
+  .bw-input:focus { border-color: var(--accent); }
+  .bw-save-btn { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; padding: 10px 18px; border-radius: 10px; border: 1px solid var(--accent); background: rgba(232,255,71,0.08); color: var(--accent); cursor: pointer; white-space: nowrap; }
+  .bw-stats-row { display: flex; gap: 10px; margin-bottom: 20px; }
+  .bw-stat { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 10px; text-align: center; }
+  .bw-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--accent); line-height: 1; }
+  .bw-stat-lbl { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+  .bw-stat-val.negative { color: var(--accent3); }
+  .bw-stat-val.positive { color: var(--accent2); }
   .summary-streak { display: flex; align-items: center; gap: 12px; background: rgba(232,255,71,0.06); border: 1px solid rgba(232,255,71,0.2); border-radius: 10px; padding: 12px 16px; width: 100%; }
   .summary-streak-fire { font-size: 24px; flex-shrink: 0; }
   .summary-streak-val { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--accent); letter-spacing: 1px; }
@@ -1261,6 +1284,7 @@
     <button class="prog-subtab active" onclick="showProgTab('volume',this)">Volume</button>
     <button class="prog-subtab" onclick="showProgTab('prs',this)">PRs</button>
     <button class="prog-subtab" onclick="showProgTab('muscles',this)">Muscles</button>
+    <button class="prog-subtab" onclick="showProgTab('body',this)">Body</button>
     <button class="prog-subtab" onclick="showProgTab('rawlog',this)">Log</button>
   </div>
 
@@ -1302,6 +1326,27 @@
     <div class="prog-card">
       <div class="prog-card-label">Volume by Muscle Group</div>
       <div id="muscleContainer"><div style="color:var(--muted);font-size:13px;padding:12px 0;">Log workouts to see your muscle breakdown.</div></div>
+    </div>
+  </div>
+
+  <!-- BODY WEIGHT TAB -->
+  <div id="prog-body" class="prog-tab">
+    <div class="bw-input-row">
+      <div class="bw-date-label" id="bwDateLabel">TODAY</div>
+      <input type="number" class="bw-input" id="bwInput" placeholder="lbs" min="50" max="400" step="0.1"/>
+      <button class="bw-save-btn" onclick="saveTodayBW()">Save</button>
+    </div>
+    <div class="bw-stats-row" id="bwStatsRow" style="display:none;">
+      <div class="bw-stat"><div class="bw-stat-val" id="bwStart">—</div><div class="bw-stat-lbl">Start</div></div>
+      <div class="bw-stat"><div class="bw-stat-val" id="bwCurrent">—</div><div class="bw-stat-lbl">Current</div></div>
+      <div class="bw-stat"><div class="bw-stat-val" id="bwChange">—</div><div class="bw-stat-lbl">Change</div></div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-label">Weight Trend</div>
+      <div class="chart-wrap">
+        <canvas id="bwChart" height="120"></canvas>
+      </div>
+      <div id="bwEmpty" style="color:var(--muted);font-size:13px;padding:12px 0;display:none;">Log your weight daily to see your trend.</div>
     </div>
   </div>
 
@@ -1630,11 +1675,16 @@ const BW_EXERCISES = new Set(['pullups','chinups','nordic']);
 //  STORAGE
 // ═══════════════════════════════════════════════════════
 function sKey(w,day,ex,s){return 'wlog:w'+w+':'+day+':'+ex+':s'+s;}
-function saveSet(w,day,ex,s,weight,done,reps){try{localStorage.setItem(sKey(w,day,ex,s),JSON.stringify({weight:weight,done:done,reps:reps||'',ts:Date.now()}));}catch(e){}}
-function loadSet(w,day,ex,s){try{var r=localStorage.getItem(sKey(w,day,ex,s));return r?JSON.parse(r):{weight:'',done:false,reps:''};}catch(e){return{weight:'',done:false,reps:''};}}
+function saveSet(w,day,ex,s,weight,done,reps,rpe){try{localStorage.setItem(sKey(w,day,ex,s),JSON.stringify({weight:weight,done:done,reps:reps||'',rpe:rpe||'',ts:Date.now()}));}catch(e){}}
+function loadSet(w,day,ex,s){try{var r=localStorage.getItem(sKey(w,day,ex,s));return r?JSON.parse(r):{weight:'',done:false,reps:'',rpe:''};}catch(e){return{weight:'',done:false,reps:'',rpe:''};}}
 
 function allLogKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wlog:')==0)keys.push(k);}}catch(e){}return keys;}
 function getActiveWeek(){var el=document.getElementById('activeWeekSelect');return el?parseInt(el.value,10)||1:1;}
+
+// Body weight storage
+function saveBW(dateStr,val){try{localStorage.setItem('bw:'+dateStr,val);}catch(e){}}
+function loadBW(dateStr){try{var v=localStorage.getItem('bw:'+dateStr);return v?parseFloat(v):null;}catch(e){return null;}}
+function allBWKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('bw:')==0)keys.push(k);}}catch(e){}return keys;}
 
 // ═══════════════════════════════════════════════════════
 //  NAV
@@ -1884,7 +1934,10 @@ function buildTrackers(){
           var inp=document.createElement('input');
           inp.type='number';inp.className='set-weight-input';inp.placeholder='—';
           inp.min=0;inp.step=2.5;inp.value=data.weight||'';inp.title='Weight used (lbs)';
-          inp.addEventListener('input',function(){saveSet(getActiveWeek(),day,ex.id,setIdx,inp.value,bubble.classList.contains('done'));});
+          inp.addEventListener('input',function(){
+            var cur=loadSet(getActiveWeek(),day,ex.id,setIdx);
+            saveSet(getActiveWeek(),day,ex.id,setIdx,inp.value,bubble.classList.contains('done'),cur.reps||'',cur.rpe||'');
+          });
           inp.addEventListener('click',function(e){e.stopPropagation();});
 
           var unit=document.createElement('span');unit.className='set-unit';unit.textContent='lb';
@@ -1894,7 +1947,8 @@ function buildTrackers(){
             e.stopPropagation();
             var done=!bubble.classList.contains('done');
             bubble.classList.toggle('done',done);
-            saveSet(getActiveWeek(),day,ex.id,setIdx,inp.value,done);
+            var cur=loadSet(getActiveWeek(),day,ex.id,setIdx);
+            saveSet(getActiveWeek(),day,ex.id,setIdx,inp.value,done,cur.reps||'',cur.rpe||'');
             updateDayPillStates();
             renderStreakBanner();
             if(done&&setIdx<ex.sets-1){
@@ -2139,7 +2193,7 @@ function buildLogGroups(wfv,dfv){
     if(!grouped[week])grouped[week]={};
     if(!grouped[week][day])grouped[week][day]={};
     if(!grouped[week][day][exId])grouped[week][day][exId]=[];
-    grouped[week][day][exId][si]={weight:val.weight,done:val.done,reps:val.reps||'',ts:val.ts};
+    grouped[week][day][exId][si]={weight:val.weight,done:val.done,reps:val.reps||'',rpe:val.rpe||'',ts:val.ts};
   });
   return grouped;
 }
@@ -2199,7 +2253,8 @@ function renderLogHistory(){
           var chipId='chip-'+week+'-'+day+'-'+exId+'-'+si;
           var wDisplay=s.weight?s.weight+' lbs':'BW';
           var rDisplay=' · '+(s.reps?s.reps+' reps':'— reps');
-          var chipLabel='S'+(si+1)+': '+wDisplay+rDisplay;
+          var rpeDisplay=s.rpe?(' · RPE '+s.rpe):'';
+          var chipLabel='S'+(si+1)+': '+wDisplay+rDisplay+rpeDisplay;
           var completedClass=s.done?'completed':'';
           html+='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+si+')">'+chipLabel+'</span>';
         });
@@ -2218,6 +2273,16 @@ function showProgTab(id,btn){
   var el=document.getElementById('prog-'+id);if(el)el.classList.add('active');
   if(btn)btn.classList.add('active');
   if(id==='rawlog')renderLogHistory();
+  if(id==='body'){
+    if(typeof Chart==='undefined'){
+      var s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+      s.onload=function(){renderBWTab();};
+      document.head.appendChild(s);
+    } else {
+      renderBWTab();
+    }
+  }
 }
 
 function setRange(weeks,btn){
@@ -2233,6 +2298,107 @@ function setMuscleRange(mode,btn){
 }
 
 function renderProgress(){renderVolume();renderPRs();renderMuscles();}
+
+// ── BODY WEIGHT ──
+function todayStr(){
+  var d=new Date();
+  return d.getFullYear()+'-'+(d.getMonth()<9?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate();
+}
+
+function saveTodayBW(){
+  var inp=document.getElementById('bwInput');
+  if(!inp||!inp.value)return;
+  var val=parseFloat(inp.value);
+  if(isNaN(val)||val<50||val>400)return;
+  saveBW(todayStr(),val);
+  renderBWTab();
+}
+
+function renderBWTab(){
+  var inp=document.getElementById('bwInput');
+  var label=document.getElementById('bwDateLabel');
+  var today=todayStr();
+  if(inp){var existing=loadBW(today);if(existing)inp.value=existing;}
+  if(label){
+    var d=new Date();
+    var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    label.textContent=months[d.getMonth()]+' '+d.getDate();
+  }
+  var keys=allBWKeys().sort();
+  var entries=[];
+  keys.forEach(function(k){
+    var dateStr=k.replace('bw:','');
+    var val=loadBW(dateStr);
+    if(val)entries.push({date:dateStr,val:val});
+  });
+  var statsRow=document.getElementById('bwStatsRow');
+  var emptyEl=document.getElementById('bwEmpty');
+  var chartWrap=document.querySelector('#prog-body .chart-wrap');
+  if(entries.length===0){
+    if(statsRow)statsRow.style.display='none';
+    if(emptyEl)emptyEl.style.display='block';
+    if(chartWrap)chartWrap.style.display='none';
+    return;
+  }
+  if(emptyEl)emptyEl.style.display='none';
+  if(chartWrap)chartWrap.style.display='block';
+  var first=entries[0].val;
+  var last=entries[entries.length-1].val;
+  var change=Math.round((last-first)*10)/10;
+  var changeStr=(change>0?'+':'')+change+' lbs';
+  if(statsRow){
+    statsRow.style.display='flex';
+    var startEl=document.getElementById('bwStart');
+    var curEl=document.getElementById('bwCurrent');
+    var chEl=document.getElementById('bwChange');
+    if(startEl)startEl.textContent=first+' lbs';
+    if(curEl)curEl.textContent=last+' lbs';
+    if(chEl){
+      chEl.textContent=changeStr;
+      chEl.className='bw-stat-val'+(change<0?' negative':change>0?' positive':'');
+    }
+  }
+  renderBWChart(entries);
+}
+
+function renderBWChart(entries){
+  if(typeof Chart==='undefined')return;
+  var labels=entries.map(function(e){
+    var parts=e.date.split('-');
+    var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[parseInt(parts[1],10)-1]+' '+parseInt(parts[2],10);
+  });
+  var vals=entries.map(function(e){return e.val;});
+  var canvas=document.getElementById('bwChart');
+  if(!canvas)return;
+  if(canvas._chart){canvas._chart.destroy();}
+  var minVal=Math.min.apply(null,vals)-2;
+  var maxVal=Math.max.apply(null,vals)+2;
+  canvas._chart=new Chart(canvas,{
+    type:'line',
+    data:{
+      labels:labels,
+      datasets:[{
+        data:vals,
+        borderColor:'#4ecdc4',
+        backgroundColor:'rgba(78,205,196,0.08)',
+        borderWidth:2,
+        pointBackgroundColor:'#4ecdc4',
+        pointRadius:4,
+        tension:0.3,
+        fill:true
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.parsed.y+' lbs';}}}},
+      scales:{
+        x:{ticks:{color:'#555',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{min:minVal,max:maxVal,ticks:{color:'#555',font:{size:10},callback:function(v){return v+' lbs';}},grid:{color:'rgba(255,255,255,0.06)'}}
+      }
+    }
+  });
+}
 
 function loadAndRenderProgress(){
   if(typeof Chart==='undefined'){
@@ -2826,12 +2992,12 @@ function renderSessionExercise(idx){
 
 function saveSessionReps(day,exId,setIdx,reps){
   var cur=loadSet(session.week,day,exId,setIdx);
-  saveSet(session.week,day,exId,setIdx,cur.weight,cur.done,reps);
+  saveSet(session.week,day,exId,setIdx,cur.weight,cur.done,reps,cur.rpe||'');
 }
 
 function saveSessionSet(day,exId,setIdx,weight,done){
   var cur=loadSet(session.week,day,exId,setIdx);
-  saveSet(session.week,day,exId,setIdx,weight,done,cur.reps);
+  saveSet(session.week,day,exId,setIdx,weight,done,cur.reps,cur.rpe||'');
   updateSessionVolume();
 }
 
@@ -2844,12 +3010,52 @@ function toggleSessionSet(day,exId,setIdx,restSecs,hasNextSet){
   var done=!btn.classList.contains('done');
   btn.classList.toggle('done',done);
   if(row)row.classList.toggle('done-row',done);
-  saveSet(session.week,day,exId,setIdx,inp?inp.value:'',done,repsInp?repsInp.value:'');
+  var curRpe=loadSet(session.week,day,exId,setIdx).rpe||'';
+  saveSet(session.week,day,exId,setIdx,inp?inp.value:'',done,repsInp?repsInp.value:'',curRpe);
   updateSessionVolume();
   buildSessionNav();
   var pills=document.querySelectorAll('.session-ex-pill');
   if(pills[session.currentExIdx])pills[session.currentExIdx].classList.add('active');
-  if(done&&hasNextSet)startSessionRest(restSecs);
+  if(done){
+    showRpePopup(day,exId,setIdx,restSecs,hasNextSet);
+  }
+}
+
+function showRpePopup(day,exId,setIdx,restSecs,hasNextSet){
+  var existing=document.getElementById('rpePopup');
+  if(existing)existing.parentNode.removeChild(existing);
+  var overlay=document.createElement('div');
+  overlay.id='rpePopup';
+  overlay.className='rpe-overlay';
+  var btns='';
+  for(var r=6;r<=10;r++){
+    var label=r===6?'6 — Easy':r===7?'7 — Moderate':r===8?'8 — Hard':r===9?'9 — Very Hard':'10 — Max';
+    btns+='<button class="rpe-btn" onclick="selectRpe(\''+day+'\',\''+exId+'\','+setIdx+','+restSecs+','+hasNextSet+','+r+')">'+label+'</button>';
+  }
+  overlay.innerHTML='<div class="rpe-card">'+
+    '<div class="rpe-title">HOW HARD WAS THAT SET?</div>'+
+    '<div class="rpe-sub">Rate of Perceived Exertion</div>'+
+    '<div class="rpe-btns">'+btns+'</div>'+
+    '<button class="rpe-skip" onclick="skipRpePopup(\''+day+'\',\''+exId+'\','+setIdx+','+restSecs+','+hasNextSet+')">Skip</button>'+
+  '</div>';
+  document.body.appendChild(overlay);
+}
+
+function selectRpe(day,exId,setIdx,restSecs,hasNextSet,rpe){
+  var cur=loadSet(session.week,day,exId,setIdx);
+  saveSet(session.week,day,exId,setIdx,cur.weight,cur.done,cur.reps,String(rpe));
+  closeRpePopup();
+  if(hasNextSet)startSessionRest(restSecs);
+}
+
+function skipRpePopup(day,exId,setIdx,restSecs,hasNextSet){
+  closeRpePopup();
+  if(hasNextSet)startSessionRest(restSecs);
+}
+
+function closeRpePopup(){
+  var el=document.getElementById('rpePopup');
+  if(el)el.parentNode.removeChild(el);
 }
 
 function startSessionRest(secs){
@@ -3071,14 +3277,14 @@ function saveChipEdit(week,day,exId,setIdx){
   var newW=wi?wi.value:'';
   var newR=ri?ri.value:'';
   var cur=loadSet(+week,day,exId,setIdx);
-  saveSet(+week,day,exId,setIdx,newW,cur.done,newR);
-  // Rebuild chip display
+  saveSet(+week,day,exId,setIdx,newW,cur.done,newR,cur.rpe||'');
   var editEl=document.getElementById(chipId);
   if(!editEl)return;
   var wDisplay=newW?newW+' lbs':'BW';
   var rDisplay=' · '+(newR?newR+' reps':'— reps');
+  var rpeDisplay=cur.rpe?(' · RPE '+cur.rpe):'';
   var completedClass=cur.done?'completed':'';
-  editEl.outerHTML='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+setIdx+')">S'+(setIdx+1)+': '+wDisplay+rDisplay+'</span>';
+  editEl.outerHTML='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+setIdx+')">S'+(setIdx+1)+': '+wDisplay+rDisplay+rpeDisplay+'</span>';
   renderProgress();
 }
 
