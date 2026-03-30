@@ -50,6 +50,16 @@
   .week-tab { font-family: 'DM Mono', monospace; font-size: 11px; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg3); color: var(--muted); cursor: pointer; transition: all 0.15s; }
   .week-tab:hover { border-color: var(--accent); color: var(--accent); }
   .week-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+  .week-tab.done { border-color: rgba(78,205,196,0.4); color: var(--accent3); background: rgba(78,205,196,0.07); }
+  .week-tab.done::after { content: ' ✓'; }
+  .week-tab.active.done { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .week-tab.active.done::after { content: ' ✓'; color: var(--bg); }
+
+  /* ── STREAK BANNER ── */
+  .streak-banner { display: flex; align-items: center; gap: 10px; background: rgba(232,255,71,0.06); border: 1px solid rgba(232,255,71,0.18); border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; }
+  .streak-fire { font-size: 20px; flex-shrink: 0; }
+  .streak-text { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.5px; }
+  .streak-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
   .day-panel { display: none; }
   .day-panel.active { display: block; }
 
@@ -495,6 +505,10 @@
   .summary-cooldown-meta { text-align: right; flex-shrink: 0; }
   .summary-cooldown-dur { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent2); display: block; margin-bottom: 2px; }
   .summary-cooldown-cue { font-size: 11px; color: var(--muted); font-style: italic; }
+  .summary-streak { display: flex; align-items: center; gap: 12px; background: rgba(232,255,71,0.06); border: 1px solid rgba(232,255,71,0.2); border-radius: 10px; padding: 12px 16px; width: 100%; }
+  .summary-streak-fire { font-size: 24px; flex-shrink: 0; }
+  .summary-streak-val { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--accent); letter-spacing: 1px; }
+  .summary-streak-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
   /* ── WARM-UP & CARDIO ROWS ── */
   .wu-list { padding: 4px 0; }
   .wu-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
@@ -717,6 +731,14 @@
 <!-- ===== WORKOUTS ===== -->
 <div id="workouts" class="section active">
   <div class="section-title">Workout Plans — All 8 Weeks</div>
+  <div id="streakBanner" class="streak-banner" style="display:none;">
+    <div class="streak-fire">🔥</div>
+    <div>
+      <div class="streak-text" id="streakText">WEEK 1 STREAK</div>
+      <div class="streak-sub" id="streakSub">Keep it going</div>
+    </div>
+  </div>
+
   <div class="week-selector-bar">
     <label>Logging for:</label>
     <div class="week-select-wrap">
@@ -1646,6 +1668,69 @@ function showDay(id,btn){
   var el=document.getElementById(id);
   if(el)el.classList.add('active');
   if(btn)btn.classList.add('active');
+  updateDayPillStates();
+}
+
+// Returns true if every set for every exercise on a given day+week is marked done
+function isDayComplete(week,day){
+  var exList=EXERCISES[day];
+  if(!exList||!exList.length)return false;
+  for(var i=0;i<exList.length;i++){
+    var ex=exList[i];
+    var allDone=true;
+    for(var s=0;s<ex.sets;s++){
+      var d=loadSet(week,day,ex.id,s);
+      if(!d.done){allDone=false;break;}
+    }
+    if(!allDone)return false;
+  }
+  return true;
+}
+
+// Update the ✓ / teal done state on all day pills
+function updateDayPillStates(){
+  var week=getActiveWeek();
+  var workoutDays=['d1','d2','d4','d5'];
+  document.querySelectorAll('.week-tab').forEach(function(btn){
+    // Extract day id from onclick attr
+    var match=btn.getAttribute('onclick').match(/showDay\('([^']+)'/);
+    if(!match)return;
+    var day=match[1];
+    if(workoutDays.indexOf(day)===-1){btn.classList.remove('done');return;}
+    if(isDayComplete(week,day)){
+      btn.classList.add('done');
+    } else {
+      btn.classList.remove('done');
+    }
+  });
+}
+
+// Count consecutive weeks (1–8) where at least one workout day has all sets done
+function calcStreak(){
+  var streak=0;
+  for(var w=1;w<=8;w++){
+    var weekHasWorkout=false;
+    var days=['d1','d2','d4','d5'];
+    for(var di=0;di<days.length;di++){
+      if(isDayComplete(w,days[di])){weekHasWorkout=true;break;}
+    }
+    if(weekHasWorkout){streak=w;}
+    else{break;}
+  }
+  return streak;
+}
+
+function renderStreakBanner(){
+  var streak=calcStreak();
+  var banner=document.getElementById('streakBanner');
+  var textEl=document.getElementById('streakText');
+  var subEl=document.getElementById('streakSub');
+  if(!banner)return;
+  if(streak===0){banner.style.display='none';return;}
+  banner.style.display='flex';
+  textEl.textContent='WEEK '+streak+' STREAK';
+  var subs=['Just getting started — keep showing up','Building the habit — solid work','3 weeks in — you\'re locked in','Halfway there — don\'t stop now','5 weeks strong — this is becoming who you are','6 weeks — the program is working','7 weeks — one more push','8 weeks complete — full program finished 🏆'];
+  subEl.textContent=subs[streak-1]||'Keep it going';
 }
 
 function toggleBlock(header){
@@ -1687,6 +1772,8 @@ function onWeekChange(){
     b.className='week-info-badge '+PHASE_CLS[phase];
   }
   buildTrackers();
+  updateDayPillStates();
+  renderStreakBanner();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1808,6 +1895,8 @@ function buildTrackers(){
             var done=!bubble.classList.contains('done');
             bubble.classList.toggle('done',done);
             saveSet(getActiveWeek(),day,ex.id,setIdx,inp.value,done);
+            updateDayPillStates();
+            renderStreakBanner();
             if(done&&setIdx<ex.sets-1){
               var timerEl=bubble.nextElementSibling;
               if(timerEl){var startBtn=timerEl.querySelector('.rest-timer-btn');if(startBtn&&startBtn.textContent==='START')startBtn.click();}
@@ -2893,6 +2982,14 @@ function endSession(){
     '</div>';
   }
 
+  // Streak milestone
+  var streakAfter=calcStreak();
+  var streakHTML='';
+  if(streakAfter>0){
+    var streakMsgs=['Just getting started — keep showing up','Building the habit — solid work','3 weeks in — you\'re locked in','Halfway there — don\'t stop now','5 weeks strong — this is becoming who you are','6 weeks — the program is working','7 weeks — one more push','8 weeks complete — full program finished 🏆'];
+    streakHTML='<div class="summary-streak"><span class="summary-streak-fire">🔥</span><div><div class="summary-streak-val">WEEK '+streakAfter+' STREAK</div><div class="summary-streak-sub">'+( streakMsgs[streakAfter-1]||'Keep going')+'</div></div></div>';
+  }
+
   var durHTML='<div class="summary-stat summary-dur-stat" onclick="editSummaryDuration('+session.week+',\''+session.day+'\')">'+
     '<div class="summary-stat-val" id="summaryDurVal">'+mins+'</div>'+
     '<div class="summary-stat-lbl">Min <span style="font-size:8px;color:#555;">✎</span></div>'+
@@ -2908,10 +3005,13 @@ function endSession(){
       '<div class="summary-stat"><div class="summary-stat-val">'+session.exercises.length+'</div><div class="summary-stat-lbl">Exercises</div></div>'+
       durHTML+
     '</div>'+
+    streakHTML+
     prsHTML+
     coolHTML+
     '<button class="summary-done-btn" onclick="closeSession()">Done</button>'+
   '</div>';
+  updateDayPillStates();
+  renderStreakBanner();
 }
 
 function editSummaryDuration(week,day){
@@ -3155,6 +3255,8 @@ showSubSection=function(id){
 buildSchedule();
 document.querySelectorAll('.block-body').forEach(function(b){if(b.style.display!=='block')b.style.display='none';});
 buildTrackers();
+updateDayPillStates();
+renderStreakBanner();
 loadSavedTheme();
 
 </script>
