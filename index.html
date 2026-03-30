@@ -635,6 +635,16 @@
   .theme-custom-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .theme-color-picker { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; padding: 2px; background: none; flex-shrink: 0; }
   .theme-reset-btn { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; transition: all 0.15s; width: 100%; }
+  /* ── SYNC DATA ── */
+  .sync-status-card { display:flex; align-items:flex-start; gap:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
+  .sync-status-icon { font-size:28px; flex-shrink:0; }
+  .sync-status-title { font-size:15px; font-weight:600; color:var(--text); margin-bottom:4px; }
+  .sync-status-sub { font-size:13px; color:var(--muted); line-height:1.5; }
+  .sync-now-btn { width:100%; padding:16px; border-radius:12px; background:var(--accent); color:var(--bg); font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:2px; border:none; cursor:pointer; margin-bottom:10px; transition:all 0.15s; }
+  .sync-now-btn:disabled { opacity:0.5; cursor:not-allowed; }
+  .sync-pull-btn { width:100%; padding:14px; border-radius:12px; background:var(--bg3); color:var(--text); font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px; border:1px solid var(--border); cursor:pointer; transition:all 0.15s; }
+  .sync-pull-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
   .theme-reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
 
   /* ── NUTRITION ── */
@@ -1460,6 +1470,11 @@
       <div class="more-card-title">Themes</div>
       <div class="more-card-desc">Customize colors & appearance</div>
     </div>
+    <div class="more-card" onclick="showSubSection('syncdata')">
+      <div class="more-card-icon">☁️</div>
+      <div class="more-card-title">Sync Data</div>
+      <div class="more-card-desc">Push all data to cloud & re-sync</div>
+    </div>
   </div>
 </div>
 
@@ -1635,6 +1650,29 @@
     </div>
   </div>
 
+</div>
+
+<!-- ===== SYNC DATA ===== -->
+<div id="syncdata" class="section">
+  <button class="section-back-btn" onclick="showSubSection(null)">More</button>
+  <div class="section-title">Sync Data</div>
+  <p style="color:var(--muted);font-size:15px;margin-bottom:28px;">Manually push all data from this device to the cloud. Use this if your data isn't showing up on another device.</p>
+
+  <div class="sync-status-card" id="syncStatusCard">
+    <div class="sync-status-icon" id="syncStatusIcon">☁️</div>
+    <div>
+      <div class="sync-status-title" id="syncStatusTitle">Ready to sync</div>
+      <div class="sync-status-sub" id="syncStatusSub" id="syncStatusSub">Tap the button below to push all your workout data, body weight, and preferences to Supabase.</div>
+    </div>
+  </div>
+
+  <button class="sync-now-btn" id="syncNowBtn" onclick="forceSyncNow()">↑ Push All Data to Cloud</button>
+  <button class="sync-pull-btn" id="syncPullBtn" onclick="forcePullNow()">↓ Pull Latest from Cloud</button>
+
+  <div style="margin-top:24px;padding:14px 16px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border);">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Logged in as</div>
+    <div style="font-size:14px;color:var(--text);" id="syncUserEmail">—</div>
+  </div>
 </div>
 
 </div><!-- /main -->
@@ -3498,6 +3536,124 @@ function buildThemePresets(){
   }).join('');
 }
 
+function setSyncStatus(icon,title,sub){
+  var iconEl=document.getElementById('syncStatusIcon');
+  var titleEl=document.getElementById('syncStatusTitle');
+  var subEl=document.getElementById('syncStatusSub');
+  if(iconEl)iconEl.textContent=icon;
+  if(titleEl)titleEl.textContent=title;
+  if(subEl)subEl.textContent=sub;
+}
+
+function updateSyncUserEmail(){
+  var el=document.getElementById('syncUserEmail');
+  if(el&&currentUser)el.textContent=currentUser.email||'—';
+}
+
+function forceSyncNow(){
+  if(!supaClient||!currentUser){
+    setSyncStatus('⚠️','Not logged in','Please log in first to sync data.');
+    return;
+  }
+  var btn=document.getElementById('syncNowBtn');
+  var pullBtn=document.getElementById('syncPullBtn');
+  if(btn)btn.disabled=true;
+  if(pullBtn)pullBtn.disabled=true;
+  setSyncStatus('⏳','Syncing...','Pushing all your data to the cloud. This may take a moment.');
+
+  // Reset migration flag so it runs fresh
+  localStorage.removeItem('supa_migrated');
+
+  // Gather all sets
+  var sets=[];
+  allLogKeys().forEach(function(k){
+    try{
+      var val=JSON.parse(localStorage.getItem(k)||'{}');
+      var p=k.replace('wlog:','').split(':');
+      if(p.length<4)return;
+      sets.push({
+        user_id:currentUser.id,
+        week:parseInt(p[0].replace('w',''),10),
+        day:p[1],exercise_id:p[2],
+        set_index:parseInt(p[3].replace('s',''),10),
+        weight:val.weight||'',reps:val.reps||'',
+        done:val.done||false,rpe:val.rpe||'',
+        ts:val.ts||Date.now()
+      });
+    }catch(e){}
+  });
+
+  var bwEntries=[];
+  allBWKeys().forEach(function(k){
+    var val=loadBW(k.replace('bw:',''));
+    if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});
+  });
+
+  var prefKeys=['appTheme','appThemeCustom'];
+  var prefs=[];
+  prefKeys.forEach(function(k){
+    var v=localStorage.getItem(k);
+    if(v)prefs.push({user_id:currentUser.id,key:k,value:v});
+  });
+
+  var done=0;
+  var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)||1;
+  var hadError=false;
+
+  function checkDone(err){
+    if(err)hadError=true;
+    done++;
+    if(done>=total){
+      localStorage.setItem('supa_migrated','1');
+      if(btn)btn.disabled=false;
+      if(pullBtn)pullBtn.disabled=false;
+      if(hadError){
+        setSyncStatus('⚠️','Sync issue','Some data may not have synced. Try again.');
+      } else {
+        setSyncStatus('✅','Sync complete','All '+sets.length+' sets, '+(bwEntries.length)+' body weight entries pushed to cloud.');
+      }
+    }
+  }
+
+  if(sets.length){
+    supaClient.from('workout_sets').upsert(sets,{onConflict:'user_id,week,day,exercise_id,set_index'})
+      .then(function(r){checkDone(r.error);});
+  } else checkDone();
+
+  if(bwEntries.length){
+    supaClient.from('body_weight').upsert(bwEntries,{onConflict:'user_id,date'})
+      .then(function(r){checkDone(r.error);});
+  } else if(total>1)checkDone();
+
+  if(prefs.length){
+    supaClient.from('user_preferences').upsert(prefs,{onConflict:'user_id,key'})
+      .then(function(r){checkDone(r.error);});
+  } else if(total>2)checkDone();
+}
+
+function forcePullNow(){
+  if(!supaClient||!currentUser){
+    setSyncStatus('⚠️','Not logged in','Please log in first.');
+    return;
+  }
+  var btn=document.getElementById('syncNowBtn');
+  var pullBtn=document.getElementById('syncPullBtn');
+  if(btn)btn.disabled=true;
+  if(pullBtn)pullBtn.disabled=true;
+  setSyncStatus('⏳','Pulling...','Fetching latest data from the cloud.');
+  pullFromSupabase(function(){
+    if(btn)btn.disabled=false;
+    if(pullBtn)pullBtn.disabled=false;
+    setSyncStatus('✅','Pull complete','Latest cloud data loaded. Refreshing app...');
+    setTimeout(function(){
+      buildTrackers();
+      updateDayPillStates();
+      renderStreakBanner();
+      setSyncStatus('☁️','Ready to sync','Your data is up to date.');
+    },1200);
+  });
+}
+
 function loadSavedTheme(){
   try{
     var themeId=localStorage.getItem('appTheme')||'default';
@@ -3520,6 +3676,7 @@ var _origShowSubSection=showSubSection;
 showSubSection=function(id){
   _origShowSubSection(id);
   if(id==='themes')buildThemePresets();
+  if(id==='syncdata'){updateSyncUserEmail();setSyncStatus('☁️','Ready to sync','Tap below to push all your data to the cloud.');}
 };
 
 // ═══════════════════════════════════════════════════════
