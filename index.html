@@ -1903,6 +1903,25 @@ function resetChecklist(){document.querySelectorAll('.check-item').forEach(funct
 // ═══════════════════════════════════════════════════════
 //  WEEK CHANGE
 // ═══════════════════════════════════════════════════════
+// Auto-select the first incomplete workout day for the active week
+function autoSelectNextDay(){
+  var week=getActiveWeek();
+  var order=['d1','d2','d4','d5'];
+  var targetDay=null;
+  for(var i=0;i<order.length;i++){
+    if(!isDayComplete(week,order[i])){targetDay=order[i];break;}
+  }
+  if(!targetDay)targetDay='d1'; // all done — fall back to Day 1
+  // Find the tab button for this day and activate it
+  var tabs=document.querySelectorAll('.week-tab');
+  var targetBtn=null;
+  tabs.forEach(function(btn){
+    var match=btn.getAttribute('onclick').match(/showDay\('([^']+)'/);
+    if(match&&match[1]===targetDay)targetBtn=btn;
+  });
+  if(targetBtn)showDay(targetDay,targetBtn);
+}
+
 function onWeekChange(){
   var w=getActiveWeek();
   var phase=PHASE_MAP[w]||'Foundation';
@@ -1914,6 +1933,7 @@ function onWeekChange(){
   buildTrackers();
   updateDayPillStates();
   renderStreakBanner();
+  autoSelectNextDay();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3774,6 +3794,7 @@ function onAuthSuccess(){
       buildTrackers();
       updateDayPillStates();
       renderStreakBanner();
+      autoSelectNextDay();
     });
   });
 }
@@ -3894,6 +3915,7 @@ function initApp(){
   buildTrackers();
   updateDayPillStates();
   renderStreakBanner();
+  autoSelectNextDay();
   loadSavedTheme();
 }
 
@@ -3909,6 +3931,7 @@ supaClient.auth.getSession().then(function(res){
       buildTrackers();
       updateDayPillStates();
       renderStreakBanner();
+      autoSelectNextDay();
     });
   } else {
     showLoginScreen();
