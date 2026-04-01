@@ -519,6 +519,9 @@
 
   /* ── BODY WEIGHT ── */
   .bw-input-row { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+  .bw-date-picker { font-family: 'DM Mono', monospace; font-size: 13px; padding: 10px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; color: var(--text); outline: none; flex: 1; min-width: 0; }
+  .bw-date-picker:focus { border-color: var(--accent); }
+  .bw-date-picker::-webkit-calendar-picker-indicator { filter: invert(0.6); }
   .bw-date-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); flex-shrink: 0; }
   .bw-input { font-family: 'DM Mono', monospace; font-size: 18px; padding: 10px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; color: var(--text); width: 100px; text-align: center; outline: none; }
   .bw-input:focus { border-color: var(--accent); }
@@ -1387,9 +1390,9 @@
   <!-- BODY WEIGHT TAB -->
   <div id="prog-body" class="prog-tab">
     <div class="bw-input-row">
-      <div class="bw-date-label" id="bwDateLabel">TODAY</div>
+      <input type="date" class="bw-date-picker" id="bwDatePicker"/>
       <input type="number" class="bw-input" id="bwInput" placeholder="lbs" min="50" max="400" step="0.1"/>
-      <button class="bw-save-btn" onclick="saveTodayBW()">Save</button>
+      <button class="bw-save-btn" onclick="saveBWEntry()">Save</button>
     </div>
     <div class="bw-stats-row" id="bwStatsRow" style="display:none;">
       <div class="bw-stat"><div class="bw-stat-val" id="bwStart">—</div><div class="bw-stat-lbl">Start</div></div>
@@ -1906,13 +1909,24 @@ function resetChecklist(){document.querySelectorAll('.check-item').forEach(funct
 // Auto-select the first incomplete workout day for the active week
 function autoSelectNextDay(){
   var week=getActiveWeek();
-  var order=['d1','d2','d4','d5'];
+  var workoutDays=['d1','d2','d4','d5'];
+  var allDays=['d1','d2','d3','d4','d5','d6','d7'];
+
+  // First: find the first incomplete workout day
   var targetDay=null;
-  for(var i=0;i<order.length;i++){
-    if(!isDayComplete(week,order[i])){targetDay=order[i];break;}
+  for(var i=0;i<workoutDays.length;i++){
+    if(!isDayComplete(week,workoutDays[i])){targetDay=workoutDays[i];break;}
   }
-  if(!targetDay)targetDay='d1'; // all done — fall back to Day 1
-  // Find the tab button for this day and activate it
+
+  // If all workout days are complete, select based on today's day of week
+  // Mon=d1, Tue=d2, Wed=d3, Thu=d4, Fri=d5, Sat=d6, Sun=d7
+  if(!targetDay){
+    var dowMap={1:'d1',2:'d2',3:'d3',4:'d4',5:'d5',6:'d6',0:'d7'};
+    var dow=new Date().getDay(); // 0=Sun, 1=Mon ... 6=Sat
+    targetDay=dowMap[dow]||'d1';
+  }
+
+  // Find the matching tab button and activate it
   var tabs=document.querySelectorAll('.week-tab');
   var targetBtn=null;
   tabs.forEach(function(btn){
@@ -2424,24 +2438,39 @@ function todayStr(){
   return d.getFullYear()+'-'+(d.getMonth()<9?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate();
 }
 
-function saveTodayBW(){
+function saveBWEntry(){
+  var datePicker=document.getElementById('bwDatePicker');
   var inp=document.getElementById('bwInput');
-  if(!inp||!inp.value)return;
+  if(!datePicker||!inp||!inp.value)return;
+  var dateStr=datePicker.value||todayStr();
   var val=parseFloat(inp.value);
   if(isNaN(val)||val<50||val>400)return;
-  saveBW(todayStr(),val);
+  saveBW(dateStr,val);
   renderBWTab();
 }
 
 function renderBWTab(){
+  var datePicker=document.getElementById('bwDatePicker');
   var inp=document.getElementById('bwInput');
-  var label=document.getElementById('bwDateLabel');
   var today=todayStr();
-  if(inp){var existing=loadBW(today);if(existing)inp.value=existing;}
-  if(label){
-    var d=new Date();
-    var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    label.textContent=months[d.getMonth()]+' '+d.getDate();
+
+  // Set date picker to today if not already set
+  if(datePicker&&!datePicker.value)datePicker.value=today;
+
+  // Load existing value for currently selected date
+  if(datePicker&&inp){
+    var existing=loadBW(datePicker.value||today);
+    if(existing)inp.value=existing;
+    else inp.value='';
+  }
+
+  // When date changes, load that day's existing value
+  if(datePicker&&!datePicker._bwListener){
+    datePicker._bwListener=true;
+    datePicker.addEventListener('change',function(){
+      var v=loadBW(datePicker.value);
+      if(inp)inp.value=v?v:'';
+    });
   }
   var keys=allBWKeys().sort();
   var entries=[];
