@@ -1908,32 +1908,30 @@ function resetChecklist(){document.querySelectorAll('.check-item').forEach(funct
 // ═══════════════════════════════════════════════════════
 // Auto-select the first incomplete workout day for the active week
 function autoSelectNextDay(){
-  var week=getActiveWeek();
-  var workoutDays=['d1','d2','d4','d5'];
-  var allDays=['d1','d2','d3','d4','d5','d6','d7'];
+  setTimeout(function(){
+    var week=getActiveWeek();
+    var workoutDays=['d1','d2','d4','d5'];
 
-  // First: find the first incomplete workout day
-  var targetDay=null;
-  for(var i=0;i<workoutDays.length;i++){
-    if(!isDayComplete(week,workoutDays[i])){targetDay=workoutDays[i];break;}
-  }
+    // Find first incomplete workout day
+    var targetDay=null;
+    for(var i=0;i<workoutDays.length;i++){
+      if(!isDayComplete(week,workoutDays[i])){targetDay=workoutDays[i];break;}
+    }
 
-  // If all workout days are complete, select based on today's day of week
-  // Mon=d1, Tue=d2, Wed=d3, Thu=d4, Fri=d5, Sat=d6, Sun=d7
-  if(!targetDay){
-    var dowMap={1:'d1',2:'d2',3:'d3',4:'d4',5:'d5',6:'d6',0:'d7'};
-    var dow=new Date().getDay(); // 0=Sun, 1=Mon ... 6=Sat
-    targetDay=dowMap[dow]||'d1';
-  }
+    // All workout days complete — use today's day of week
+    if(!targetDay){
+      var dowMap={1:'d1',2:'d2',3:'d3',4:'d4',5:'d5',6:'d6',0:'d7'};
+      targetDay=dowMap[new Date().getDay()]||'d1';
+    }
 
-  // Find the matching tab button and activate it
-  var tabs=document.querySelectorAll('.week-tab');
-  var targetBtn=null;
-  tabs.forEach(function(btn){
-    var match=btn.getAttribute('onclick').match(/showDay\('([^']+)'/);
-    if(match&&match[1]===targetDay)targetBtn=btn;
-  });
-  if(targetBtn)showDay(targetDay,targetBtn);
+    var tabs=document.querySelectorAll('.week-tab');
+    var targetBtn=null;
+    tabs.forEach(function(btn){
+      var match=btn.getAttribute('onclick').match(/showDay\('([^']+)'/);
+      if(match&&match[1]===targetDay)targetBtn=btn;
+    });
+    if(targetBtn)showDay(targetDay,targetBtn);
+  },150);
 }
 
 function onWeekChange(){
