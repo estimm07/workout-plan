@@ -57,9 +57,7 @@
   .week-tab:hover { border-color: var(--accent); color: var(--accent); }
   .week-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
   .week-tab.done { border-color: rgba(78,205,196,0.4); color: var(--accent3); background: rgba(78,205,196,0.07); }
-  .week-tab.done::after { content: ' ✓'; }
   .week-tab.active.done { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-  .week-tab.active.done::after { content: ' ✓'; color: var(--bg); }
 
   /* ── CYCLE 2 BANNER ── */
   .cycle2-banner { background: rgba(255,107,53,0.06); border: 1px solid rgba(255,107,53,0.3); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -1296,7 +1294,7 @@
   <button class="section-back-btn" onclick="showSubSection(null)">More</button>
   <div class="section-title">Progressive Overload Rules</div>
   <div class="prog-grid">
-    <div class="prog-card"><h3>When to Add Weight</h3><ul><li>Complete all reps of all sets with good form</li><li>The last rep of the last set feels like RPE 7–8 (not 10)</li><li>Add 2.5–5 lbs next session for that exercise</li><li>On pull-ups: when you hit the top of the rep range cleanly, add a rep next week</li></ul></div>
+    <div class="prog-card"><h3>When to Add Weight</h3><ul><li>Dumbbells go in 5 lb increments — use double progression to earn each jump</li><li>Work within a rep range (e.g. 8–12). Stay at the same weight until you hit the top of the range on every set</li><li>Once you hit 3×12 (or prescribed top rep) cleanly with good form, add 5 lbs next session</li><li>The last rep of the last set should feel like RPE 7–8 before adding weight</li><li>On pull-ups: when you hit the top of the rep range cleanly, add a rep next week</li></ul></div>
     <div class="prog-card"><h3>When to Scale Back</h3><ul><li>Form breaks down before completing all reps — drop weight 10%</li><li>Any lower back sensation — reduce range of motion or swap exercise</li><li>Fatigue carryover from the previous day — reduce sets to 2</li><li>Soreness so bad you can't move well — take an extra rest day</li></ul></div>
     <div class="prog-card"><h3>Treadmill Progression</h3><ul><li>Weeks 1–2: 6–8% grade, 3.0 mph, 10 min</li><li>Weeks 3–4: 8–10% grade, 3.0 mph, 12 min</li><li>Weeks 5–6: 10% grade, 3.2 mph, 15 min</li><li>Weeks 7–8: 12% grade, 3.2–3.5 mph, 15 min</li></ul></div>
     <div class="prog-card"><h3>Pull-Up Progression</h3><ul><li>Wk 1–2: 3 × 6–8 reps (bodyweight)</li><li>Wk 3–4: 3 × 8–10 reps</li><li>Wk 5–6: 4 × 8–10 reps</li><li>Wk 7–8: 4 × 10–12 or add band-weight vest if available</li></ul></div>
@@ -1792,7 +1790,7 @@ const EXERCISES = {
 
 const PHASE_MAP = {1:'Foundation',2:'Foundation',3:'Foundation',4:'Hypertrophy',5:'Hypertrophy',6:'Hypertrophy',7:'Intensification',8:'Intensification'};
 const PHASE_CLS = {Foundation:'p1',Hypertrophy:'p2',Intensification:'p3'};
-const DAY_LABELS = {d1:'Day 1 · Upper A',d2:'Day 2 · Lower A',d4:'Day 4 · Upper B',d5:'Day 5 · Lower B'};
+var DAY_LABELS = {'d1':'Day 1 · Upper A','d2':'Day 2 · Lower A','d3':'Day 3 · Rest','d4':'Day 4 · Upper B','d5':'Day 5 · Lower B','d6':'Day 6 · Optional','d7':'Day 7 · Rest'};
 const BW_EXERCISES = new Set(['pullups','chinups','nordic']);
 
 // ═══════════════════════════════════════════════════════
@@ -1889,18 +1887,21 @@ function isDayComplete(week,day){
   return true;
 }
 
-// Update the ✓ / teal done state on all day pills
+// Update day pill labels to show current week
+function updateDayPillLabels(){
+  updateDayPillStates();
+}
+
 function updateDayPillStates(){
   var week=getActiveWeek();
   document.querySelectorAll('.week-tab').forEach(function(btn){
     var match=btn.getAttribute('onclick').match(/showDay\('([^']+)'/);
     if(!match)return;
     var day=match[1];
-    if(isDayComplete(week,day)){
-      btn.classList.add('done');
-    } else {
-      btn.classList.remove('done');
-    }
+    var complete=isDayComplete(week,day);
+    btn.classList.toggle('done',complete);
+    var base=DAY_LABELS[day]||day;
+    btn.textContent='Wk '+week+' · '+base+(complete?' ✓':'');
   });
   // Also update rest day button states
   ['d3','d6','d7'].forEach(function(day){
@@ -3149,6 +3150,7 @@ function saveDuration(w,day,mins){try{localStorage.setItem(dKey(w,day),String(mi
 function loadDuration(w,day){try{var v=localStorage.getItem(dKey(w,day));return v?parseInt(v,10):null;}catch(e){return null;}}
 
 // ── Suggested weight per exercise ──
+function roundTo5(val){return Math.round(val/5)*5;}
 function getSuggestedWeight(day,exId,numSets,week){
   if(BW_EXERCISES.has(exId))return null;
   var prevWeek=week-1;
@@ -3166,13 +3168,13 @@ function getSuggestedWeight(day,exId,numSets,week){
     }
   }
   if(!setCount)return null;
-  var avgWeight=Math.round(totalWeight/setCount);
-  // Progressive overload increment
-  var increment=week<=3?2.5:5;
+  var avgWeight=roundTo5(Math.round(totalWeight/setCount));
+  var increment=5; // Always 5 lb jumps — dumbbells go in 5 lb increments
   if(allDone){
-    return {weight:avgWeight+increment,label:'Try '+( avgWeight+increment)+' lbs (+'+increment+')'};
+    var next=roundTo5(avgWeight+increment);
+    return {weight:next,label:'Try '+next+' lbs (+5) — own the top of your rep range first'};
   } else {
-    return {weight:avgWeight,label:'Repeat '+avgWeight+' lbs'};
+    return {weight:avgWeight,label:'Repeat '+avgWeight+' lbs — hit the full rep range before moving up'};
   }
 }
 
