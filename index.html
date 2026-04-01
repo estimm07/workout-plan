@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>8-Week Home Training Plan</title>
+<title>FORGE</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="FORGE"/>
+<meta name="theme-color" content="#0d0d0f"/>
+<link rel="apple-touch-icon" href="FORGE.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -55,6 +60,17 @@
   .week-tab.done::after { content: ' ✓'; }
   .week-tab.active.done { background: var(--accent); color: var(--bg); border-color: var(--accent); }
   .week-tab.active.done::after { content: ' ✓'; color: var(--bg); }
+
+  /* ── CYCLE 2 BANNER ── */
+  .cycle2-banner { background: rgba(255,107,53,0.06); border: 1px solid rgba(255,107,53,0.3); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .cycle2-top { display: flex; align-items: flex-start; gap: 12px; }
+  .cycle2-icon { font-size: 22px; flex-shrink: 0; }
+  .cycle2-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--accent2); letter-spacing: 1px; }
+  .cycle2-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .cycle2-body { font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .cycle2-actions { display: flex; justify-content: flex-end; }
+  .cycle2-dismiss { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; }
+  .cycle2-dismiss:hover { border-color: var(--accent2); color: var(--accent2); }
 
   /* ── STREAK BANNER ── */
   .streak-banner { display: flex; align-items: center; gap: 10px; background: rgba(232,255,71,0.06); border: 1px solid rgba(232,255,71,0.18); border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; }
@@ -744,8 +760,8 @@
 <!-- ===== LOGIN SCREEN ===== -->
 <div id="loginScreen" style="display:none;">
   <div class="login-wrap">
-    <div class="login-logo">💪</div>
-    <div class="login-title">WORKOUT PLAN</div>
+    <div class="login-logo"><img src="FORGE.png" style="width:72px;height:72px;border-radius:16px;"/></div>
+    <div class="login-title">FORGE</div>
     <div class="login-sub">Sign in to sync your data across all devices</div>
     <div class="login-card">
       <div id="loginMsg" class="login-msg" style="display:none;"></div>
@@ -816,7 +832,7 @@
 
 <!-- ===== WORKOUTS ===== -->
 <div id="workouts" class="section active">
-  <div class="section-title">Workout Plans — All 8 Weeks</div>
+  <div class="section-title">FORGE — 8 Week Program</div>
   <div id="streakBanner" class="streak-banner" style="display:none;">
     <div class="streak-fire">🔥</div>
     <div>
@@ -1559,7 +1575,7 @@
       <div class="nutr-timing-label">Training Days</div>
       <div class="nutr-timing-table">
         <div class="nutr-timing-row"><div class="nutr-timing-time">Breakfast</div><div class="nutr-timing-items">Multivitamin · Fish oil (1) · Collagen peptides (if not pre-workout)</div></div>
-        <div class="nutr-timing-row"><div class="nutr-timing-time">Pre-workout</div><div class="nutr-timing-items">⅓ scoop pre-workout · Collagen peptides (30–60 min before training)</div></div>
+        <div class="nutr-timing-row"><div class="nutr-timing-time">Pre-workout</div><div class="nutr-timing-items">1 scoop Endura-Formance · Collagen peptides (30–60 min before training)</div></div>
         <div class="nutr-timing-row"><div class="nutr-timing-time">Post-workout</div><div class="nutr-timing-items">Kirkland protein shake (30–40g protein within 1–2 hrs)</div></div>
         <div class="nutr-timing-row"><div class="nutr-timing-time">Dinner</div><div class="nutr-timing-items">Fish oil (1)</div></div>
         <div class="nutr-timing-row"><div class="nutr-timing-time">Before bed</div><div class="nutr-timing-items">Magnesium glycinate (200–400mg)</div></div>
@@ -1591,9 +1607,9 @@
         <div class="nutr-supp-meta">Orgain (Costco) · Rest days only</div>
       </div>
       <div class="nutr-supp-card">
-        <div class="nutr-supp-header"><span class="nutr-supp-name">Pre-Workout (1st Phorm)</span><span class="nutr-supp-dose">⅓ scoop</span></div>
-        <p class="nutr-text">At ⅓ scoop you're getting ~1.7g creatine, ~1g beta alanine, and modest amounts of the other compounds. Contains 5g creatine at full dose — so don't stack with Orgain creatine on training days. Take 20–30 min before training.</p>
-        <div class="nutr-supp-meta">Training days only · 20–30 min pre-workout</div>
+        <div class="nutr-supp-header"><span class="nutr-supp-name">Pre-Workout (1st Phorm Endura-Formance)</span><span class="nutr-supp-dose">1 scoop</span></div>
+        <p class="nutr-text">Caffeine-free pre-workout with 5g creatine monohydrate, beta-alanine (buffers muscle fatigue), betaine anhydrous, L-tyrosine, PeakO2 (oxygen delivery), and S7 (nitric oxide support). No stimulants — energy comes from performance ingredients, not caffeine. Since it contains 5g creatine, skip Orgain creatine on training days. You intentionally take ⅓ scoop to reduce the beta-alanine tingling intensity.</p>
+        <div class="nutr-supp-meta">1st Phorm · Training days only · 20–30 min pre-workout</div>
       </div>
       <div class="nutr-supp-card">
         <div class="nutr-supp-header"><span class="nutr-supp-name">Fish Oil</span><span class="nutr-supp-dose">2 softgels / day</span></div>
@@ -1608,12 +1624,12 @@
       <div class="nutr-supp-card">
         <div class="nutr-supp-header"><span class="nutr-supp-name">Magnesium Glycinate</span><span class="nutr-supp-dose">200–400mg / day</span></div>
         <p class="nutr-text">The most impactful addition to your stack. Supports sleep quality, muscle recovery, and reduces soreness. Start at 200mg and increase to 400mg after a week if needed.</p>
-        <div class="nutr-supp-meta">Pure Encapsulations (recommended) · 30–60 min before bed</div>
+        <div class="nutr-supp-meta">Pure Encapsulations Magnesium Glycinate · 30–60 min before bed</div>
       </div>
       <div class="nutr-supp-card">
         <div class="nutr-supp-header"><span class="nutr-supp-name">Collagen Peptides</span><span class="nutr-supp-dose">10–15g / day</span></div>
-        <p class="nutr-text">Specifically recommended given your lower back history. Supports connective tissue — tendons, ligaments, spinal fascia — which bears the load of hip thrusts, RDLs, and split squats. Must be taken with vitamin C (your multi covers this). Take 30–60 min before training or before bed on rest days.</p>
-        <div class="nutr-supp-meta">Momentous (recommended, contains FORTIGEL) · Pre-workout or before bed</div>
+        <p class="nutr-text">Specifically recommended given your lower back history. Supports connective tissue — tendons, ligaments, spinal fascia — which bears the load of hip thrusts, RDLs, and split squats. Momentous includes FORTIGEL (clinically studied for tendon and ligament synthesis) and vitamin C is already in the formula — no separate vitamin C source needed. Take 30–60 min before training or before bed on rest days.</p>
+        <div class="nutr-supp-meta">Momentous Collagen Peptides (FORTIGEL + Vitamin C included) · Pre-workout or before bed</div>
       </div>
     </div>
   </div>
@@ -2006,6 +2022,24 @@ function autoSelectNextDay(){
   },150);
 }
 
+function renderCycle2Banner(){
+  var banner=document.getElementById('cycle2Banner');
+  if(!banner)return;
+  var week=getActiveWeek();
+  var dismissed=localStorage.getItem('cycle2Dismissed');
+  if(week>=7&&!dismissed){
+    banner.style.display='flex';
+  } else {
+    banner.style.display='none';
+  }
+}
+
+function dismissCycle2Banner(){
+  try{localStorage.setItem('cycle2Dismissed','1');}catch(e){}
+  var banner=document.getElementById('cycle2Banner');
+  if(banner)banner.style.display='none';
+}
+
 function onWeekChange(){
   var w=getActiveWeek();
   var phase=PHASE_MAP[w]||'Foundation';
@@ -2017,6 +2051,7 @@ function onWeekChange(){
   buildTrackers();
   updateDayPillStates();
   renderStreakBanner();
+  renderCycle2Banner();
   autoSelectNextDay();
 }
 
@@ -4019,6 +4054,7 @@ function initApp(){
   buildTrackers();
   updateDayPillStates();
   renderStreakBanner();
+  renderCycle2Banner();
   autoSelectNextDay();
   loadSavedTheme();
 }
