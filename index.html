@@ -1987,32 +1987,37 @@ function toggleRestDayComplete(day){
 
 function autoSelectNextDay(){
   setTimeout(function(){
-    var week=getActiveWeek();
     var allDays=['d1','d2','d3','d4','d5','d6','d7'];
-
-    // Find first incomplete day in the week
+    var targetWeek=null;
     var targetDay=null;
-    for(var i=0;i<allDays.length;i++){
-      if(!isDayComplete(week,allDays[i])){targetDay=allDays[i];break;}
-    }
 
-    // All 7 days complete — advance to next week
-    if(!targetDay){
-      var nextWeek=week+1;
-      if(nextWeek<=8){
-        // Update week selector
-        var sel=document.getElementById('activeWeekSelect');
-        if(sel){
-          sel.value=String(nextWeek);
-          onWeekChange();
-          return; // onWeekChange calls autoSelectNextDay again
+    // Scan all weeks 1-8 to find the first incomplete day across the whole program
+    for(var w=1;w<=8;w++){
+      for(var i=0;i<allDays.length;i++){
+        if(!isDayComplete(w,allDays[i])){
+          targetWeek=w;
+          targetDay=allDays[i];
+          break;
         }
       }
-      // Week 8 all done — stay on d1
+      if(targetWeek)break;
+    }
+
+    // All 8 weeks fully complete — stay on week 8 day 1
+    if(!targetWeek){
+      targetWeek=8;
       targetDay='d1';
     }
 
-    // Find and activate the matching tab button
+    // Update week selector if needed
+    var sel=document.getElementById('activeWeekSelect');
+    if(sel&&parseInt(sel.value,10)!==targetWeek){
+      sel.value=String(targetWeek);
+      onWeekChange(); // rebuilds trackers and pill states for the new week
+      return; // onWeekChange will call autoSelectNextDay again — it will now match week and skip this block
+    }
+
+    // Activate the matching day tab
     var tabs=document.querySelectorAll('.week-tab');
     var targetBtn=null;
     tabs.forEach(function(btn){
