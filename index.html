@@ -638,6 +638,11 @@
   .theme-custom-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .theme-color-picker { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; padding: 2px; background: none; flex-shrink: 0; }
   .theme-reset-btn { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; transition: all 0.15s; width: 100%; }
+  /* ── REST DAY COMPLETE BUTTON ── */
+  .rdc-btn { width:100%; padding:16px; border-radius:12px; background:var(--bg3); border:1px solid var(--border); color:var(--muted); font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:2px; cursor:pointer; margin-bottom:16px; transition:all 0.15s; }
+  .rdc-btn:hover { border-color:var(--accent3); color:var(--accent3); }
+  .rdc-btn.rdc-done { background:rgba(78,205,196,0.07); border-color:rgba(78,205,196,0.4); color:var(--accent3); }
+
   /* ── SYNC DATA ── */
   .sync-status-card { display:flex; align-items:flex-start; gap:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
   .sync-status-icon { font-size:28px; flex-shrink:0; }
@@ -817,6 +822,20 @@
     <div>
       <div class="streak-text" id="streakText">WEEK 1 STREAK</div>
       <div class="streak-sub" id="streakSub">Keep it going</div>
+    </div>
+  </div>
+
+  <div id="cycle2Banner" class="cycle2-banner" style="display:none;">
+    <div class="cycle2-top">
+      <span class="cycle2-icon">🏁</span>
+      <div>
+        <div class="cycle2-title">WEEK 7 — FINAL PUSH</div>
+        <div class="cycle2-sub">2 weeks left. Time to start planning what comes next.</div>
+      </div>
+    </div>
+    <p class="cycle2-body">In Week 8 you'll test your 1-rep-range max on major lifts. When you're done, come back to Claude to discuss Cycle 2 — either a new program phase or a second program to live in this app.</p>
+    <div class="cycle2-actions">
+      <button class="cycle2-dismiss" onclick="dismissCycle2Banner()">Dismiss</button>
     </div>
   </div>
 
@@ -1040,6 +1059,7 @@
 
   <!-- DAY 3 REST -->
   <div id="d3" class="day-panel">
+    <button class="rdc-btn" id="rdcBtn-d3" onclick="toggleRestDayComplete('d3')">Mark Day Complete</button>
     <div class="workout-block">
       <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">😴</div><div class="block-header-text"><div class="block-title">Wednesday — Rest or Active Recovery</div><div class="block-meta">Choose one option below</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
@@ -1234,6 +1254,7 @@
 
   <!-- DAY 6 -->
   <div id="d6" class="day-panel">
+    <button class="rdc-btn" id="rdcBtn-d6" onclick="toggleRestDayComplete('d6')">Mark Day Complete</button>
     <div class="workout-block">
       <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cardio">🚶</div><div class="block-header-text"><div class="block-title">Saturday — Optional 5th Day</div><div class="block-meta">Only do if you feel recovered</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body">
@@ -1246,6 +1267,7 @@
 
   <!-- DAY 7 -->
   <div id="d7" class="day-panel">
+    <button class="rdc-btn" id="rdcBtn-d7" onclick="toggleRestDayComplete('d7')">Mark Day Complete</button>
     <div class="workout-block">
       <div class="block-header" onclick="toggleBlock(this)"><div class="block-icon icon-cool">😴</div><div class="block-header-text"><div class="block-title">Sunday — Full Rest</div><div class="block-meta">Non-negotiable recovery</div></div><div class="block-toggle">▾</div></div>
       <div class="block-body"><div class="note-box"><strong>Rest day priorities:</strong> 7–9 hrs sleep, 3+ liters water, high-protein meals (target 0.8–1g protein per pound of bodyweight = ~130–165g/day), light walking if desired. No structured exercise.</div></div>
@@ -1779,6 +1801,23 @@ function saveBW(dateStr,val){
 function loadBW(dateStr){try{var v=localStorage.getItem('bw:'+dateStr);return v?parseFloat(v):null;}catch(e){return null;}}
 function allBWKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('bw:')==0)keys.push(k);}}catch(e){}return keys;}
 
+// Rest day completion storage
+function saveRestDayComplete(week,day){
+  try{localStorage.setItem('rdc:w'+week+':'+day,'1');}catch(e){}
+  if(supaClient&&currentUser){
+    supaClient.from('workout_sets').upsert({
+      user_id:currentUser.id,week:week,day:day,exercise_id:'_rest',set_index:0,
+      weight:'',reps:'',done:true,rpe:'',ts:Date.now()
+    },{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(){});
+  }
+}
+function loadRestDayComplete(week,day){
+  try{return localStorage.getItem('rdc:w'+week+':'+day)==='1';}catch(e){return false;}
+}
+function clearRestDayComplete(week,day){
+  try{localStorage.removeItem('rdc:w'+week+':'+day);}catch(e){}
+}
+
 // ═══════════════════════════════════════════════════════
 //  NAV
 // ═══════════════════════════════════════════════════════
@@ -1816,6 +1855,10 @@ function showDay(id,btn){
 
 // Returns true if every set for every exercise on a given day+week is marked done
 function isDayComplete(week,day){
+  // Rest/optional days — check manual completion flag
+  var restDays=['d3','d6','d7'];
+  if(restDays.indexOf(day)!==-1)return loadRestDayComplete(week,day);
+  // Workout days — check all sets done
   var exList=EXERCISES[day];
   if(!exList||!exList.length)return false;
   for(var i=0;i<exList.length;i++){
@@ -1833,18 +1876,23 @@ function isDayComplete(week,day){
 // Update the ✓ / teal done state on all day pills
 function updateDayPillStates(){
   var week=getActiveWeek();
-  var workoutDays=['d1','d2','d4','d5'];
   document.querySelectorAll('.week-tab').forEach(function(btn){
-    // Extract day id from onclick attr
     var match=btn.getAttribute('onclick').match(/showDay\('([^']+)'/);
     if(!match)return;
     var day=match[1];
-    if(workoutDays.indexOf(day)===-1){btn.classList.remove('done');return;}
     if(isDayComplete(week,day)){
       btn.classList.add('done');
     } else {
       btn.classList.remove('done');
     }
+  });
+  // Also update rest day button states
+  ['d3','d6','d7'].forEach(function(day){
+    var btn=document.getElementById('rdcBtn-'+day);
+    if(!btn)return;
+    var complete=loadRestDayComplete(getActiveWeek(),day);
+    btn.textContent=complete?'✓ Day Complete':'Mark Day Complete';
+    btn.classList.toggle('rdc-done',complete);
   });
 }
 
@@ -1907,23 +1955,47 @@ function resetChecklist(){document.querySelectorAll('.check-item').forEach(funct
 //  WEEK CHANGE
 // ═══════════════════════════════════════════════════════
 // Auto-select the first incomplete workout day for the active week
+function toggleRestDayComplete(day){
+  var week=getActiveWeek();
+  var isComplete=loadRestDayComplete(week,day);
+  if(isComplete){
+    clearRestDayComplete(week,day);
+  } else {
+    saveRestDayComplete(week,day);
+  }
+  updateDayPillStates();
+  renderStreakBanner();
+  autoSelectNextDay();
+}
+
 function autoSelectNextDay(){
   setTimeout(function(){
     var week=getActiveWeek();
-    var workoutDays=['d1','d2','d4','d5'];
+    var allDays=['d1','d2','d3','d4','d5','d6','d7'];
 
-    // Find first incomplete workout day
+    // Find first incomplete day in the week
     var targetDay=null;
-    for(var i=0;i<workoutDays.length;i++){
-      if(!isDayComplete(week,workoutDays[i])){targetDay=workoutDays[i];break;}
+    for(var i=0;i<allDays.length;i++){
+      if(!isDayComplete(week,allDays[i])){targetDay=allDays[i];break;}
     }
 
-    // All workout days complete — use today's day of week
+    // All 7 days complete — advance to next week
     if(!targetDay){
-      var dowMap={1:'d1',2:'d2',3:'d3',4:'d4',5:'d5',6:'d6',0:'d7'};
-      targetDay=dowMap[new Date().getDay()]||'d1';
+      var nextWeek=week+1;
+      if(nextWeek<=8){
+        // Update week selector
+        var sel=document.getElementById('activeWeekSelect');
+        if(sel){
+          sel.value=String(nextWeek);
+          onWeekChange();
+          return; // onWeekChange calls autoSelectNextDay again
+        }
+      }
+      // Week 8 all done — stay on d1
+      targetDay='d1';
     }
 
+    // Find and activate the matching tab button
     var tabs=document.querySelectorAll('.week-tab');
     var targetBtn=null;
     tabs.forEach(function(btn){
@@ -3885,6 +3957,11 @@ function pullFromSupabase(cb){
   supaClient.from('workout_sets').select('*').eq('user_id',currentUser.id).then(function(res){
     if(res.data){
       res.data.forEach(function(r){
+        // Handle rest day completions stored as _rest exercise
+        if(r.exercise_id==='_rest'){
+          if(r.done)try{localStorage.setItem('rdc:w'+r.week+':'+r.day,'1');}catch(e){}
+          return;
+        }
         var k=sKey(r.week,r.day,r.exercise_id,r.set_index);
         var existing=null;
         try{existing=JSON.parse(localStorage.getItem(k));}catch(e){}
