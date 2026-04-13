@@ -915,9 +915,10 @@ function allLogKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var
 function saveBW(dateStr,val){try{localStorage.setItem('bw:'+dateStr,val);}catch(e){}pushBWToSupabase(dateStr,val);}
 function loadBW(dateStr){try{var v=localStorage.getItem('bw:'+dateStr);return v?parseFloat(v):null;}catch(e){return null;}}
 function allBWKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('bw:')==0)keys.push(k);}}catch(e){}return keys;}
-function saveRestDayComplete(week,day){
-  try{localStorage.setItem('rdc:w'+week+':'+day,'1');}catch(e){}
-  if(supaClient&&currentUser){supaClient.from('workout_sets').upsert({user_id:currentUser.id,week:week,day:day,exercise_id:'_rest',set_index:0,weight:'',reps:'',done:true,rpe:'',ts:Date.now()},{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(){});}
+function saveRestDayComplete(week,day,value){
+  var complete=(value===undefined)?true:!!value;
+  try{if(complete)localStorage.setItem('rdc:w'+week+':'+day,'1');else localStorage.removeItem('rdc:w'+week+':'+day);}catch(e){}
+  if(supaClient&&currentUser){supaClient.from('workout_sets').upsert({user_id:currentUser.id,week:week,day:day,exercise_id:'_rest',set_index:0,weight:'',reps:'',done:complete,rpe:'',ts:Date.now()},{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(){});}
 }
 function loadRestDayComplete(week,day){try{return localStorage.getItem('rdc:w'+week+':'+day)==='1';}catch(e){return false;}}
 function clearRestDayComplete(week,day){try{localStorage.removeItem('rdc:w'+week+':'+day);}catch(e){}}
@@ -1033,7 +1034,25 @@ function toggleRestDayComplete(dayId){
   updateDayPillStates();
   saveData();
 }
-function autoSelectNextDay(){var week=getActiveWeek();var tabs=document.querySelectorAll('.week-tab');var targetBtn=null;for(var i=0;i<tabs.length;i++){var btn=tabs[i];var day=btn.getAttribute('data-day')||((btn.getAttribute('onclick')||'').match(/'([^']+)'/)||[])[1];if(!isDayComplete(week,day)){targetBtn=btn;break;}}if(!targetBtn&&tabs.length)targetBtn=tabs[0];if(targetBtn){var dayId=targetBtn.getAttribute('data-day')||((targetBtn.getAttribute('onclick')||'').match(/'([^']+)'/)||[])[1];showDay(dayId,targetBtn);}}
+function autoSelectNextDay(){
+  var dayOrder=['d1','d2','d3','d4','d5','d6','d7'];
+  var foundWeek=null,foundDay=null;
+  for(var w=1;w<=8;w++){
+    for(var di=0;di<dayOrder.length;di++){
+      if(!isDayComplete(w,dayOrder[di])){foundWeek=w;foundDay=dayOrder[di];break;}
+    }
+    if(foundWeek)break;
+  }
+  if(!foundWeek){foundWeek=1;foundDay='d1';}
+  if(foundWeek!==activeWeek){
+    activeWeek=foundWeek;
+    var select=document.getElementById('activeWeekSelect');
+    if(select)select.value=String(activeWeek);
+    updateWeekIndicator();
+  }
+  var targetBtn=document.querySelector('.week-tab[data-day="'+foundDay+'"]');
+  if(targetBtn)showDay(foundDay,targetBtn);
+}
 function initUI(){
   var select=document.getElementById('activeWeekSelect');
   if(select){activeWeek=parseInt(select.value,10)||1;}
@@ -1339,6 +1358,29 @@ function _updateRestZone(){var countEl=document.getElementById('sessionRestCount
 function skipRest(){clearInterval(session.restInterval);session.restRemaining=0;session.restActive=false;var zone=document.getElementById('sessionRestZone');if(zone)zone.innerHTML='';}
 function updateSessionVolume(){var total=0;(session.exercises||[]).forEach(function(ex){if(BW_EXERCISES.has(ex.id))return;for(var s=0;s<ex.sets+2;s++){var d=loadSet(session.week,session.day,ex.id,s);if(d.done&&d.weight)total+=parseFloat(d.weight)||0;}});var el=document.getElementById('sessionVol');if(el)el.textContent=total.toLocaleString()+' lbs';}
 var COOLDOWN_DATA={d1:[{name:'Doorway Chest Stretch',duration:'45 sec/side',cue:'Arms at 90°, lean through doorway'},{name:'Lat Stretch (bar hang)',duration:'30 sec × 2',cue:'Passive dead hang on pull-up bar'},{name:'Child\'s Pose',duration:'60 sec',cue:'Reach long, let thoracic relax'},{name:'Supine Spinal Twist',duration:'45 sec/side',cue:'Keep shoulders flat, gentle rotation'}],d2:[{name:'Pigeon Pose (or Figure-4)',duration:'60 sec/side',cue:'Hips square, breathe into the stretch'},{name:'Lying Hamstring Stretch',duration:'45 sec/side',cue:'Loop band or towel around foot, leg straight'},{name:'Hip Flexor Stretch (kneeling)',duration:'45 sec/side',cue:'Rear knee on floor, drive hips forward gently'},{name:'Child\'s Pose',duration:'60 sec',cue:'Wide knees, arms extended, breathe deeply'},{name:'Supine Spinal Twist',duration:'45 sec/side',cue:'Keep lower back relaxed, don\'t force rotation'}],d4:[{name:'Cross-Body Shoulder Stretch',duration:'45 sec/side',cue:'Pull arm across chest, keep shoulder down'},{name:'Overhead Tricep Stretch',duration:'30 sec/side',cue:'Elbow bent behind head, gentle pressure'},{name:'Doorway Chest Stretch',duration:'45 sec/side',cue:'Arms at 90°, lean through gently'},{name:'Neck Side Stretch',duration:'30 sec/side',cue:'Ear to shoulder, no rotation, slow and gentle'}],d5:[{name:'Pigeon Pose (or Figure-4)',duration:'60 sec/side',cue:'Breathe into the hip, don\'t force it'},{name:'Standing Quad Stretch',duration:'30 sec/side',cue:'Hold wall for balance, keep knees together'},{name:'Seated Hamstring Stretch',duration:'45 sec/side',cue:'Sit on floor, reach toward foot, back straight'},{name:'Glute Bridge Hold (stretch)',duration:'30 sec',cue:'Hold at top, focus on breathing and release'},{name:'Child\'s Pose',duration:'60 sec',cue:'Final full-body decompression'}]};
+function calcStreak(){
+  var streak=0;
+  for(var w=1;w<=8;w++){
+    var weekDone=true;
+    var dayOrder=['d1','d2','d3','d4','d5','d6','d7'];
+    for(var di=0;di<dayOrder.length;di++){
+      if(!isDayComplete(w,dayOrder[di])){weekDone=false;break;}
+    }
+    if(weekDone)streak=w;else break;
+  }
+  return streak;
+}
+function renderStreakBanner(){
+  var banner=document.getElementById('streakBanner');if(!banner)return;
+  var streak=calcStreak();
+  if(streak>0){
+    banner.style.display='flex';
+    var txt=banner.querySelector('.streak-text');var sub=banner.querySelector('.streak-sub');
+    if(txt)txt.textContent='WEEK '+streak+' COMPLETE';
+    var msgs=['Just getting started — keep showing up','Building the habit — solid work','3 weeks in — you\'re locked in','Halfway there — don\'t stop now','5 weeks strong — this is becoming who you are','6 weeks — the program is working','7 weeks — one more push','8 weeks complete — full program finished 🏆'];
+    if(sub)sub.textContent=msgs[streak-1]||'Keep going';
+  }else{banner.style.display='none';}
+}
 function endSession(){
   clearInterval(session.elapsedInterval);clearInterval(session.restInterval);clearInterval(session.cardioInterval);
   var secs=Math.floor((Date.now()-session.startTime)/1000);var mins=Math.round(secs/60)||1;saveDuration(session.week,session.day,mins);
