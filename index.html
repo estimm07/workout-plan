@@ -950,14 +950,17 @@ function isDayComplete(week,day){
   var restDays=['d3','d6','d7'];
   if(restDays.indexOf(day)!==-1)return loadRestDayComplete(week,day);
   var exList=EXERCISES[day];if(!exList||!exList.length)return false;
+  var total=0,doneCt=0;
   for(var i=0;i<exList.length;i++){
     var ex=exList[i];
     for(var s=0;s<ex.sets;s++){
+      total++;
       var d=loadSet(week,day,ex.id,s);
-      if(!d.done)return false;
+      if(d.done)doneCt++;
     }
   }
-  return true;
+  if(total===0)return false;
+  return (doneCt/total)>=0.9;
 }
 function updateDayPillStates(){
   var week=getActiveWeek();
