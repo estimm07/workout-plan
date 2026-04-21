@@ -368,6 +368,26 @@ select::-ms-expand{display:none;}
 .info-section-body li:last-child{border-bottom:none;}
 .info-section-body li::before{content:'·';position:absolute;left:0;color:var(--accent-text);font-weight:700;}
 .info-back-flag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;padding:3px 9px;border-radius:4px;background:var(--warning-dim);color:var(--warning);border:1px solid var(--warning-border);margin-top:var(--sp-2);}
+.ex-video-block{margin:0 0 var(--sp-4);padding-bottom:var(--sp-4);border-bottom:1px solid var(--border);}
+.ex-video-actions{display:flex;gap:var(--sp-2);align-items:center;flex-wrap:wrap;}
+.ex-video-btn-primary{flex:1;min-width:0;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#000;border:1px solid var(--accent);border-radius:var(--r-md);padding:10px var(--sp-4);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:opacity 0.15s;}
+.ex-video-btn-primary:hover{opacity:0.88;}
+.ex-video-btn-ghost{width:100%;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:transparent;color:var(--accent-text);border:1px dashed var(--accent);border-radius:var(--r-md);padding:10px var(--sp-4);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.15s;}
+.ex-video-btn-ghost:hover{background:var(--accent-dim);}
+.ex-video-edit-link{background:none;border:none;color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;padding:12px var(--sp-3);min-height:44px;}
+.ex-video-edit-link:hover{color:var(--text);}
+.ex-video-input{width:100%;box-sizing:border-box;font-family:'DM Mono',monospace;font-size:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);padding:12px var(--sp-3);outline:none;transition:border-color 0.15s;margin-bottom:var(--sp-3);min-height:44px;}
+.ex-video-input:focus{border-color:var(--accent);}
+.ex-video-input::placeholder{color:rgba(255,255,255,0.35);}
+.ex-video-edit-actions{display:flex;gap:var(--sp-2);flex-wrap:wrap;}
+.ex-video-save,.ex-video-cancel,.ex-video-remove{flex:1 1 auto;min-height:44px;padding:10px var(--sp-3);border-radius:var(--r-md);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s,background 0.15s;}
+.ex-video-save{background:var(--accent);color:#000;border:1px solid var(--accent);}
+.ex-video-save:disabled{opacity:0.4;cursor:not-allowed;}
+.ex-video-cancel{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
+.ex-video-remove{background:transparent;color:var(--warning);border:1px solid var(--warning-border);}
+.ex-video-remove:hover{background:var(--warning-dim);}
+.ex-video-warn{margin:var(--sp-3) 0;padding:10px var(--sp-3);background:var(--warning-dim);border:1px solid var(--warning-border);border-radius:var(--r-sm);color:var(--warning);font-size:12px;line-height:1.5;}
+.ex-video-warn-actions{display:flex;gap:var(--sp-2);margin-top:var(--sp-2);}
 /* S6 PROGRESS */
 .prog-subtabs{display:flex;gap:0;margin-bottom:var(--sp-5);border-bottom:1px solid var(--border);overflow-x:auto;}
 .prog-subtabs::-webkit-scrollbar{height:0;}
@@ -915,6 +935,12 @@ function allLogKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var
 function saveBW(dateStr,val){try{localStorage.setItem('bw:'+dateStr,val);}catch(e){}pushBWToSupabase(dateStr,val);}
 function loadBW(dateStr){try{var v=localStorage.getItem('bw:'+dateStr);return v?parseFloat(v):null;}catch(e){return null;}}
 function allBWKeys(){var keys=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('bw:')==0)keys.push(k);}}catch(e){}return keys;}
+var VIDEOS_KEY='forge_exercise_videos';
+function loadVideos(){try{var r=localStorage.getItem(VIDEOS_KEY);return r?JSON.parse(r):{};}catch(e){return {};}}
+function saveVideos(obj){try{localStorage.setItem(VIDEOS_KEY,JSON.stringify(obj||{}));}catch(e){}}
+function getVideo(name){if(!name)return null;var all=loadVideos();return all[name]||null;}
+function setVideo(name,url){if(!name)return null;var all=loadVideos();var rec={url:url,updated_at:new Date().toISOString()};all[name]=rec;saveVideos(all);pushVideoToSupabase(name,rec.url,rec.updated_at);return rec;}
+function removeVideo(name){if(!name)return;var all=loadVideos();if(all[name]){delete all[name];saveVideos(all);}deleteVideoFromSupabase(name);}
 function saveRestDayComplete(week,day,value){
   var complete=(value===undefined)?true:!!value;
   try{if(complete)localStorage.setItem('rdc:w'+week+':'+day,'1');else localStorage.removeItem('rdc:w'+week+':'+day);}catch(e){}
@@ -1300,11 +1326,69 @@ function startCardioChain(idx){
 }
 function isExerciseDone(ex){for(var s=0;s<ex.sets;s++){var d=loadSet(session.week,session.day,ex.id,s);if(!d.done)return false;}return ex.sets>0;}
 var EX_INFO={'bench-press':{cues:['Plant feet flat on floor throughout','Retract and depress shoulder blades into bench','Lower to lower chest — bar path slightly diagonal','Press in a slight arc back toward the rack','Keep wrists stacked over elbows'],notes:'Dumbbells allow a more natural arc than barbell. Squeeze the chest at the top — don\'t just lock the elbows.',back:null},'incline-press':{cues:['Set bench at 30° — no higher or you shift load to shoulders','Shoulder blades pinched and pulled down before you unrack','Lower to upper chest, elbows at roughly 45° from torso','You should feel this in your upper chest, NOT your front delts','If shoulders are taking over — drop the weight and reset your setup'],notes:'⚠️ Shoulder check: if you feel it in the front of your shoulder rather than upper chest, your bench angle is too steep.',back:null},'pullups':{cues:['Dead hang to start — full shoulder elevation','Initiate by depressing the shoulder blades, then pull','Drive elbows down and back toward your hips','Chin clears bar at top — no neck craning','Lower with control — 2–3 second descent'],notes:'Think "elbows to back pockets" rather than pulling with your hands.',back:'Keep your core slightly braced — don\'t hyperextend the lower back at the bottom.'},'chinups':{cues:['Supinated grip (palms toward you), shoulder-width','Initiate from shoulder blades, not biceps curl','Drive elbows down to your sides','Full range — dead hang to chin over bar','Control the descent — resist gravity'],notes:'Chin-ups bias the biceps more than pull-ups.',back:'Brace your core at the bottom to prevent lower back arching.'},'bent-row':{cues:['Hip hinge to about 45° torso angle — not a squat','Neutral spine throughout — no rounding','Pull elbows back and up toward hips','Row to lower ribcage, not upper chest','Squeeze shoulder blades together at top'],notes:'The weight should travel in a straight vertical line.',back:'This is a hinge pattern — keep your lower back in neutral. Brace core before each rep.'},'chest-row':{cues:['Chest firmly on the bench — take lower back out','Let arms hang fully at the bottom','Pull elbows back past the torso','Squeeze shoulder blades hard at the top','Lower slowly — 2–3 seconds down'],notes:'One of the safest rowing variations for your back. Use it to go heavy.',back:null},'db-curl':{cues:['Start with palms facing each other, rotate to supinated as you curl','Keep upper arm pinned to your side','Full extension at the bottom','Slow lowering phase is where the growth happens','Alternate arms with control'],notes:'The supination during the curl increases bicep peak activation.',back:null},'shoulder-press':{cues:['Start at ear height, palms forward','Press in a slight inward arc — not straight up','Lock out at top without shrugging','Lower slowly to ear height — full range','Keep core braced'],notes:'Seated is safer for your back than standing.',back:'Do not hyperextend the lower back to get the weight up. Drop the weight if you\'re leaning back significantly.'},'lat-raise':{cues:['Slight forward lean from the hips','Lead with your elbows — not your hands','Raise to shoulder height only','Pinky slightly higher than thumb at the top','Lower with control — 2–3 seconds'],notes:'Go lighter than you think. Most people use too much weight and hit traps instead of lateral deltoids.',back:null},'skull-crusher':{cues:['Upper arms vertical and stationary throughout','Hinge only at the elbow','Lower to just above forehead','Press back up keeping upper arms locked','Keep wrists neutral'],notes:'If you feel elbow pain, angle your upper arms very slightly back (5–10°).',back:null},'face-pull':{cues:['Anchor band at face height or above','Pull to your face — not your neck or chest','Elbows high and out to the sides','External rotate at the end — hands finish by your ears','Control the return — resist the band'],notes:'This is a health exercise as much as a strength exercise.',back:null},'oh-tricep':{cues:['Upper arms stay vertical and close to your head','Hinge only at the elbows','Full stretch at the bottom','Press until arms are fully extended overhead','Keep core braced'],notes:'Overhead position puts the long head of the tricep in a stretched position.',back:'Don\'t arch the lower back to get the elbows higher.'},'hip-thrust':{cues:['Upper back against bench — shoulder blades on the edge','Drive through heels — not the balls of your feet','Squeeze glutes hard at the top','Hips fully extended at top — body forms a straight line','Chin tucked — don\'t hyperextend the neck'],notes:'This is your deadlift replacement. Own the glute squeeze at the top — hold for 1 second.',back:'No spinal loading. If you feel it in your lower back, you\'re using lumbar extensors instead of glutes.'},'sl-hip-thrust':{cues:['Non-working leg either bent or straight — your preference','Drive through the heel of the working leg only','Keep hips level — don\'t let one side drop','Full extension at the top, then controlled descent','Use a lighter weight than bilateral'],notes:'Exposes left-right imbalances. Always start with the weaker side.',back:null},'goblet-squat':{cues:['Hold DB vertically at chest height','Feet shoulder-width, toes slightly out','Sit between your knees — not behind them','Keep chest tall throughout','Drive through the full foot to stand'],notes:'The goblet position acts as a counterbalance.',back:'Keep the torso upright.'},'rdl':{cues:['Soft bend in the knees throughout','Push hips back — hip hinge not a squat','Lower until you feel a hamstring stretch (usually shin level)','Keep the dumbbells close to your legs','Drive hips forward to return to standing'],notes:'THIS IS PROGRAMMED LIGHT FOR A REASON. Keep it controlled.',back:'⚠️ Back safety priority. Neutral spine is non-negotiable. If you feel any discomfort, stop and substitute.'},'rev-lunge':{cues:['Step back — not forward — reduces knee stress','Front shin stays vertical','Back knee tracks to just above the floor','Drive through the front heel to return','Keep torso upright throughout'],notes:'Safer for the knees than forward lunges.',back:null},'calf-raise':{cues:['Full range — heel below the step at the bottom','Rise to the very top','Pause briefly at the top','Control the descent','Both legs equally weighted'],notes:'Calves adapt quickly. If these feel easy, slow the tempo.',back:null},'bss':{cues:['Rear foot elevated on bench — top of the foot down','Front foot far enough forward that your shin stays vertical','Lower until rear knee nearly touches floor','Drive through front heel to stand','Keep torso upright'],notes:'One of the hardest exercises. Start light.',back:'Bracing your core protects the lower back from rotational stress.'},'nordic':{cues:['Anchor feet firmly under bench or DB','Start kneeling upright — core braced','Lower your body toward the floor as slowly as possible','Catch yourself with hands before you hit the floor','Use arms to push back to start'],notes:'5–6 slow reps is genuinely hard. One of the best hamstring injury prevention exercises.',back:null},'clamshell':{cues:['Side-lying, hips stacked, knees bent at 90°','Keep feet together throughout','Rotate the top knee up like a clamshell opening','Don\'t let your hips roll back','Pause at the top'],notes:'Glute medius and hip external rotator exercise.',back:null},'dead-bug':{cues:['Lower back pressed flat into the floor — non-negotiable','Opposite arm and leg extend simultaneously','Move slowly — 3 seconds out, 3 seconds back','Never let your lower back lift off the floor','Breathe out as you extend'],notes:'If your lower back lifts, reduce the range of motion.',back:'Specifically designed to protect the lower back by training deep spinal stabilisers.'},'plank':{cues:['Forearms on floor, elbows under shoulders','Body in a straight line from head to heels','Squeeze glutes and quads','Breathe steadily','If hips drop or pike, stop the set'],notes:'A quality 30-second plank beats a sagging 60-second one.',back:'Keep the spine neutral.'}};
+function _exVidEscAttr(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function _exVidIsValidUrl(s){if(!s)return false;try{var u=new URL(s);return u.protocol==='http:'||u.protocol==='https:';}catch(e){return false;}}
+function _exVidIsYouTube(hostname){if(!hostname)return false;var h=hostname.toLowerCase();return h==='youtube.com'||h==='www.youtube.com'||h==='m.youtube.com'||h==='youtu.be';}
+function _exVidBlockContentHTML(label){
+  var rec=getVideo(label);var lab=_exVidEscAttr(label);
+  if(rec&&rec.url){
+    return '<div class="ex-video-actions"><a class="ex-video-btn-primary" href="'+_exVidEscAttr(rec.url)+'" target="_blank" rel="noopener noreferrer">▶ Watch Form Video</a><button class="ex-video-edit-link" onclick="showVideoEditor(\''+lab+'\')">Edit</button></div>';
+  }
+  return '<button class="ex-video-btn-ghost" onclick="showVideoEditor(\''+lab+'\')">+ Add Form Video</button>';
+}
+function _exVidBlockHTML(label){return '<div class="ex-video-block" id="exVideoBlock">'+_exVidBlockContentHTML(label)+'</div>';}
+function showVideoEditor(label){
+  var block=document.getElementById('exVideoBlock');if(!block)return;
+  var rec=getVideo(label);var cur=rec&&rec.url?rec.url:'';var hasExisting=!!(rec&&rec.url);var lab=_exVidEscAttr(label);
+  var html='';
+  html+='<input type="url" class="ex-video-input" id="exVideoInput" placeholder="https://youtube.com/watch?v=..." value="'+_exVidEscAttr(cur)+'" autocomplete="off" oninput="onVideoInputChange()"/>';
+  html+='<div class="ex-video-edit-actions">';
+  html+='<button class="ex-video-save" id="exVideoSaveBtn" onclick="attemptSaveVideo(\''+lab+'\')"'+(_exVidIsValidUrl(cur)?'':' disabled')+'>Save</button>';
+  html+='<button class="ex-video-cancel" onclick="cancelVideoEdit(\''+lab+'\')">Cancel</button>';
+  if(hasExisting)html+='<button class="ex-video-remove" onclick="removeVideoFromModal(\''+lab+'\')">Remove</button>';
+  html+='</div>';
+  html+='<div id="exVideoWarn"></div>';
+  block.innerHTML=html;
+  var inp=document.getElementById('exVideoInput');if(inp){try{inp.focus();}catch(e){}}
+}
+function onVideoInputChange(){
+  var inp=document.getElementById('exVideoInput');var btn=document.getElementById('exVideoSaveBtn');if(!inp||!btn)return;
+  btn.disabled=!_exVidIsValidUrl((inp.value||'').trim());
+  var warn=document.getElementById('exVideoWarn');if(warn)warn.innerHTML='';
+}
+function attemptSaveVideo(label){
+  var inp=document.getElementById('exVideoInput');if(!inp)return;
+  var url=(inp.value||'').trim();if(!_exVidIsValidUrl(url))return;
+  var host='';try{host=new URL(url).hostname;}catch(e){}
+  if(!_exVidIsYouTube(host)){
+    var warn=document.getElementById('exVideoWarn');var lab=_exVidEscAttr(label);
+    if(warn){
+      warn.innerHTML='<div class="ex-video-warn">This isn\'t a YouTube URL — it\'ll still open in a browser when tapped. Save anyway?<div class="ex-video-warn-actions"><button class="ex-video-save" onclick="confirmSaveVideo(\''+lab+'\')">Save anyway</button><button class="ex-video-cancel" onclick="dismissVideoWarn()">Cancel</button></div></div>';
+      return;
+    }
+  }
+  confirmSaveVideo(label);
+}
+function confirmSaveVideo(label){
+  var inp=document.getElementById('exVideoInput');if(!inp)return;
+  var url=(inp.value||'').trim();if(!_exVidIsValidUrl(url))return;
+  setVideo(label,url);
+  var block=document.getElementById('exVideoBlock');if(block)block.innerHTML=_exVidBlockContentHTML(label);
+}
+function cancelVideoEdit(label){var block=document.getElementById('exVideoBlock');if(block)block.innerHTML=_exVidBlockContentHTML(label);}
+function dismissVideoWarn(){var warn=document.getElementById('exVideoWarn');if(warn)warn.innerHTML='';}
+function removeVideoFromModal(label){
+  if(!window.confirm('Remove the saved video for "'+label+'"?'))return;
+  removeVideo(label);
+  var block=document.getElementById('exVideoBlock');if(block)block.innerHTML=_exVidBlockContentHTML(label);
+}
 function showExInfo(exId,label){
   var info=EX_INFO[exId];var overlay=document.getElementById('exInfoOverlay');var titleEl=document.getElementById('exInfoTitle');var bodyEl=document.getElementById('exInfoBody');if(!overlay||!titleEl||!bodyEl)return;
   titleEl.textContent=label;
-  if(!info){bodyEl.innerHTML='<div class="info-section"><div class="info-section-body">No additional notes for this exercise.</div></div>';}
-  else{var html='';html+='<div class="info-section"><div class="info-section-label">Form Cues</div><ul class="info-section-body">';info.cues.forEach(function(c){html+='<li>'+c+'</li>';});html+='</ul></div>';if(info.notes){html+='<div class="info-section"><div class="info-section-label">Coaching Notes</div><div class="info-section-body">'+info.notes+'</div></div>';}if(info.back){html+='<div class="info-section"><div class="info-section-label">Back Safety</div><div class="info-section-body">'+info.back+'</div><div class="info-back-flag">⚠️ Back Safety Note</div></div>';}bodyEl.innerHTML=html;}
+  var html=_exVidBlockHTML(label);
+  if(!info){html+='<div class="info-section"><div class="info-section-body">No additional notes for this exercise.</div></div>';}
+  else{html+='<div class="info-section"><div class="info-section-label">Form Cues</div><ul class="info-section-body">';info.cues.forEach(function(c){html+='<li>'+c+'</li>';});html+='</ul></div>';if(info.notes){html+='<div class="info-section"><div class="info-section-label">Coaching Notes</div><div class="info-section-body">'+info.notes+'</div></div>';}if(info.back){html+='<div class="info-section"><div class="info-section-label">Back Safety</div><div class="info-section-body">'+info.back+'</div><div class="info-back-flag">⚠️ Back Safety Note</div></div>';}}
+  bodyEl.innerHTML=html;
   overlay.classList.add('open');
 }
 function closeExInfo(e){if(e&&e.target!==document.getElementById('exInfoOverlay'))return;var overlay=document.getElementById('exInfoOverlay');if(overlay)overlay.classList.remove('open');}
@@ -1458,11 +1542,13 @@ function forceSyncNow(){
   var bwEntries=[];allBWKeys().forEach(function(k){var val=loadBW(k.replace('bw:',''));if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});});
   var prefKeys=['appTheme','appThemeCustom'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
   var prefs=[];prefKeys.forEach(function(k){var v=localStorage.getItem(k);if(v)prefs.push({user_id:currentUser.id,key:k,value:v});});
-  var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)||1;var hadError=false;
-  function checkDone(err){if(err)hadError=true;done++;if(done>=total){localStorage.setItem('supa_migrated','1');if(btn)btn.disabled=false;if(pullBtn)pullBtn.disabled=false;if(hadError){setSyncStatus('⚠️','Sync issue','Some data may not have synced. Try again.');}else{setSyncStatus('✅','Sync complete','All '+sets.length+' sets, '+(bwEntries.length)+' body weight entries pushed to cloud.');}}}
+  var videoMap=loadVideos();var videos=[];Object.keys(videoMap).forEach(function(name){var rec=videoMap[name];if(rec&&rec.url)videos.push({user_id:currentUser.id,exercise_name:name,video_url:rec.url,updated_at:rec.updated_at||new Date().toISOString()});});
+  var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)+(videos.length?1:0)||1;var hadError=false;
+  function checkDone(err){if(err)hadError=true;done++;if(done>=total){localStorage.setItem('supa_migrated','1');if(btn)btn.disabled=false;if(pullBtn)pullBtn.disabled=false;if(hadError){setSyncStatus('⚠️','Sync issue','Some data may not have synced. Try again.');}else{setSyncStatus('✅','Sync complete','All '+sets.length+' sets, '+(bwEntries.length)+' body weight entries, '+videos.length+' videos pushed to cloud.');}}}
   if(sets.length){supaClient.from('workout_sets').upsert(sets,{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(r){checkDone(r.error);});}else checkDone();
   if(bwEntries.length){supaClient.from('body_weight').upsert(bwEntries,{onConflict:'user_id,date'}).then(function(r){checkDone(r.error);});}else if(total>1)checkDone();
   if(prefs.length){supaClient.from('user_preferences').upsert(prefs,{onConflict:'user_id,key'}).then(function(r){checkDone(r.error);});}else if(total>2)checkDone();
+  if(videos.length){supaClient.from('exercise_videos').upsert(videos,{onConflict:'user_id,exercise_name'}).then(function(r){checkDone(r.error);});}else if(total>3)checkDone();
 }
 function forcePullNow(){
   if(!supaClient||!currentUser){setSyncStatus('⚠️','Not logged in','Please log in first.');return;}
@@ -1493,21 +1579,26 @@ function migrateLocalToSupabase(cb){
   var bwEntries=[];allBWKeys().forEach(function(k){var val=loadBW(k.replace('bw:',''));if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});});
   var prefKeys=['appTheme','appThemeCustom'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
   var prefs=[];prefKeys.forEach(function(k){var v=localStorage.getItem(k);if(v)prefs.push({user_id:currentUser.id,key:k,value:v});});
-  var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)||1;
+  var videoMap=loadVideos();var videos=[];Object.keys(videoMap).forEach(function(name){var rec=videoMap[name];if(rec&&rec.url)videos.push({user_id:currentUser.id,exercise_name:name,video_url:rec.url,updated_at:rec.updated_at||new Date().toISOString()});});
+  var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)+(videos.length?1:0)||1;
   function checkDone(){done++;if(done>=total){localStorage.setItem('supa_migrated','1');hideSyncIndicator();cb&&cb();}}
   if(sets.length){supaClient.from('workout_sets').upsert(sets,{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(){checkDone();});}else checkDone();
   if(bwEntries.length){supaClient.from('body_weight').upsert(bwEntries,{onConflict:'user_id,date'}).then(function(){checkDone();});}else if(total>1)checkDone();
   if(prefs.length){supaClient.from('user_preferences').upsert(prefs,{onConflict:'user_id,key'}).then(function(){checkDone();});}else if(total>2)checkDone();
+  if(videos.length){supaClient.from('exercise_videos').upsert(videos,{onConflict:'user_id,exercise_name'}).then(function(){checkDone();});}else if(total>3)checkDone();
 }
 function pullFromSupabase(cb){
-  if(!supaClient||!currentUser){cb&&cb();return;}showSyncIndicator('↓ syncing...');var done=0;function checkDone(){done++;if(done>=3){hideSyncIndicator();cb&&cb();}}
+  if(!supaClient||!currentUser){cb&&cb();return;}showSyncIndicator('↓ syncing...');var done=0;function checkDone(){done++;if(done>=4){hideSyncIndicator();cb&&cb();}}
   supaClient.from('workout_sets').select('*').eq('user_id',currentUser.id).then(function(res){if(res.data){res.data.forEach(function(r){if(r.exercise_id==='_rest'){if(r.done)try{localStorage.setItem('rdc:w'+r.week+':'+r.day,'1');}catch(e){}return;}var k=sKey(r.week,r.day,r.exercise_id,r.set_index);var existing=null;try{existing=JSON.parse(localStorage.getItem(k));}catch(e){}if(!existing||(r.ts&&(!existing.ts||r.ts>existing.ts))){try{localStorage.setItem(k,JSON.stringify({weight:r.weight,done:r.done,reps:r.reps,rpe:r.rpe,ts:r.ts}));}catch(e){}}});}checkDone();});
   supaClient.from('body_weight').select('*').eq('user_id',currentUser.id).then(function(res){if(res.data){res.data.forEach(function(r){saveBW(r.date,r.value);});}checkDone();});
   supaClient.from('user_preferences').select('*').eq('user_id',currentUser.id).then(function(res){if(res.data){res.data.forEach(function(r){try{localStorage.setItem(r.key,r.value);}catch(e){}});}checkDone();});
+  supaClient.from('exercise_videos').select('*').eq('user_id',currentUser.id).then(function(res){if(res.data){var all=loadVideos();res.data.forEach(function(r){if(!r||!r.exercise_name)return;var existing=all[r.exercise_name];var remoteTs=r.updated_at?new Date(r.updated_at).getTime():0;var localTs=existing&&existing.updated_at?new Date(existing.updated_at).getTime():0;if(!existing||remoteTs>localTs){all[r.exercise_name]={url:r.video_url||'',updated_at:r.updated_at||new Date().toISOString()};}});saveVideos(all);}checkDone();});
 }
 function pushSetToSupabase(w,day,exId,setIdx,data){if(!supaClient||!currentUser)return;supaClient.from('workout_sets').upsert({user_id:currentUser.id,week:w,day:day,exercise_id:exId,set_index:setIdx,weight:data.weight||'',reps:data.reps||'',done:data.done||false,rpe:data.rpe||'',ts:data.ts||Date.now()},{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(){});}
 function pushBWToSupabase(dateStr,val){if(!supaClient||!currentUser)return;supaClient.from('body_weight').upsert({user_id:currentUser.id,date:dateStr,value:val},{onConflict:'user_id,date'}).then(function(){});}
 function pushPrefToSupabase(key,value){if(!supaClient||!currentUser)return;supaClient.from('user_preferences').upsert({user_id:currentUser.id,key:key,value:value},{onConflict:'user_id,key'}).then(function(){});}
+function pushVideoToSupabase(name,url,updatedAt){if(!supaClient||!currentUser)return;supaClient.from('exercise_videos').upsert({user_id:currentUser.id,exercise_name:name,video_url:url,updated_at:updatedAt||new Date().toISOString()},{onConflict:'user_id,exercise_name'}).then(function(){});}
+function deleteVideoFromSupabase(name){if(!supaClient||!currentUser)return;supaClient.from('exercise_videos').delete().eq('user_id',currentUser.id).eq('exercise_name',name).then(function(){});}
 function initApp(){buildSchedule();document.querySelectorAll('.block-body').forEach(function(b){if(b.style.display!=='block')b.style.display='none';});loadSavedTheme();initUI();}
 initSupabase();
 supaClient.auth.getSession().then(function(res){if(res.data&&res.data.session&&res.data.session.user){currentUser=res.data.session.user;hideLoginScreen();initApp();pullFromSupabase(function(){initUI();});}else{showLoginScreen();}});
