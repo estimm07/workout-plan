@@ -975,7 +975,7 @@ function showDay(id,btn){
 }
 function isDayComplete(week,day){
   var restDays=['d3','d6','d7'];
-  if(restDays.indexOf(day)!==-1)return loadRestDayComplete(week,day);
+  if(restDays.indexOf(day)!==-1)return true;
   var exList=EXERCISES[day];if(!exList||!exList.length)return false;
   var total=0,doneCt=0;
   for(var i=0;i<exList.length;i++){
