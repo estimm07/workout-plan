@@ -1022,12 +1022,14 @@ function updateCurrentFocus(dayId){
   chip.textContent=phase;
 }
 function updateWeekIndicator(){
-  var badge=document.getElementById('weekInfoBadge');
+  var badge=document.getElementById('weekPhaseBadge');
   var select=document.getElementById('activeWeekSelect');
   if(select && String(select.value)!==String(activeWeek)) select.value=String(activeWeek);
-  if(activeWeek<=3){badge.textContent='PHASE 1';badge.className='week-info-badge p1';}
-  else if(activeWeek<=6){badge.textContent='PHASE 2';badge.className='week-info-badge p2';}
-  else{badge.textContent='PHASE 3';badge.className='week-info-badge p3';}
+  if(badge){
+    if(activeWeek<=3){badge.textContent='Phase 1 · Foundation';badge.className='week-info-badge p1';}
+    else if(activeWeek<=6){badge.textContent='Phase 2 · Hypertrophy';badge.className='week-info-badge p2';}
+    else{badge.textContent='Phase 3 · Intensification';badge.className='week-info-badge p3';}
+  }
   document.querySelectorAll('.week-pill').forEach(function(btn){
     var isActive=parseInt(btn.getAttribute('data-week'),10)===activeWeek;
     btn.classList.toggle('active',isActive);
