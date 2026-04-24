@@ -658,6 +658,11 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
     <p class="cycle2-body">In Week 8 you'll test your 1-rep-range max on major lifts. When you're done, come back to Claude to discuss Cycle 2 — either a new program phase or a second program to live in this app.</p>
     <div class="cycle2-actions"><button class="cycle2-dismiss" onclick="dismissCycle2Banner()">Dismiss</button></div>
   </div>
+  <div id="forgeDebugPanel" style="background:#1a0a2e;border:1px solid #7c3aed;border-radius:10px;padding:14px;margin-bottom:16px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.7;color:#c4b5fd;">
+    <div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:8px;letter-spacing:0.08em;">&#x1F50D; FORGE DEBUG</div>
+    <div id="forgeDebugLog" style="white-space:pre-wrap;word-break:break-all;">Initializing...</div>
+    <button onclick="document.getElementById('forgeDebugPanel').style.display='none'" style="margin-top:10px;width:100%;padding:8px;background:none;border:1px solid #7c3aed;border-radius:6px;color:#a78bfa;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.06em;cursor:pointer;">DISMISS DEBUG PANEL</button>
+  </div>
   <div class="week-selector-bar">
     <label>Logging for:</label>
     <div class="week-selector-row">
@@ -1064,20 +1069,23 @@ function toggleRestDayComplete(dayId){
   updateDayPillStates();
   saveData();
 }
+var _dbgReady=false;var _dbg=function(msg){var el=document.getElementById('forgeDebugLog');if(!el)return;if(!_dbgReady){el.textContent='';_dbgReady=true;}el.textContent+=msg+'\n';};
 function autoSelectNextDay(){
   var dayOrder=['d1','d2','d3','d4','d5','d6','d7'];
   var foundWeek=null,foundDay=null;
-  console.log('[FORGE] autoSelectNextDay start, activeWeek='+activeWeek);
+  var lsKeys=0;try{for(var ki=0;ki<localStorage.length;ki++){if(localStorage.key(ki).indexOf('wlog:')==0)lsKeys++;}}catch(e){}
+  _dbg('--- autoSelectNextDay ---');
+  _dbg('localStorage wlog keys: '+lsKeys);
+  _dbg('activeWeek at start: '+activeWeek);
   for(var w=1;w<=8;w++){
     for(var di=0;di<dayOrder.length;di++){
-      var complete=isDayComplete(w,dayOrder[di]);
-      console.log('[FORGE] w'+w+' '+dayOrder[di]+' complete='+complete);
-      if(!complete){foundWeek=w;foundDay=dayOrder[di];break;}
+      var comp=isDayComplete(w,dayOrder[di]);
+      if(!comp){foundWeek=w;foundDay=dayOrder[di];_dbg('First incomplete: w'+w+' '+dayOrder[di]);break;}
     }
     if(foundWeek)break;
   }
-  console.log('[FORGE] result: week='+foundWeek+' day='+foundDay);
-  if(!foundWeek){foundWeek=1;foundDay='d1';}
+  if(!foundWeek){foundWeek=1;foundDay='d1';_dbg('All complete, defaulting w1 d1');}
+  _dbg('Result: week='+foundWeek+' day='+foundDay);
   if(foundWeek!==activeWeek){
     activeWeek=foundWeek;
     var select=document.getElementById('activeWeekSelect');
@@ -1085,19 +1093,24 @@ function autoSelectNextDay(){
     updateWeekIndicator();
   }
   var targetBtn=document.querySelector('.week-tab[data-day="'+foundDay+'"]');
-  console.log('[FORGE] targetBtn='+!!targetBtn+' for '+foundDay);
+  _dbg('targetBtn found: '+!!targetBtn);
   if(targetBtn)showDay(foundDay,targetBtn);
-  console.log('[FORGE] done, activeWeek now='+activeWeek);
+  _dbg('activeWeek after: '+activeWeek);
 }
+var _initUICount=0;
 function initUI(){
+  _initUICount++;
+  var el=document.getElementById('forgeDebugLog');if(el)el.textContent+='\n--- initUI #'+_initUICount+' ---\n';
   var select=document.getElementById('activeWeekSelect');
   if(select){activeWeek=parseInt(select.value,10)||1;}
+  _dbg('select.value='+( select?select.value:'?')+' activeWeek='+activeWeek);
   updateWeekIndicator();
-  try{autoSelectNextDay();}catch(e){}
+  try{autoSelectNextDay();}catch(e){_dbg('autoSelect ERROR: '+e);}
   buildTrackers();
   try{renderStreakBanner();}catch(e){}
   try{renderCycle2Banner();}catch(e){}
   renderDay();
+  _dbg('initUI #'+_initUICount+' done. Final activeWeek='+activeWeek);
 }
 var activeTimer=null;
 function createRestTimer(restSecs){
@@ -1608,7 +1621,7 @@ function pushVideoToSupabase(name,url,updatedAt){if(!supaClient||!currentUser)re
 function deleteVideoFromSupabase(name){if(!supaClient||!currentUser)return;supaClient.from('exercise_videos').delete().eq('user_id',currentUser.id).eq('exercise_name',name).then(function(){});}
 function initApp(){buildSchedule();document.querySelectorAll('.block-body').forEach(function(b){if(b.style.display!=='block')b.style.display='none';});loadSavedTheme();initUI();}
 initSupabase();
-supaClient.auth.getSession().then(function(res){if(res.data&&res.data.session&&res.data.session.user){currentUser=res.data.session.user;hideLoginScreen();initApp();pullFromSupabase(function(){initUI();});}else{showLoginScreen();}});
+supaClient.auth.getSession().then(function(res){if(res.data&&res.data.session&&res.data.session.user){currentUser=res.data.session.user;hideLoginScreen();initApp();pullFromSupabase(function(){_dbg('\n=== pullFromSupabase DONE ===');initUI();});}else{showLoginScreen();}});
 </script>
 </body>
 </html>
