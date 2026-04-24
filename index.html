@@ -987,7 +987,7 @@ function isDayComplete(week,day){
     }
   }
   if(total===0)return false;
-  return (doneCt/total)>=0.5;
+  return (doneCt/total)>=0.9;
 }
 function updateDayPillStates(){
   var week=getActiveWeek();
@@ -1067,12 +1067,16 @@ function toggleRestDayComplete(dayId){
 function autoSelectNextDay(){
   var dayOrder=['d1','d2','d3','d4','d5','d6','d7'];
   var foundWeek=null,foundDay=null;
+  console.log('[FORGE] autoSelectNextDay start, activeWeek='+activeWeek);
   for(var w=1;w<=8;w++){
     for(var di=0;di<dayOrder.length;di++){
-      if(!isDayComplete(w,dayOrder[di])){foundWeek=w;foundDay=dayOrder[di];break;}
+      var complete=isDayComplete(w,dayOrder[di]);
+      console.log('[FORGE] w'+w+' '+dayOrder[di]+' complete='+complete);
+      if(!complete){foundWeek=w;foundDay=dayOrder[di];break;}
     }
     if(foundWeek)break;
   }
+  console.log('[FORGE] result: week='+foundWeek+' day='+foundDay);
   if(!foundWeek){foundWeek=1;foundDay='d1';}
   if(foundWeek!==activeWeek){
     activeWeek=foundWeek;
@@ -1081,7 +1085,9 @@ function autoSelectNextDay(){
     updateWeekIndicator();
   }
   var targetBtn=document.querySelector('.week-tab[data-day="'+foundDay+'"]');
+  console.log('[FORGE] targetBtn='+!!targetBtn+' for '+foundDay);
   if(targetBtn)showDay(foundDay,targetBtn);
+  console.log('[FORGE] done, activeWeek now='+activeWeek);
 }
 function initUI(){
   var select=document.getElementById('activeWeekSelect');
@@ -1091,6 +1097,7 @@ function initUI(){
   buildTrackers();
   try{renderStreakBanner();}catch(e){}
   try{renderCycle2Banner();}catch(e){}
+  renderDay();
 }
 var activeTimer=null;
 function createRestTimer(restSecs){
@@ -1572,7 +1579,7 @@ function hideLoginScreen(){var ls=document.getElementById('loginScreen');if(ls)l
 function setLoginMsg(msg,type){var el=document.getElementById('loginMsg');if(!el)return;el.textContent=msg;el.className='login-msg '+(type||'error');el.style.display=msg?'block':'none';}
 function handleLogin(){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPassword').value;if(!email||!pass){setLoginMsg('Please enter email and password.');return;}var btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='Signing in...';supaClient.auth.signInWithPassword({email:email,password:pass}).then(function(res){btn.disabled=false;btn.textContent='Sign In';if(res.error){setLoginMsg(res.error.message);return;}currentUser=res.data.user;setLoginMsg('');onAuthSuccess();});}
 function handleSignup(){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPassword').value;if(!email||!pass){setLoginMsg('Please enter email and password.');return;}if(pass.length<6){setLoginMsg('Password must be at least 6 characters.');return;}var btn=document.getElementById('signupBtn');btn.disabled=true;btn.textContent='Creating account...';supaClient.auth.signUp({email:email,password:pass}).then(function(res){btn.disabled=false;btn.textContent='Create Account';if(res.error){setLoginMsg(res.error.message);return;}if(res.data&&res.data.user&&res.data.user.id){currentUser=res.data.user;setLoginMsg('');onAuthSuccess();}else{setLoginMsg('Account created! Check your email to confirm, then sign in.','success');}});}
-function onAuthSuccess(){hideLoginScreen();initApp();migrateLocalToSupabase(function(){pullFromSupabase(function(){buildTrackers();try{renderStreakBanner();}catch(e){}try{renderCycle2Banner();}catch(e){}renderDay();});});}
+function onAuthSuccess(){hideLoginScreen();initApp();migrateLocalToSupabase(function(){pullFromSupabase(function(){initUI();});});}
 function migrateLocalToSupabase(cb){
   if(!currentUser)return cb&&cb();var migrated=localStorage.getItem('supa_migrated');if(migrated){return cb&&cb();}showSyncIndicator('↑ migrating data...');
   var sets=[];allLogKeys().forEach(function(k){try{var val=JSON.parse(localStorage.getItem(k)||'{}');var p=k.replace('wlog:','').split(':');if(p.length<4)return;sets.push({user_id:currentUser.id,week:parseInt(p[0].replace('w',''),10),day:p[1],exercise_id:p[2],set_index:parseInt(p[3].replace('s',''),10),weight:val.weight||'',reps:val.reps||'',done:val.done||false,rpe:val.rpe||'',ts:val.ts||Date.now()});}catch(e){}});
@@ -1601,7 +1608,7 @@ function pushVideoToSupabase(name,url,updatedAt){if(!supaClient||!currentUser)re
 function deleteVideoFromSupabase(name){if(!supaClient||!currentUser)return;supaClient.from('exercise_videos').delete().eq('user_id',currentUser.id).eq('exercise_name',name).then(function(){});}
 function initApp(){buildSchedule();document.querySelectorAll('.block-body').forEach(function(b){if(b.style.display!=='block')b.style.display='none';});loadSavedTheme();initUI();}
 initSupabase();
-supaClient.auth.getSession().then(function(res){if(res.data&&res.data.session&&res.data.session.user){currentUser=res.data.session.user;hideLoginScreen();initApp();pullFromSupabase(function(){buildTrackers();try{renderStreakBanner();}catch(e){}try{renderCycle2Banner();}catch(e){}renderDay();});}else{showLoginScreen();}});
+supaClient.auth.getSession().then(function(res){if(res.data&&res.data.session&&res.data.session.user){currentUser=res.data.session.user;hideLoginScreen();initApp();pullFromSupabase(function(){initUI();});}else{showLoginScreen();}});
 </script>
 </body>
 </html>
