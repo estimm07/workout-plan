@@ -658,11 +658,6 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
     <p class="cycle2-body">In Week 8 you'll test your 1-rep-range max on major lifts. When you're done, come back to Claude to discuss Cycle 2 — either a new program phase or a second program to live in this app.</p>
     <div class="cycle2-actions"><button class="cycle2-dismiss" onclick="dismissCycle2Banner()">Dismiss</button></div>
   </div>
-  <div id="forgeDebugPanel" style="background:#1a0a2e;border:1px solid #7c3aed;border-radius:10px;padding:14px;margin-bottom:16px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.7;color:#c4b5fd;">
-    <div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:8px;">&#x1F50D; FORGE DEBUG</div>
-    <div id="forgeDebugLog" style="white-space:pre-wrap;word-break:break-all;">Loading...</div>
-    <button onclick="document.getElementById('forgeDebugPanel').style.display='none'" style="margin-top:10px;width:100%;padding:8px;background:none;border:1px solid #7c3aed;border-radius:6px;color:#a78bfa;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;">DISMISS</button>
-  </div>
   <div class="week-selector-bar">
     <label>Logging for:</label>
     <div class="week-selector-row">
@@ -674,7 +669,7 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
           <option value="7">Week 7 — Intensification</option><option value="8">Week 8 — Intensification</option>
         </select>
       </div>
-      <span id="weekPhaseBadge" class="week-info-badge p1">Phase 1 · Foundation</span>
+      <span id="weekInfoBadge" class="week-info-badge p1">Phase 1 · Foundation</span>
     </div>
   </div>
   <p class="week-instruction">Select your current week above. Enter weight used per set and tap <strong>✓</strong> to mark it complete — all data is <strong>auto-saved</strong> to your browser. Or tap <strong>Start Workout</strong> for the focused session mode.</p>
@@ -891,8 +886,6 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
 // ═══════════════════════════════════════════════════════
 //  CORE CONFIG
 // ═══════════════════════════════════════════════════════
-var _dbgEl=null;
-function _dbg(msg){if(!_dbgEl)_dbgEl=document.getElementById('forgeDebugLog');if(!_dbgEl)return;if(_dbgEl.textContent==='Loading...')_dbgEl.textContent='';_dbgEl.textContent+=msg+'\n';}
 const EXERCISES = {
   d1: [
     {id:'bench-press',   label:'DB Bench Press',          sets:3, rest:75},
@@ -994,7 +987,7 @@ function isDayComplete(week,day){
     }
   }
   if(total===0)return false;
-  return (doneCt/total)>=0.9;
+  return (doneCt/total)>=0.5;
 }
 function updateDayPillStates(){
   var week=getActiveWeek();
@@ -1090,21 +1083,14 @@ function autoSelectNextDay(){
   var targetBtn=document.querySelector('.week-tab[data-day="'+foundDay+'"]');
   if(targetBtn)showDay(foundDay,targetBtn);
 }
-var _iuN=0;
 function initUI(){
-  _iuN++;
-  var _lsN=0;try{for(var _ki=0;_ki<localStorage.length;_ki++){if(localStorage.key(_ki)&&localStorage.key(_ki).indexOf('wlog:')==0)_lsN++;}}catch(e){}
-  _dbg('=== initUI #'+_iuN+' wlog:'+_lsN+' ===');
   var select=document.getElementById('activeWeekSelect');
   if(select){activeWeek=parseInt(select.value,10)||1;}
-  _dbg('A sel='+(select?select.value:'null')+' aw='+activeWeek);
-  try{updateWeekIndicator();_dbg('B updateWeekIndicator OK');}catch(e){_dbg('B ERR:'+e.message);}
-  try{autoSelectNextDay();_dbg('C autoSelect OK');}catch(e){_dbg('C ERR:'+e.message);}
-  try{buildTrackers();_dbg('D buildTrackers OK');}catch(e){_dbg('D ERR:'+e.message);}
+  updateWeekIndicator();
+  try{autoSelectNextDay();}catch(e){}
+  buildTrackers();
   try{renderStreakBanner();}catch(e){}
   try{renderCycle2Banner();}catch(e){}
-  try{renderDay();_dbg('E renderDay OK');}catch(e){_dbg('E ERR:'+e.message);}
-  _dbg('END #'+_iuN+' aw='+activeWeek);
 }
 var activeTimer=null;
 function createRestTimer(restSecs){
@@ -1586,7 +1572,7 @@ function hideLoginScreen(){var ls=document.getElementById('loginScreen');if(ls)l
 function setLoginMsg(msg,type){var el=document.getElementById('loginMsg');if(!el)return;el.textContent=msg;el.className='login-msg '+(type||'error');el.style.display=msg?'block':'none';}
 function handleLogin(){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPassword').value;if(!email||!pass){setLoginMsg('Please enter email and password.');return;}var btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='Signing in...';supaClient.auth.signInWithPassword({email:email,password:pass}).then(function(res){btn.disabled=false;btn.textContent='Sign In';if(res.error){setLoginMsg(res.error.message);return;}currentUser=res.data.user;setLoginMsg('');onAuthSuccess();});}
 function handleSignup(){var email=document.getElementById('loginEmail').value.trim();var pass=document.getElementById('loginPassword').value;if(!email||!pass){setLoginMsg('Please enter email and password.');return;}if(pass.length<6){setLoginMsg('Password must be at least 6 characters.');return;}var btn=document.getElementById('signupBtn');btn.disabled=true;btn.textContent='Creating account...';supaClient.auth.signUp({email:email,password:pass}).then(function(res){btn.disabled=false;btn.textContent='Create Account';if(res.error){setLoginMsg(res.error.message);return;}if(res.data&&res.data.user&&res.data.user.id){currentUser=res.data.user;setLoginMsg('');onAuthSuccess();}else{setLoginMsg('Account created! Check your email to confirm, then sign in.','success');}});}
-function onAuthSuccess(){hideLoginScreen();initApp();migrateLocalToSupabase(function(){pullFromSupabase(function(){_dbg('--- post-migrate-pull ---');initUI();});});}
+function onAuthSuccess(){hideLoginScreen();initApp();migrateLocalToSupabase(function(){pullFromSupabase(function(){initUI();});});}
 function migrateLocalToSupabase(cb){
   if(!currentUser)return cb&&cb();var migrated=localStorage.getItem('supa_migrated');if(migrated){return cb&&cb();}showSyncIndicator('↑ migrating data...');
   var sets=[];allLogKeys().forEach(function(k){try{var val=JSON.parse(localStorage.getItem(k)||'{}');var p=k.replace('wlog:','').split(':');if(p.length<4)return;sets.push({user_id:currentUser.id,week:parseInt(p[0].replace('w',''),10),day:p[1],exercise_id:p[2],set_index:parseInt(p[3].replace('s',''),10),weight:val.weight||'',reps:val.reps||'',done:val.done||false,rpe:val.rpe||'',ts:val.ts||Date.now()});}catch(e){}});
@@ -1615,7 +1601,7 @@ function pushVideoToSupabase(name,url,updatedAt){if(!supaClient||!currentUser)re
 function deleteVideoFromSupabase(name){if(!supaClient||!currentUser)return;supaClient.from('exercise_videos').delete().eq('user_id',currentUser.id).eq('exercise_name',name).then(function(){});}
 function initApp(){buildSchedule();document.querySelectorAll('.block-body').forEach(function(b){if(b.style.display!=='block')b.style.display='none';});loadSavedTheme();initUI();}
 initSupabase();
-supaClient.auth.getSession().then(function(res){if(res.data&&res.data.session&&res.data.session.user){currentUser=res.data.session.user;hideLoginScreen();initApp();pullFromSupabase(function(){_dbg('--- post-pull ---');initUI();});}else{showLoginScreen();}});
+supaClient.auth.getSession().then(function(res){if(res.data&&res.data.session&&res.data.session.user){currentUser=res.data.session.user;hideLoginScreen();initApp();pullFromSupabase(function(){try{autoSelectNextDay();}catch(e){}buildTrackers();try{renderStreakBanner();}catch(e){}try{renderCycle2Banner();}catch(e){}renderDay();});}else{showLoginScreen();}});
 </script>
 </body>
 </html>
