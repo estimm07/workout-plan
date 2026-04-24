@@ -987,7 +987,7 @@ function isDayComplete(week,day){
     }
   }
   if(total===0)return false;
-  return (doneCt/total)>=0.9;
+  return (doneCt/total)>=0.5;
 }
 function updateDayPillStates(){
   var week=getActiveWeek();
@@ -1091,7 +1091,6 @@ function initUI(){
   buildTrackers();
   try{renderStreakBanner();}catch(e){}
   try{renderCycle2Banner();}catch(e){}
-  renderDay();
 }
 var activeTimer=null;
 function createRestTimer(restSecs){
