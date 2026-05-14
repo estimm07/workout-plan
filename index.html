@@ -566,6 +566,97 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
 .login-btn-secondary{background:var(--bg3);border:1px solid var(--border2)!important;color:var(--text);}
 .login-btn:disabled{opacity:0.5;cursor:not-allowed;}
 @media(max-width:600px){.main{padding:var(--sp-4) var(--sp-3) 72px;}.nav-bar{padding:0 var(--sp-2);}.nav-btn{font-size:11px;padding:14px var(--sp-3);}.section-title{font-size:20px;margin-bottom:var(--sp-4);}.week-instruction{font-size:14px;line-height:1.6;}.exercise-table th:nth-child(4),.exercise-table td:nth-child(4){display:none;}.exercise-table tbody tr.exercise-main-row td:first-child{padding-left:var(--sp-3);}.exercise-table tbody tr.exercise-main-row td:last-child{padding-right:var(--sp-3);}.ex-name{font-size:14px;}.ex-cue{font-size:12px;}.set-bubble{min-width:100px;}.set-tracker{padding:var(--sp-3);}.more-grid{grid-template-columns:1fr;}.week-selector-row{align-items:flex-start;flex-direction:column;}.week-info-badge{margin-top:var(--sp-1);}.log-item{padding:var(--sp-3) 0;}}
+
+/* RECOVERY MODE */
+:root{--recovery-accent:#f97316;--recovery-dim:rgba(249,115,22,0.10);--recovery-border:rgba(249,115,22,0.28);--recovery-text:#fdba74;}
+.recovery-mode-banner{background:linear-gradient(135deg,rgba(249,115,22,0.12),rgba(249,115,22,0.06));border:1px solid var(--recovery-border);border-radius:var(--r-lg);padding:var(--sp-4);margin-bottom:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3);}
+.recovery-mode-banner-top{display:flex;align-items:flex-start;gap:var(--sp-3);}
+.recovery-mode-banner-icon{font-size:22px;flex-shrink:0;}
+.recovery-mode-banner-title{font-family:'Inter Tight',sans-serif;font-size:16px;font-weight:700;letter-spacing:-0.02em;color:var(--recovery-text);}
+.recovery-mode-banner-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.recovery-mode-banner-body{font-size:13px;color:var(--text);line-height:1.6;}
+.recovery-mode-banner-actions{display:flex;gap:var(--sp-2);flex-wrap:wrap;}
+.recovery-mode-open-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.06em;padding:9px 16px;border-radius:var(--r-sm);background:var(--recovery-accent);border:none;color:#fff;cursor:pointer;flex:1;transition:opacity 0.15s;touch-action:manipulation;}
+.recovery-mode-open-btn:hover{opacity:0.88;}
+.recovery-mode-deactivate-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.06em;padding:9px 14px;border-radius:var(--r-sm);background:none;border:1px solid var(--recovery-border);color:var(--recovery-text);cursor:pointer;transition:background 0.15s;touch-action:manipulation;}
+.recovery-mode-deactivate-btn:hover{background:var(--recovery-dim);}
+.rm-stage-tabs{display:flex;gap:var(--sp-2);margin-bottom:var(--sp-5);overflow-x:auto;}
+.rm-stage-tab-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.06em;padding:9px 16px;border-radius:999px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all 0.15s;min-height:36px;touch-action:manipulation;}
+.rm-stage-tab-btn:hover{border-color:var(--recovery-border);color:var(--recovery-text);}
+.rm-stage-tab-btn.active{background:var(--recovery-accent);border-color:var(--recovery-accent);color:#fff;font-weight:500;}
+.rm-stage-panel{display:none;}
+.rm-stage-panel.active{display:block;}
+.rm-stage-header{background:linear-gradient(135deg,rgba(249,115,22,0.12),rgba(249,115,22,0.05));border:1px solid var(--recovery-border);border-radius:var(--r-lg);padding:var(--sp-4);margin-bottom:var(--sp-5);}
+.rm-stage-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--recovery-text);margin-bottom:6px;}
+.rm-stage-title{font-family:'Inter Tight',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.02em;color:var(--text);margin-bottom:var(--sp-2);}
+.rm-stage-desc{font-size:13px;color:var(--text2);line-height:1.65;max-width:56ch;}
+.rm-day-counter{display:flex;align-items:center;gap:var(--sp-2);margin-top:var(--sp-3);}
+.rm-day-pip{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--recovery-border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--text2);transition:all 0.2s;}
+.rm-day-pip.done{background:var(--recovery-accent);border-color:var(--recovery-accent);color:#fff;}
+.rm-day-pip.today{border-color:var(--recovery-text);color:var(--recovery-text);box-shadow:0 0 0 3px rgba(249,115,22,0.15);}
+.rm-section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);margin-bottom:var(--sp-3);margin-top:var(--sp-5);}
+.rm-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:var(--sp-3);}
+.rm-card-header{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-4);background:transparent;border:none;width:100%;text-align:left;cursor:pointer;color:var(--text);}
+.rm-card-header>*{pointer-events:none;}
+.rm-card-icon{width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:rgba(249,115,22,0.10);}
+.rm-card-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);flex:1;}
+.rm-card-meta{font-size:12px;color:var(--text2);margin-top:2px;}
+.rm-card-toggle{font-size:13px;color:var(--text2);transition:transform 0.2s var(--ease);flex-shrink:0;}
+.rm-card-toggle.open{transform:rotate(180deg);}
+.rm-card-body{border-top:1px solid var(--border);padding:var(--sp-4);display:none;}
+.rm-exercise-row{display:flex;align-items:flex-start;gap:var(--sp-3);padding:var(--sp-3) 0;border-bottom:1px solid var(--border);}
+.rm-exercise-row:last-child{border-bottom:none;}
+.rm-ex-check{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border2);background:none;color:transparent;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:all 0.15s;touch-action:manipulation;}
+.rm-ex-check:hover{border-color:var(--recovery-text);}
+.rm-ex-check.done{background:var(--recovery-accent);border-color:var(--recovery-accent);color:#fff;}
+.rm-ex-content{flex:1;}
+.rm-ex-name{font-size:15px;font-weight:600;color:var(--text);line-height:1.2;}
+.rm-ex-detail{font-size:13px;color:var(--text2);margin-top:4px;line-height:1.55;font-style:italic;}
+.rm-ex-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.rm-ex-duration{font-family:'DM Mono',monospace;font-size:13px;color:var(--recovery-text);}
+.rm-timer-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.06em;padding:5px 10px;border-radius:var(--r-sm);border:1px solid var(--recovery-border);background:var(--recovery-dim);color:var(--recovery-text);cursor:pointer;transition:background 0.15s;touch-action:manipulation;}
+.rm-timer-btn:hover{background:rgba(249,115,22,0.20);}
+.rm-timer-display{font-family:'DM Mono',monospace;font-size:22px;color:var(--recovery-text);line-height:1;min-height:26px;}
+.rm-checkin-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-4);margin-bottom:var(--sp-4);}
+.rm-checkin-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);margin-bottom:var(--sp-3);}
+.rm-checkin-question{font-size:15px;font-weight:500;color:var(--text);margin-bottom:var(--sp-4);}
+.rm-checkin-btns{display:flex;gap:var(--sp-2);}
+.rm-checkin-btn{flex:1;padding:12px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.04em;color:var(--text);cursor:pointer;transition:all 0.15s;touch-action:manipulation;}
+.rm-checkin-btn:hover{border-color:var(--recovery-border);color:var(--recovery-text);}
+.rm-checkin-btn.selected-better{background:rgba(52,211,153,0.10);border-color:var(--done-border);color:var(--done-text);}
+.rm-checkin-btn.selected-same{background:var(--recovery-dim);border-color:var(--recovery-border);color:var(--recovery-text);}
+.rm-checkin-btn.selected-worse{background:rgba(239,68,68,0.10);border-color:rgba(239,68,68,0.3);color:#fca5a5;}
+.rm-unlock-notice{display:flex;align-items:center;gap:var(--sp-3);background:rgba(52,211,153,0.08);border:1px solid var(--done-border);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-4);}
+.rm-unlock-icon{font-size:18px;flex-shrink:0;}
+.rm-unlock-text{font-size:13px;color:var(--done-text);line-height:1.5;}
+.rm-heat-ice-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-4);}
+.rm-hi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);text-align:center;}
+.rm-hi-icon{font-size:24px;margin-bottom:var(--sp-2);}
+.rm-hi-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.rm-hi-detail{font-size:12px;color:var(--text2);line-height:1.5;}
+.rm-return-checklist{display:flex;flex-direction:column;gap:var(--sp-2);margin-bottom:var(--sp-5);}
+.rm-return-item{display:flex;align-items:flex-start;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);cursor:pointer;transition:background 0.15s;touch-action:manipulation;}
+.rm-return-item:hover{background:rgba(255,255,255,0.02);}
+.rm-return-check{width:20px;height:20px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all 0.15s;color:transparent;}
+.rm-return-item.rm-checked .rm-return-check{background:var(--done-text);border-color:var(--done-text);color:#0a0a0b;}
+.rm-return-text{font-size:14px;color:var(--text);}
+.rm-return-item.rm-checked .rm-return-text{color:var(--text2);text-decoration:line-through;}
+.rm-return-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.rm-cleared-card{background:linear-gradient(135deg,rgba(52,211,153,0.10),rgba(52,211,153,0.05));border:1px solid var(--done-border);border-radius:var(--r-lg);padding:var(--sp-5);text-align:center;margin-bottom:var(--sp-5);}
+.rm-cleared-icon{font-size:36px;margin-bottom:var(--sp-3);}
+.rm-cleared-title{font-family:'Inter Tight',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--done-text);margin-bottom:var(--sp-2);}
+.rm-cleared-sub{font-size:13px;color:var(--text2);line-height:1.6;max-width:42ch;margin:0 auto;}
+.rm-cleared-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.06em;padding:12px 24px;border-radius:var(--r-md);background:var(--done-text);border:none;color:#0a0a0b;cursor:pointer;margin-top:var(--sp-4);font-weight:600;transition:opacity 0.15s;touch-action:manipulation;}
+.rm-cleared-btn:hover{opacity:0.88;}
+.rm-activate-btn{width:100%;padding:15px;border-radius:var(--r-md);background:var(--recovery-accent);border:none;color:#fff;font-family:'Inter Tight',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.02em;cursor:pointer;transition:opacity 0.15s,transform 0.1s;display:flex;align-items:center;justify-content:center;gap:var(--sp-2);touch-action:manipulation;}
+.rm-activate-btn:hover{opacity:0.9;}
+.rm-activate-btn:active{transform:scale(0.99);}
+.rm-deactivate-full-btn{width:100%;padding:13px;border-radius:var(--r-md);background:none;border:1px solid var(--border2);color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.06em;cursor:pointer;margin-top:var(--sp-3);transition:border-color 0.15s,color 0.15s;touch-action:manipulation;}
+.rm-deactivate-full-btn:hover{border-color:var(--danger);color:#fca5a5;}
+.rm-advance-btn{width:100%;padding:13px;border-radius:var(--r-md);border:1px solid var(--recovery-border);background:var(--recovery-dim);color:var(--recovery-text);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.06em;cursor:pointer;transition:background 0.15s;touch-action:manipulation;margin-top:var(--sp-4);}
+.rm-advance-btn:hover{background:rgba(249,115,22,0.20);}
+.more-card.recovery-active-card{border-color:var(--recovery-border);background:rgba(249,115,22,0.05);}
+.more-card.recovery-active-card .more-card-title{color:var(--recovery-text);}
 </style>
 </head>
 <body>
@@ -657,6 +748,21 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
     <div class="cycle2-top"><span class="cycle2-icon">🏁</span><div><div class="cycle2-title">WEEK 7 — FINAL PUSH</div><div class="cycle2-sub">2 weeks left. Time to start planning what comes next.</div></div></div>
     <p class="cycle2-body">In Week 8 you'll test your 1-rep-range max on major lifts. When you're done, come back to Claude to discuss Cycle 2 — either a new program phase or a second program to live in this app.</p>
     <div class="cycle2-actions"><button class="cycle2-dismiss" onclick="dismissCycle2Banner()">Dismiss</button></div>
+  </div>
+  <!-- RECOVERY MODE BANNER -->
+  <div id="recoveryModeBanner" class="recovery-mode-banner" style="display:none;">
+    <div class="recovery-mode-banner-top">
+      <div class="recovery-mode-banner-icon">🩹</div>
+      <div>
+        <div class="recovery-mode-banner-title">RECOVERY MODE ACTIVE</div>
+        <div class="recovery-mode-banner-sub" id="recoveryBannerSub">Day 1 of flare protocol · Check in daily</div>
+      </div>
+    </div>
+    <div class="recovery-mode-banner-body">Your lower back recovery protocol is running. Follow the staged plan before returning to training.</div>
+    <div class="recovery-mode-banner-actions">
+      <button class="recovery-mode-open-btn" onclick="showSubSection('recoverymode')">Open Protocol →</button>
+      <button class="recovery-mode-deactivate-btn" onclick="deactivateRecoveryMode()">Clear</button>
+    </div>
   </div>
   <div class="week-selector-bar">
     <label>Logging for:</label>
@@ -816,11 +922,143 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
     <div class="more-card" onclick="showSubSection('progression')"><div class="more-card-icon">📈</div><div class="more-card-title">Program Guide</div><div class="more-card-desc">Progression rules &amp; weekly blueprint</div></div>
     <div class="more-card" onclick="showSubSection('checklist')"><div class="more-card-icon">✅</div><div class="more-card-title">Pre-Session</div><div class="more-card-desc">Checklist before every workout</div></div>
     <div class="more-card" onclick="showSubSection('safety')"><div class="more-card-icon">🛡️</div><div class="more-card-title">Safety</div><div class="more-card-desc">Form cues &amp; back protocol</div></div>
+    <div class="more-card" id="recoveryModeMoreCard" onclick="showSubSection('recoverymode')"><div class="more-card-icon">🩹</div><div class="more-card-title" id="recoveryModeMoreTitle">Recovery Mode</div><div class="more-card-desc" id="recoveryModeMoreDesc">Lower back flare protocol</div></div>
     <div class="more-card" onclick="showSubSection('themes')"><div class="more-card-icon">🎨</div><div class="more-card-title">Themes</div><div class="more-card-desc">Customize colors &amp; appearance</div></div>
     <div class="more-card" onclick="showSubSection('syncdata')"><div class="more-card-icon">☁️</div><div class="more-card-title">Sync Data</div><div class="more-card-desc">Push all data to cloud &amp; re-sync</div></div>
   </div>
 </div>
 
+
+<!-- ===== RECOVERY MODE ===== -->
+<div id="recoverymode" class="section">
+  <button class="section-back-btn" onclick="showSubSection(null)">More</button>
+  <div class="section-title">Recovery Mode</div>
+  <p class="section-intro">A structured 3-stage protocol for lower back flares. Follow each stage in order. Goal is to break the cycle of flare → rest → return too early → retweak.</p>
+  <div id="rmNotActive">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-5);margin-bottom:var(--sp-5);">
+      <div style="font-family:'Inter Tight',sans-serif;font-size:18px;font-weight:600;letter-spacing:-0.02em;color:var(--text);margin-bottom:var(--sp-2);">Not currently active</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:var(--sp-4);">Activate Recovery Mode when you notice lower back tightness, guarding, or pain. A banner will appear on the Workouts tab and guide you through the right steps before returning to training.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);margin-bottom:var(--sp-3);">What triggers it</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.9;">· Sudden tightening with movement<br>· Lower back guarding or spasm<br>· Bilateral lumbar soreness that doesn’t resolve overnight<br>· Any lower back sensation during a set that made you stop</div>
+    </div>
+    <button class="rm-activate-btn" onclick="activateRecoveryMode()">🩹 &nbsp;Activate Recovery Mode</button>
+  </div>
+  <div id="rmActive" style="display:none;">
+    <div class="rm-stage-tabs">
+      <button class="rm-stage-tab-btn active" data-stage="0" onclick="showRmStage(0,this)">Stage 1 · Flare</button>
+      <button class="rm-stage-tab-btn" data-stage="1" onclick="showRmStage(1,this)">Stage 2 · Reactivation</button>
+      <button class="rm-stage-tab-btn" data-stage="2" onclick="showRmStage(2,this)">Stage 3 · Return</button>
+    </div>
+    <!-- STAGE 1 -->
+    <div class="rm-stage-panel active" id="rm-stage-0">
+      <div class="rm-stage-header">
+        <div class="rm-stage-label">Stage 1 · Days 1–3</div>
+        <div class="rm-stage-title">Flare Protocol</div>
+        <div class="rm-stage-desc">Pure recovery. No training. Calm the guarding response and decompress the lumbar spine. Do this routine twice daily — morning before you start moving, and evening.</div>
+        <div class="rm-day-counter" id="rmDayCounter"></div>
+      </div>
+      <div class="rm-checkin-card">
+        <div class="rm-checkin-label">Daily Check-In</div>
+        <div class="rm-checkin-question">How does the guarding feel today compared to yesterday?</div>
+        <div class="rm-checkin-btns">
+          <button class="rm-checkin-btn" id="ci-better" onclick="saveCheckin('better')">✓ Better</button>
+          <button class="rm-checkin-btn" id="ci-same" onclick="saveCheckin('same')">→ Same</button>
+          <button class="rm-checkin-btn" id="ci-worse" onclick="saveCheckin('worse')">↓ Worse</button>
+        </div>
+        <div id="rmCheckinFeedback" style="margin-top:var(--sp-3);font-size:13px;color:var(--text2);line-height:1.55;display:none;"></div>
+      </div>
+      <div class="rm-heat-ice-grid">
+        <div class="rm-hi-card"><div class="rm-hi-icon">🌡️</div><div class="rm-hi-title">Heat First</div><div class="rm-hi-detail">15–20 min heating pad on lower back. Calms muscular guarding — priority over ice.</div></div>
+        <div class="rm-hi-card"><div class="rm-hi-icon">🧊</div><div class="rm-hi-title">Ice if Inflamed</div><div class="rm-hi-detail">Only if acutely hot or radiating sensation. 10–15 min wrapped ice after heat.</div></div>
+      </div>
+      <div class="rm-section-label">Stretch Routine — Twice Daily</div>
+      <div class="rm-card">
+        <button type="button" class="rm-card-header" onclick="toggleRmCard(this)">
+          <div class="rm-card-icon">🧘</div>
+          <div style="flex:1;"><div class="rm-card-title">Decompression &amp; Hip Flexor Sequence</div><div class="rm-card-meta">~12 min · Do in order · Never force anything</div></div>
+          <div class="rm-card-toggle">▾</div>
+        </button>
+        <div class="rm-card-body">
+          <div class="rm-exercise-row">
+            <button class="rm-ex-check" onclick="toggleRmExCheck(this)">✓</button>
+            <div class="rm-ex-content"><div class="rm-ex-name">Supine Knee-to-Chest</div><div class="rm-ex-detail">Lying on back — pull one knee in at a time, then both. Lower back soft against the floor. Gentle lumbar traction.</div></div>
+            <div class="rm-ex-right"><div class="rm-ex-duration">30–45 sec</div><button class="rm-timer-btn" onclick="startRmTimer(this,40)">START</button><div class="rm-timer-display"></div></div>
+          </div>
+          <div class="rm-exercise-row">
+            <button class="rm-ex-check" onclick="toggleRmExCheck(this)">✓</button>
+            <div class="rm-ex-content"><div class="rm-ex-name">Child's Pose with Lateral Reach</div><div class="rm-ex-detail">Sit back toward heels, walk hands to each side. Opens the QL — runs from lower rib to hip, gets brutal with asymmetric loading like house work and yard work.</div></div>
+            <div class="rm-ex-right"><div class="rm-ex-duration">45 sec/side</div><button class="rm-timer-btn" onclick="startRmTimer(this,45)">START</button><div class="rm-timer-display"></div></div>
+          </div>
+          <div class="rm-exercise-row">
+            <button class="rm-ex-check" onclick="toggleRmExCheck(this)">✓</button>
+            <div class="rm-ex-content"><div class="rm-ex-name">90/90 Hip Flexor Stretch</div><div class="rm-ex-detail">Front knee at 90°, back knee on ground, drive hips forward gently. Most important one for the sitting + active day pattern. Short hip flexors pull on the lumbar spine.</div></div>
+            <div class="rm-ex-right"><div class="rm-ex-duration">60–90 sec/side</div><button class="rm-timer-btn" onclick="startRmTimer(this,75)">START</button><div class="rm-timer-display"></div></div>
+          </div>
+          <div class="rm-exercise-row">
+            <button class="rm-ex-check" onclick="toggleRmExCheck(this)">✓</button>
+            <div class="rm-ex-content"><div class="rm-ex-name">Dead Bug — Neurological Reset</div><div class="rm-ex-detail">Not a workout — a reset. Extend opposite arm/leg slowly, breathe out on extension. Back flat to floor the entire time. Re-engages deep stabilizers without loading the spine.</div></div>
+            <div class="rm-ex-right"><div class="rm-ex-duration">5–6 reps/side</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="rm-section-label">Desk &amp; Movement Reminders</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);font-size:13px;color:var(--text2);line-height:1.9;">· Sit-stand intervals: 25–30 min max — don't sit 2 hrs then suddenly stand<br>· Picking anything up: hinge at hips, brace first, every time<br>· Chair height: hips at or above knee — too low tilts pelvis posteriorly<br>· Morning: apply heat pad before you start moving around</div>
+      <div style="margin-top:var(--sp-5);">
+        <div id="stage1UnlockNotice" class="rm-unlock-notice" style="display:none;"><div class="rm-unlock-icon">✅</div><div class="rm-unlock-text">You've logged improvement. Stage 2 is unlocked — move there when the sudden-tightening feeling is <strong>gone, not just better</strong>.</div></div>
+        <button class="rm-advance-btn" onclick="showRmStage(1,null)">Advance to Stage 2 →</button>
+      </div>
+    </div>
+    <!-- STAGE 2 -->
+    <div class="rm-stage-panel" id="rm-stage-1">
+      <div class="rm-stage-header">
+        <div class="rm-stage-label">Stage 2 · Days 4–5</div>
+        <div class="rm-stage-title">Reactivation Protocol</div>
+        <div class="rm-stage-desc">Only start once the sudden-tightening feeling has meaningfully reduced. No weights, no standing loaded movements. Wake up the posterior chain after it's been shut down.</div>
+      </div>
+      <div class="note-box" style="margin-bottom:var(--sp-4);"><strong>Before starting Stage 2:</strong> The guarding sensation should be gone or nearly gone. If you still feel tightening with sudden movement, stay in Stage 1 another day.</div>
+      <div class="rm-section-label">Reactivation Session — Once Daily</div>
+      <div class="rm-card">
+        <button type="button" class="rm-card-header" onclick="toggleRmCard(this)">
+          <div class="rm-card-icon">💪</div>
+          <div style="flex:1;"><div class="rm-card-title">Glute &amp; Core Wake-Up</div><div class="rm-card-meta">~15 min · Bodyweight only · No spine loading</div></div>
+          <div class="rm-card-toggle">▾</div>
+        </button>
+        <div class="rm-card-body">
+          <div class="rm-exercise-row"><button class="rm-ex-check" onclick="toggleRmExCheck(this)">✓</button><div class="rm-ex-content"><div class="rm-ex-name">Glute Bridges (Bodyweight, Slow)</div><div class="rm-ex-detail">Squeeze hard at top, hold 2 sec, slow descent. Glutes are almost certainly underactive right now — this wakes them up before any loading returns.</div></div><div class="rm-ex-right"><div class="rm-ex-duration">3 × 15</div></div></div>
+          <div class="rm-exercise-row"><button class="rm-ex-check" onclick="toggleRmExCheck(this)">✓</button><div class="rm-ex-content"><div class="rm-ex-name">Banded Clamshells</div><div class="rm-ex-detail">Side lying, band above knees, rotate top knee up without tilting the pelvis. Hip medius activation — critical before returning to any lower body loading.</div></div><div class="rm-ex-right"><div class="rm-ex-duration">3 × 20/side</div></div></div>
+          <div class="rm-exercise-row"><button class="rm-ex-check" onclick="toggleRmExCheck(this)">✓</button><div class="rm-ex-content"><div class="rm-ex-name">Bird Dogs</div><div class="rm-ex-detail">On all fours — extend opposite arm and opposite leg. Keep hips level, don't rotate. Lower back stays neutral. Pause at extension.</div></div><div class="rm-ex-right"><div class="rm-ex-duration">3 × 8/side</div></div></div>
+          <div class="rm-exercise-row"><button class="rm-ex-check" onclick="toggleRmExCheck(this)">✓</button><div class="rm-ex-content"><div class="rm-ex-name">Dead Bugs</div><div class="rm-ex-detail">3 seconds on the extension. Back flat. Breathe out as you extend.</div></div><div class="rm-ex-right"><div class="rm-ex-duration">3 × 6/side</div></div></div>
+        </div>
+      </div>
+      <div class="rm-section-label">Continue Stage 1 Stretches</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);font-size:13px;color:var(--text2);line-height:1.65;">Keep doing the Stage 1 stretch sequence at least once a day during Stage 2. Don't drop it just because you feel better — it's keeping you out of guarding.</div>
+      <button class="rm-advance-btn" onclick="showRmStage(2,null)">Advance to Stage 3 →</button>
+    </div>
+    <!-- STAGE 3 -->
+    <div class="rm-stage-panel" id="rm-stage-2">
+      <div class="rm-stage-header">
+        <div class="rm-stage-label">Stage 3 · Return</div>
+        <div class="rm-stage-title">Return to Training</div>
+        <div class="rm-stage-desc">Check every box before your first session back. The glutes need to be firing before any loaded movement goes near the hip hinge pattern.</div>
+      </div>
+      <div class="rm-section-label">Return Checklist — Check All Before First Session</div>
+      <div class="rm-return-checklist">
+        <div class="rm-return-item" onclick="toggleRmReturnItem(this)"><div class="rm-return-check">✓</div><div><div class="rm-return-text">Sudden-tightening sensation is completely gone</div><div class="rm-return-sub">Not just better — gone. One more day in Stage 1 is always worth it.</div></div></div>
+        <div class="rm-return-item" onclick="toggleRmReturnItem(this)"><div class="rm-return-check">✓</div><div><div class="rm-return-text">Reactivation session felt good with no setback</div><div class="rm-return-sub">Stage 2 exercises caused no pain, guarding, or next-day regression.</div></div></div>
+        <div class="rm-return-item" onclick="toggleRmReturnItem(this)"><div class="rm-return-check">✓</div><div><div class="rm-return-text">First session back is upper body push or pull only</div><div class="rm-return-sub">Day 1 or Day 4. Completely out of spinal loading while rebuilding rhythm.</div></div></div>
+        <div class="rm-return-item" onclick="toggleRmReturnItem(this)"><div class="rm-return-check">✓</div><div><div class="rm-return-text">Will skip RDLs and loaded hip hinges for first lower body session</div><div class="rm-return-sub">Let glutes wake up through hip thrusts first. Add hinges back in session 2.</div></div></div>
+        <div class="rm-return-item" onclick="toggleRmReturnItem(this)"><div class="rm-return-check">✓</div><div><div class="rm-return-text">Elevated life stress accounted for in load selection</div><div class="rm-return-sub">Recovery capacity is split during high-activity periods. Go conservative on weight.</div></div></div>
+      </div>
+      <div id="rmClearedCard" class="rm-cleared-card" style="display:none;">
+        <div class="rm-cleared-icon">🟢</div>
+        <div class="rm-cleared-title">Cleared for Training</div>
+        <div class="rm-cleared-sub">All boxes checked. Start with an upper body session and build back carefully. The protocol worked — remember what broke the cycle this time.</div>
+        <button class="rm-cleared-btn" onclick="deactivateRecoveryMode()">Exit Recovery Mode</button>
+      </div>
+      <button class="rm-deactivate-full-btn" onclick="deactivateRecoveryMode()">Exit Recovery Mode</button>
+    </div>
+  </div>
+</div>
 <!-- ===== THEMES ===== -->
 <div id="themes" class="section">
   <button class="section-back-btn" onclick="showSubSection(null)">More</button>
@@ -1091,6 +1329,8 @@ function initUI(){
   buildTrackers();
   try{renderStreakBanner();}catch(e){}
   try{renderCycle2Banner();}catch(e){}
+  try{updateRecoveryBanner();}catch(e){}
+  try{updateRecoveryMoreCard();}catch(e){}
 }
 var activeTimer=null;
 function createRestTimer(restSecs){
@@ -1561,6 +1801,94 @@ function loadSavedTheme(){
 var _origShowSubSection=showSubSection;
 showSubSection=function(id){_origShowSubSection(id);if(id==='themes')buildThemePresets();if(id==='syncdata'){updateSyncUserEmail();setSyncStatus('☁️','Ready to sync','Tap below to push all your data to the cloud.');}};
 
+
+// ═══════════════════════════════════════════════════════
+//  RECOVERY MODE
+// ═══════════════════════════════════════════════════════
+function rmLoad(){try{return JSON.parse(localStorage.getItem('recoveryMode')||'null');}catch(e){return null;}}
+function rmSave(d){try{localStorage.setItem('recoveryMode',JSON.stringify(d));}catch(e){}}
+function activateRecoveryMode(){
+  var d={active:true,startTs:Date.now(),stage:0,checkins:[],returnChecks:[false,false,false,false,false]};
+  rmSave(d);renderRecoveryMode();updateRecoveryBanner();updateRecoveryMoreCard();
+}
+function deactivateRecoveryMode(){
+  localStorage.removeItem('recoveryMode');renderRecoveryMode();updateRecoveryBanner();updateRecoveryMoreCard();
+}
+function updateRecoveryBanner(){
+  var d=rmLoad();var el=document.getElementById('recoveryModeBanner');if(!el)return;
+  if(d&&d.active){
+    el.style.display='flex';
+    var days=Math.floor((Date.now()-d.startTs)/(1000*60*60*24))+1;
+    var sub=document.getElementById('recoveryBannerSub');
+    var names=['Flare protocol','Reactivation','Return to training'];
+    if(sub)sub.textContent='Day '+days+' · '+(names[d.stage||0])+' · Check in daily';
+  }else{el.style.display='none';}
+}
+function updateRecoveryMoreCard(){
+  var d=rmLoad();var card=document.getElementById('recoveryModeMoreCard');if(!card)return;
+  var desc=document.getElementById('recoveryModeMoreDesc');
+  if(d&&d.active){card.classList.add('recovery-active-card');if(desc)desc.textContent='Active — tap to view protocol';}
+  else{card.classList.remove('recovery-active-card');if(desc)desc.textContent='Lower back flare protocol';}
+}
+function renderRecoveryMode(){
+  var d=rmLoad();var na=document.getElementById('rmNotActive');var ac=document.getElementById('rmActive');if(!na||!ac)return;
+  if(d&&d.active){na.style.display='none';ac.style.display='block';renderRmDayCounter(d);renderRmCheckin(d);showRmStageFromData(d);renderReturnChecks(d);checkReturnCleared(d);}
+  else{na.style.display='block';ac.style.display='none';}
+}
+function renderRmDayCounter(d){
+  var el=document.getElementById('rmDayCounter');if(!el)return;el.innerHTML='';
+  var days=Math.min(Math.floor((Date.now()-d.startTs)/(1000*60*60*24))+1,3);
+  for(var i=1;i<=3;i++){var p=document.createElement('div');p.className='rm-day-pip'+(i<days?' done':i===days?' today':'');p.textContent=i;el.appendChild(p);}
+}
+function renderRmCheckin(d){
+  var checkins=d.checkins||[];var today=new Date().toDateString();var entry=null;
+  for(var i=0;i<checkins.length;i++){if(checkins[i].date===today){entry=checkins[i];break;}}
+  ['better','same','worse'].forEach(function(v){var b=document.getElementById('ci-'+v);if(b)b.className='rm-checkin-btn'+(entry&&entry.value===v?' selected-'+v:'');});
+  var notice=document.getElementById('stage1UnlockNotice');
+  if(notice)notice.style.display=checkins.some(function(c){return c.value==='better';}) ? 'flex':'none';
+  var fb=document.getElementById('rmCheckinFeedback');
+  if(fb&&entry){var msgs={better:'Good. Keep doing the stretches and give it another day before considering Stage 2.',same:'Hold steady in Stage 1. The heat + stretch routine needs consistent repetition.',worse:'Take it seriously — scale back any activity, increase heat frequency, and consider seeing a physio if this persists.'};fb.textContent=msgs[entry.value]||'';fb.style.display='block';}
+  else if(fb){fb.style.display='none';}
+}
+function saveCheckin(val){
+  var d=rmLoad();if(!d)return;var today=new Date().toDateString();var checkins=d.checkins||[];var found=false;
+  for(var i=0;i<checkins.length;i++){if(checkins[i].date===today){checkins[i].value=val;found=true;break;}}
+  if(!found)checkins.push({date:today,value:val});d.checkins=checkins;rmSave(d);renderRmCheckin(d);
+}
+function showRmStage(idx){
+  var d=rmLoad();if(d){d.stage=idx;rmSave(d);}
+  document.querySelectorAll('.rm-stage-tab-btn').forEach(function(b){b.classList.toggle('active',parseInt(b.getAttribute('data-stage'),10)===idx);});
+  document.querySelectorAll('.rm-stage-panel').forEach(function(p){p.classList.toggle('active',p.id==='rm-stage-'+idx);});
+}
+function showRmStageFromData(d){showRmStage(d.stage||0);}
+function toggleRmCard(h){
+  var body=h.parentElement.querySelector('.rm-card-body');var tog=h.querySelector('.rm-card-toggle');if(!body)return;
+  var open=body.style.display==='block';body.style.display=open?'none':'block';if(tog)tog.classList.toggle('open',!open);
+}
+function toggleRmExCheck(btn){btn.classList.toggle('done');}
+var _rmTimers={};
+function startRmTimer(btn,secs){
+  var key=btn.getAttribute('data-rtk')||('t'+Math.random().toString(36).slice(2));btn.setAttribute('data-rtk',key);
+  var display=btn.parentElement.querySelector('.rm-timer-display');
+  if(_rmTimers[key]){clearInterval(_rmTimers[key]);delete _rmTimers[key];btn.textContent='START';if(display)display.textContent='';return;}
+  var rem=secs;
+  function tick(){if(display)display.textContent=rem+'s';if(rem<=0){clearInterval(_rmTimers[key]);delete _rmTimers[key];btn.textContent='START';if(display)display.textContent='✓ Done';return;}rem--;}
+  tick();_rmTimers[key]=setInterval(tick,1000);btn.textContent='STOP';
+}
+function toggleRmReturnItem(el){
+  el.classList.toggle('rm-checked');var d=rmLoad();if(!d)return;
+  var checks=[];document.querySelectorAll('.rm-return-item').forEach(function(item){checks.push(item.classList.contains('rm-checked'));});
+  d.returnChecks=checks;rmSave(d);checkReturnCleared(d);
+}
+function renderReturnChecks(d){
+  var checks=d.returnChecks||[];document.querySelectorAll('.rm-return-item').forEach(function(item,i){item.classList.toggle('rm-checked',!!checks[i]);});
+}
+function checkReturnCleared(d){
+  var checks=d.returnChecks||[];var all=checks.length>=5&&checks.every(function(c){return c;});
+  var card=document.getElementById('rmClearedCard');if(card)card.style.display=all?'block':'none';
+}
+var _origSSRM=showSubSection;
+showSubSection=function(id){_origSSRM(id);if(id==='recoverymode')renderRecoveryMode();};
 var SUPA_URL='https://zvcpzvxngfijqzluwyxc.supabase.co';
 var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Y3B6dnhuZ2ZpanF6bHV3eXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODA2MzQsImV4cCI6MjA5MDQ1NjYzNH0.zFXTkKPTcmJgal1KoPtSr_7Q6dk7Bd6OZT--KyBoa4I';
 var supaClient=null;var currentUser=null;var syncPending=false;
