@@ -1301,7 +1301,7 @@ function updateCurrentFocus(dayId){
   var week=getActiveWeek();
   var phase=getPhaseLabel(week);
   var dayLabel=getDayLabel(dayId||'d1');
-  title.textContent='Week '+week+' · '+dayLabel;
+  title.textContent='Week '+localWeek(week)+' · '+dayLabel;
   sub.textContent=(dayLabel.indexOf('Rest')!==-1||dayLabel.indexOf('Optional')!==-1)?'Recovery or optional day based on your plan.':'This is your active workout target for today.';
   chip.textContent=phase;
 }
@@ -1535,7 +1535,7 @@ function setMuscleRange(mode,btn){muscleRange=mode;btn.closest('.prog-range-togg
 function renderProgress(){renderVolume();renderPRs();renderMuscles();}
 function renderVolume(){
   var endWeek=planEndWeek(planEntryForWeek(getActiveWeek()));
-  var labels=[],data=[],startWeek=Math.max(1,endWeek+1-volRange);for(var w=startWeek;w<=endWeek;w++){labels.push('Wk '+w);data.push(getWeekVolume(w));}
+  var labels=[],data=[],startWeek=Math.max(1,endWeek+1-volRange);for(var w=startWeek;w<=endWeek;w++){labels.push('Wk '+localWeek(w));data.push(getWeekVolume(w));}
   var hasData=data.some(function(v){return v>0;});var currentVol=data[data.length-1]||0;var prevVol=data[data.length-2]||0;var delta=currentVol-prevVol;
   var volEl=document.getElementById('vol-total');if(volEl)volEl.innerHTML=hasData?currentVol.toLocaleString()+' <span>lbs this week</span>':'— <span>lbs</span>';
   var deltaEl=document.getElementById('vol-delta');if(deltaEl){if(!hasData){deltaEl.textContent='Log workouts to see your trend';deltaEl.className='prog-delta neutral';}else if(delta>0){deltaEl.textContent='↑ +'+delta.toLocaleString()+' lbs vs last week';deltaEl.className='prog-delta';}else if(delta<0){deltaEl.textContent='↓ '+delta.toLocaleString()+' lbs vs last week';deltaEl.className='prog-delta down';}else{deltaEl.textContent='→ Same volume as last week';deltaEl.className='prog-delta neutral';}}
@@ -1872,12 +1872,12 @@ function applyPlanForWeek(w){
   return true;
 }
 // ===== PLANS SCREEN =====
-// Highest week with a completed set or a completed rest day (0 if nothing logged).
+// Highest week with a completed set (0 if nothing logged). Rest-day marks are ignored,
+// since they can be set on future weeks while browsing.
 function lastLoggedWeek(){
   var max=0;
   try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i),hit=false;
     if(k&&k.indexOf('wlog:')===0){var v=null;try{v=JSON.parse(localStorage.getItem(k));}catch(e){}hit=!!(v&&v.done);}
-    else if(k&&k.indexOf('rdc:')===0)hit=true;
     if(hit){var w=parseInt(k.split(':')[1].replace('w',''),10);if(w>max)max=w;}}}catch(e){}
   return max;
 }
