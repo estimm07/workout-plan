@@ -163,6 +163,21 @@ select::-ms-expand{display:none;}
 .rest-progress{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:3px;}
 .rest-progress-bar{height:100%;background:var(--warning);border-radius:1px;transition:width 1s linear,background 0.3s;}
 .rest-timer.done-timer .rest-progress-bar{background:var(--done-text);width:0%;}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-4) var(--sp-5);margin-bottom:var(--sp-3);}
+.plan-card.current{border-color:var(--accent-border);background:var(--accent-dim);}
+.plan-card-top{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);flex-wrap:wrap;}
+.plan-card-name{font-size:16px;font-weight:700;color:var(--text);}
+.plan-card-badge{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-text);border:1px solid var(--accent-border);border-radius:999px;padding:3px 8px;}
+.plan-card-meta{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);margin-top:var(--sp-2);letter-spacing:0.04em;}
+.plan-card-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-top:var(--sp-2);}
+.plan-card .sync-pull-btn,.plan-card .sync-now-btn{margin-top:var(--sp-4);}
+.plan-progress{height:6px;border-radius:999px;background:var(--bg3);margin-top:var(--sp-3);overflow:hidden;}
+.plan-progress>div{height:100%;background:var(--accent);border-radius:999px;}
+.plan-toggle{display:flex;gap:var(--sp-3);align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);cursor:pointer;font-size:14px;color:var(--text);line-height:1.5;}
+.plan-toggle input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex-shrink:0;}
+.plan-toggle-sub{font-size:12px;color:var(--text2);}
+.plan-history-row{display:flex;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-3) 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);}
+.plan-history-row span:last-child{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);white-space:nowrap;}
 .note-box{background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);font-size:13px;color:var(--text);margin-top:var(--sp-4);line-height:1.6;}
 .note-box strong{color:var(--accent-text);font-weight:600;}
 .warning-box{background:var(--warning-dim);border:1px solid var(--warning-border);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);font-size:13px;color:var(--text);margin-top:var(--sp-4);line-height:1.6;}
@@ -745,9 +760,9 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
     </div>
   </div>
   <div id="cycle2Banner" class="cycle2-banner" style="display:none;">
-    <div class="cycle2-top"><span class="cycle2-icon">🏁</span><div><div class="cycle2-title">WEEK 7 — FINAL PUSH</div><div class="cycle2-sub">2 weeks left. Time to start planning what comes next.</div></div></div>
-    <p class="cycle2-body">In Week 8 you'll test your 1-rep-range max on major lifts. When you're done, come back to Claude to discuss Cycle 2 — either a new program phase or a second program to live in this app.</p>
-    <div class="cycle2-actions"><button class="cycle2-dismiss" onclick="dismissCycle2Banner()">Dismiss</button></div>
+    <div class="cycle2-top"><span class="cycle2-icon" id="planEndIcon">🏁</span><div><div class="cycle2-title" id="planEndTitle"></div><div class="cycle2-sub" id="planEndSub"></div></div></div>
+    <div class="cycle2-body" id="planEndBody"></div>
+    <div class="cycle2-actions" style="gap:var(--sp-2);"><button class="cycle2-dismiss" onclick="dismissPlanEndBanner()">Dismiss</button><button class="cycle2-dismiss" style="background:var(--warning);color:#111;border-color:var(--warning);" onclick="showSubSection('plans')">Choose next plan</button></div>
   </div>
   <!-- RECOVERY MODE BANNER -->
   <div id="recoveryModeBanner" class="recovery-mode-banner" style="display:none;">
@@ -848,6 +863,7 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
 <div id="more" class="section">
   <div class="section-title">More</div>
   <div class="more-grid">
+    <div class="more-card" onclick="showSubSection('plans')"><div class="more-card-icon">🗂️</div><div class="more-card-title">Plans</div><div class="more-card-desc">Switch workout plans</div></div>
     <div class="more-card" onclick="showSubSection('summary')"><div class="more-card-icon">📋</div><div class="more-card-title">Overview</div><div class="more-card-desc">Goals, split structure &amp; equipment</div></div>
     <div class="more-card" onclick="showSubSection('nutrition')"><div class="more-card-icon">🥩</div><div class="more-card-title">Nutrition</div><div class="more-card-desc">Protein targets, supplements &amp; timing</div></div>
     <div class="more-card" onclick="showSubSection('schedule')"><div class="more-card-icon">📅</div><div class="more-card-title">Schedule</div><div class="more-card-desc" id="scheduleCardDesc">8-week phase calendar</div></div>
@@ -1031,6 +1047,20 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
   <button class="sync-pull-btn" id="backupImportBtn" onclick="document.getElementById('backupFileInput').click()">⬆ Restore from Backup File</button>
   <input type="file" id="backupFileInput" accept=".json,application/json" style="display:none;" onchange="importBackupFile(this)"/>
   <div style="margin-top:var(--sp-6);padding:var(--sp-4);background:var(--card);border-radius:var(--r-md);border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;margin-bottom:var(--sp-2);">Logged in as</div><div style="font-size:14px;color:var(--text);" id="syncUserEmail">—</div></div>
+</div>
+
+<!-- ===== PLANS ===== -->
+<div id="plans" class="section">
+  <button class="section-back-btn" onclick="showSubSection(null)">More</button>
+  <div class="section-title">Workout Plans</div>
+  <p class="section-intro">Pick the plan you're training on. Switching starts the new plan at Week 1 the week after your last logged workout. Your old plan's logs, PRs and charts stay in your history.</p>
+  <div id="plansCurrent"></div>
+  <div class="section-title" style="margin-top:var(--sp-8);">Equipment</div>
+  <label class="plan-toggle"><input type="checkbox" id="kettlebellToggle" onchange="setHasKettlebells(this.checked)"/><span><strong>I have kettlebells</strong><br/><span class="plan-toggle-sub">Plans that offer kettlebell versions of exercises will use them. Turn off to use the dumbbell versions.</span></span></label>
+  <div class="section-title" style="margin-top:var(--sp-8);">Plan Library</div>
+  <div id="plansLibrary"></div>
+  <div class="section-title" style="margin-top:var(--sp-8);">Your Plan History</div>
+  <div id="plansHistory"></div>
 </div>
 
 </div><!-- /main -->
@@ -1329,15 +1359,16 @@ function toggleRestDayComplete(dayId){
   updateDayPillStates();
 }
 function autoSelectNextDay(){
-  var foundWeek=null,foundDay=null,lastWeek=lastPlannedWeek();
-  for(var w=1;w<=lastWeek;w++){
+  var foundWeek=null,foundDay=null,lastWeek=lastPlannedWeek(),tlNow=loadPlanTimeline();
+  for(var w=tlNow[tlNow.length-1].start;w<=lastWeek;w++){
     var dayOrder=planForWeek(w).days.map(function(d){return d.id;});
     for(var di=0;di<dayOrder.length;di++){
       if(!isDayComplete(w,dayOrder[di])){foundWeek=w;foundDay=dayOrder[di];break;}
     }
     if(foundWeek)break;
   }
-  if(!foundWeek){var tl=loadPlanTimeline();foundWeek=tl[tl.length-1].start;foundDay=planForWeek(foundWeek).days[0].id;}
+  // Whole plan done: stay on its last week (the Plan complete banner offers the next plan).
+  if(!foundWeek){foundWeek=lastWeek;foundDay=planForWeek(foundWeek).days[0].id;}
   if(applyPlanForWeek(foundWeek))buildTrackers();
   if(foundWeek!==activeWeek){
     activeWeek=foundWeek;
@@ -1780,6 +1811,107 @@ function applyPlanForWeek(w){
   renderPlanPages(plan);
   return true;
 }
+// ===== PLANS SCREEN =====
+// Highest week with a completed set or a completed rest day (0 if nothing logged).
+function lastLoggedWeek(){
+  var max=0;
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i),hit=false;
+    if(k&&k.indexOf('wlog:')===0){var v=null;try{v=JSON.parse(localStorage.getItem(k));}catch(e){}hit=!!(v&&v.done);}
+    else if(k&&k.indexOf('rdc:')===0)hit=true;
+    if(hit){var w=parseInt(k.split(':')[1].replace('w',''),10);if(w>max)max=w;}}}catch(e){}
+  return max;
+}
+function weeksWithLogs(from,to){
+  var weeks={};
+  allLogKeys().forEach(function(k){var w=parseInt(k.split(':')[1].replace('w',''),10);if(w<from||w>to||weeks[w])return;
+    var v=null;try{v=JSON.parse(localStorage.getItem(k));}catch(e){}if(v&&v.done)weeks[w]=1;});
+  return Object.keys(weeks).length;
+}
+function hasKettlebells(){try{return localStorage.getItem('hasKettlebells')==='1';}catch(e){return false;}}
+function setHasKettlebells(on){var v=on?'1':'0';try{localStorage.setItem('hasKettlebells',v);}catch(e){}pushPrefToSupabase('hasKettlebells',v);}
+function planMetaText(plan){var days=plan.days.filter(function(d){return d.start;}).length;return plan.weeks+' weeks · '+days+' training days a week · '+plan.phases.length+' phases';}
+function renderPlansScreen(){
+  var t=loadPlanTimeline(),cur=t[t.length-1],plan=PLANS[cur.plan],end=planEndWeek(cur);
+  var logged=weeksWithLogs(cur.start,end);
+  var cw=getActiveWeek()>=cur.start&&getActiveWeek()<=end?localWeek(getActiveWeek()):Math.min(plan.weeks,logged+1);
+  var el=document.getElementById('plansCurrent');
+  if(el)el.innerHTML='<div class="plan-card current"><div class="plan-card-top"><div class="plan-card-name">'+plan.name+'</div><span class="plan-card-badge">Current plan</span></div>'+
+    '<div class="plan-card-meta">Week '+cw+' of '+plan.weeks+' · '+logged+' of '+plan.weeks+' weeks logged</div>'+
+    '<div class="plan-progress"><div style="width:'+Math.round(logged/plan.weeks*100)+'%"></div></div>'+
+    (plan.summary?'<div class="plan-card-desc">'+plan.summary+'</div>':'')+'</div>';
+  var lib=document.getElementById('plansLibrary');
+  if(lib)lib.innerHTML=Object.keys(PLANS).map(function(id){var p=PLANS[id],isCur=id===cur.plan;
+    return '<div class="plan-card"><div class="plan-card-top"><div class="plan-card-name">'+p.name+'</div>'+(isCur?'<span class="plan-card-badge">Current</span>':'')+'</div>'+
+      '<div class="plan-card-meta">'+planMetaText(p)+'</div>'+(p.summary?'<div class="plan-card-desc">'+p.summary+'</div>':'')+
+      '<button class="'+(isCur?'sync-pull-btn':'sync-now-btn')+'" onclick="switchToPlan(\''+id+'\')">'+(isCur?'Start over from Week 1':'Switch to this plan')+'</button></div>';}).join('');
+  var hist=document.getElementById('plansHistory');
+  if(hist)hist.innerHTML=t.slice().reverse().map(function(entry){var i=t.indexOf(entry),p=PLANS[entry.plan];
+    var e=(i<t.length-1)?Math.min(planEndWeek(entry),t[i+1].start-1):planEndWeek(entry);
+    return '<div class="plan-history-row"><span>'+p.name+(i===t.length-1?' (current)':'')+'</span><span>'+weeksWithLogs(entry.start,e)+' of '+(e-entry.start+1)+' weeks logged</span></div>';}).join('');
+  var kb=document.getElementById('kettlebellToggle');if(kb)kb.checked=hasKettlebells();
+}
+function switchToPlan(id){
+  var t=loadPlanTimeline(),cur=t[t.length-1],next=PLANS[id];if(!next)return;
+  var last=lastLoggedWeek(),started=last>=cur.start,curName=PLANS[cur.plan].name;
+  var msg=(id===cur.plan?'Start '+next.name+' over from Week 1?':'Switch to '+next.name+'?')+'\n\n'+
+    (started?'It starts at Week 1 next week. Everything you logged in '+curName+' stays in your history.':'You haven\'t logged anything in '+curName+' yet, so it will be replaced.');
+  if(!confirm(msg))return;
+  var start;
+  if(started){start=last+1;t.push({plan:id,start:start});}
+  else{start=cur.start;t[t.length-1]={plan:id,start:start};}
+  savePlanTimeline(t);
+  goToWeek(start);
+}
+// Show week w on the Workouts screen, re-drawing the plan if needed.
+function goToWeek(w){
+  activeWeek=w;applyPlanForWeek(w);renderWeekSelect();updateWeekIndicator();buildTrackers();buildSchedule();
+  var first=document.querySelector('.week-tab');if(first)showDay(first.getAttribute('data-day'),first);
+  try{renderStreakBanner();}catch(e){}
+  renderDay();
+  showSection('workouts',document.querySelector('.nav-btn'));window.scrollTo(0,0);
+}
+// ===== END-OF-PLAN BANNER =====
+function currentPlanEntry(){var t=loadPlanTimeline();return t[t.length-1];}
+function firstIncompleteWeek(entry){
+  for(var w=entry.start;w<=planEndWeek(entry);w++){var days=PLANS[entry.plan].days;
+    for(var i=0;i<days.length;i++){if(!isDayComplete(w,days[i].id))return w;}}
+  return null;
+}
+// Biggest changes in each exercise's best set, from the first to the last week it was logged in this plan.
+function planLiftChanges(entry){
+  var plan=PLANS[entry.plan],end=planEndWeek(entry),seen={},out=[];
+  Object.keys(plan.session.exercises).forEach(function(day){plan.session.exercises[day].forEach(function(ex){
+    if(seen[ex.id])return;seen[ex.id]=1;var isBW=BW_EXERCISES.has(ex.id),best={};
+    for(var w=entry.start;w<=end;w++){for(var s=0;s<ex.sets+2;s++){var d=loadSet(w,day,ex.id,s);if(!d.done)continue;
+      var v=isBW?(parseFloat(d.reps)||0):(parseFloat(d.weight)||0);if(v&&(!best[w]||v>best[w]))best[w]=v;}}
+    var ws=Object.keys(best).map(Number).sort(function(a,b){return a-b;});
+    if(ws.length>=2){var a=best[ws[0]],b=best[ws[ws.length-1]];if(b!==a)out.push({label:ex.label,from:a,to:b,gain:b-a,unit:isBW?'reps':'lbs'});}
+  });});
+  return out.sort(function(x,y){return y.gain-x.gain;});
+}
+function planBannerKey(entry,stage){return 'planBanner:'+entry.plan+':'+entry.start+':'+stage;}
+function dismissPlanEndBanner(){var b=document.getElementById('cycle2Banner');if(!b)return;try{localStorage.setItem(b.getAttribute('data-key'),'1');}catch(e){}b.style.display='none';}
+function renderPlanEndBanner(){
+  var b=document.getElementById('cycle2Banner');if(!b)return;
+  var entry=currentPlanEntry(),plan=PLANS[entry.plan],next=firstIncompleteWeek(entry),stage=null;
+  if(next===null)stage='complete';else if(localWeek(next)>=plan.weeks-1&&plan.weeks>2)stage='final';
+  var key=stage?planBannerKey(entry,stage):'';var dismissed=false;try{dismissed=!!(key&&localStorage.getItem(key));}catch(e){}
+  if(!stage||dismissed){b.style.display='none';return;}
+  b.setAttribute('data-key',key);
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.innerHTML=v;};
+  if(stage==='complete'){
+    var ch=planLiftChanges(entry).filter(function(c){return c.gain>0;}).slice(0,5);
+    set('planEndIcon','🏆');set('planEndTitle',plan.name.toUpperCase()+' COMPLETE');
+    set('planEndSub','All '+plan.weeks+' weeks done. Time to pick what comes next.');
+    set('planEndBody',ch.length?'<strong>Biggest gains:</strong><br>'+ch.map(function(c){return c.label+': '+c.from+' → '+c.to+' '+c.unit+' (+'+c.gain+')';}).join('<br>'):'Pick your next plan to keep going. Everything you logged stays in your history.');
+  }else{
+    var left=plan.weeks-localWeek(next)+1;
+    set('planEndIcon','🏁');set('planEndTitle','WEEK '+localWeek(next)+' — FINAL PUSH');
+    set('planEndSub',left+(left===1?' week':' weeks')+' left in '+plan.name+'.');
+    set('planEndBody','When you finish, FORGE will help you start your next plan. You can look through the plan library now.');
+  }
+  b.style.display='flex';
+}
 // Text and sections that describe a specific plan follow the active plan.
 function updatePlanText(plan){
   var el=document.getElementById('planTitle');if(el)el.textContent=plan.title||plan.name;
@@ -1795,14 +1927,15 @@ function updatePlanText(plan){
   }
 }
 function calcStreak(){
-  var streak=0;
-  for(var w=1;w<=lastPlannedWeek();w++){
+  // Counts completed weeks in a row from the start of the current plan.
+  var streak=0,tlS=loadPlanTimeline(),s0=tlS[tlS.length-1].start;
+  for(var w=s0;w<=lastPlannedWeek();w++){
     var weekDone=true;
     var dayOrder=planForWeek(w).days.map(function(d){return d.id;});
     for(var di=0;di<dayOrder.length;di++){
       if(!isDayComplete(w,dayOrder[di])){weekDone=false;break;}
     }
-    if(weekDone)streak=w;else break;
+    if(weekDone)streak=w-s0+1;else break;
   }
   return streak;
 }
@@ -1816,6 +1949,7 @@ function renderStreakBanner(){
     var msgs=['Just getting started — keep showing up','Building the habit — solid work','3 weeks in — you\'re locked in','Halfway there — don\'t stop now','5 weeks strong — this is becoming who you are','6 weeks — the program is working','7 weeks — one more push','8 weeks complete — full program finished 🏆'];
     if(sub)sub.textContent=msgs[streak-1]||'Keep going';
   }else{banner.style.display='none';}
+  try{renderPlanEndBanner();}catch(e){}
 }
 function endSession(){
   clearInterval(session.elapsedInterval);clearInterval(session.restInterval);clearInterval(session.cardioInterval);
@@ -1889,7 +2023,7 @@ function forceSyncNow(){
   setSyncStatus('⏳','Syncing...','Pushing all your data to the cloud. This may take a moment.');localStorage.removeItem('supa_migrated');
   var sets=[];allLogKeys().forEach(function(k){try{var val=JSON.parse(localStorage.getItem(k)||'{}');var p=k.replace('wlog:','').split(':');if(p.length<4)return;sets.push({user_id:currentUser.id,week:parseInt(p[0].replace('w',''),10),day:p[1],exercise_id:p[2],set_index:parseInt(p[3].replace('s',''),10),weight:val.weight||'',reps:val.reps||'',done:val.done||false,rpe:val.rpe||'',ts:val.ts||Date.now()});}catch(e){}});
   var bwEntries=[];allBWKeys().forEach(function(k){var val=loadBW(k.replace('bw:',''));if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});});
-  var prefKeys=['appTheme','appThemeCustom','planTimeline'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
+  var prefKeys=['appTheme','appThemeCustom','planTimeline','hasKettlebells'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
   var prefs=[];prefKeys.forEach(function(k){var v=localStorage.getItem(k);if(v)prefs.push({user_id:currentUser.id,key:k,value:v});});
   var videoMap=loadVideos();var videos=[];Object.keys(videoMap).forEach(function(name){var rec=videoMap[name];if(rec&&rec.url)videos.push({user_id:currentUser.id,exercise_name:name,video_url:rec.url,updated_at:rec.updated_at||new Date().toISOString()});});
   var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)+(videos.length?1:0)||1;var hadError=false;
@@ -1907,7 +2041,7 @@ function forcePullNow(){
 // ===== BACKUP / RESTORE =====
 // Only FORGE's own keys are exported or restored (never Supabase login tokens).
 var BACKUP_PREFIXES=['wlog:','wdur:','rdc:','bw:'];
-var BACKUP_EXACT_KEYS=['appTheme','appThemeCustom','recoveryMode','planTimeline',VIDEOS_KEY];
+var BACKUP_EXACT_KEYS=['appTheme','appThemeCustom','recoveryMode','planTimeline','hasKettlebells',VIDEOS_KEY];
 function isBackupKey(k){
   if(typeof k!=='string')return false;
   if(BACKUP_EXACT_KEYS.indexOf(k)!==-1)return true;
@@ -1960,7 +2094,7 @@ function loadSavedTheme(){
   try{var themeId=localStorage.getItem('appTheme')||'default';if(themeId==='custom'){var custom={};try{custom=JSON.parse(localStorage.getItem('appThemeCustom')||'{}');}catch(e){}if(custom.accent)applyCustomColor('accent',custom.accent);if(custom.bg)applyCustomColor('bg',custom.bg);if(custom.surface)applyCustomColor('surface',custom.surface);var ap=document.getElementById('customAccent');if(ap&&custom.accent)ap.value=custom.accent;var bp=document.getElementById('customBg');if(bp&&custom.bg)bp.value=custom.bg;var sp=document.getElementById('customSurface');if(sp&&custom.surface)sp.value=custom.surface;}else{applyTheme(themeId);}}catch(e){}
 }
 var _origShowSubSection=showSubSection;
-showSubSection=function(id){_origShowSubSection(id);if(id==='themes')buildThemePresets();if(id==='syncdata'){updateSyncUserEmail();setSyncStatus('☁️','Ready to sync','Tap below to push all your data to the cloud.');}};
+showSubSection=function(id){_origShowSubSection(id);if(id==='plans')renderPlansScreen();if(id==='themes')buildThemePresets();if(id==='syncdata'){updateSyncUserEmail();setSyncStatus('☁️','Ready to sync','Tap below to push all your data to the cloud.');}};
 
 
 // ═══════════════════════════════════════════════════════
@@ -2066,7 +2200,7 @@ function migrateLocalToSupabase(cb){
   if(!currentUser)return cb&&cb();var migrated=localStorage.getItem('supa_migrated');if(migrated){return cb&&cb();}showSyncIndicator('↑ migrating data...');
   var sets=[];allLogKeys().forEach(function(k){try{var val=JSON.parse(localStorage.getItem(k)||'{}');var p=k.replace('wlog:','').split(':');if(p.length<4)return;sets.push({user_id:currentUser.id,week:parseInt(p[0].replace('w',''),10),day:p[1],exercise_id:p[2],set_index:parseInt(p[3].replace('s',''),10),weight:val.weight||'',reps:val.reps||'',done:val.done||false,rpe:val.rpe||'',ts:val.ts||Date.now()});}catch(e){}});
   var bwEntries=[];allBWKeys().forEach(function(k){var val=loadBW(k.replace('bw:',''));if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});});
-  var prefKeys=['appTheme','appThemeCustom','planTimeline'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
+  var prefKeys=['appTheme','appThemeCustom','planTimeline','hasKettlebells'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
   var prefs=[];prefKeys.forEach(function(k){var v=localStorage.getItem(k);if(v)prefs.push({user_id:currentUser.id,key:k,value:v});});
   var videoMap=loadVideos();var videos=[];Object.keys(videoMap).forEach(function(name){var rec=videoMap[name];if(rec&&rec.url)videos.push({user_id:currentUser.id,exercise_name:name,video_url:rec.url,updated_at:rec.updated_at||new Date().toISOString()});});
   var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)+(videos.length?1:0)||1;
