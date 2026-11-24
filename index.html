@@ -1915,12 +1915,28 @@ function migrateLocalToSupabase(cb){
   if(prefs.length){supaClient.from('user_preferences').upsert(prefs,{onConflict:'user_id,key'}).then(function(){checkDone();});}else if(total>2)checkDone();
   if(videos.length){supaClient.from('exercise_videos').upsert(videos,{onConflict:'user_id,exercise_name'}).then(function(){checkDone();});}else if(total>3)checkDone();
 }
+// Supabase caps each select at 1000 rows by default, so fetch every table in pages.
+// orderCols must be the table's unique key so pages never skip or repeat rows.
+var SUPA_PAGE_SIZE=1000;
+function fetchAllRows(table,orderCols,cb){
+  var rows=[];
+  function page(from){
+    var q=supaClient.from(table).select('*').eq('user_id',currentUser.id);
+    orderCols.forEach(function(c){q=q.order(c,{ascending:true});});
+    q.range(from,from+SUPA_PAGE_SIZE-1).then(function(res){
+      if(res.error){console.warn('Sync: failed loading '+table+' at row '+from,res.error);cb(rows);return;}
+      var data=res.data||[];rows=rows.concat(data);
+      if(data.length===SUPA_PAGE_SIZE)page(from+SUPA_PAGE_SIZE);else cb(rows);
+    },function(err){console.warn('Sync: failed loading '+table,err);cb(rows);});
+  }
+  page(0);
+}
 function pullFromSupabase(cb){
   if(!supaClient||!currentUser){cb&&cb();return;}showSyncIndicator('↓ syncing...');var done=0;function checkDone(){done++;if(done>=4){hideSyncIndicator();cb&&cb();}}
-  supaClient.from('workout_sets').select('*').eq('user_id',currentUser.id).then(function(res){if(res.data){res.data.forEach(function(r){if(r.exercise_id==='_rest'){if(r.done)try{localStorage.setItem('rdc:w'+r.week+':'+r.day,'1');}catch(e){}return;}var k=sKey(r.week,r.day,r.exercise_id,r.set_index);var existing=null;try{existing=JSON.parse(localStorage.getItem(k));}catch(e){}if(!existing||(r.ts&&(!existing.ts||r.ts>existing.ts))){try{localStorage.setItem(k,JSON.stringify({weight:r.weight,done:r.done,reps:r.reps,rpe:r.rpe,ts:r.ts}));}catch(e){}}});}checkDone();});
-  supaClient.from('body_weight').select('*').eq('user_id',currentUser.id).then(function(res){if(res.data){res.data.forEach(function(r){saveBW(r.date,r.value);});}checkDone();});
-  supaClient.from('user_preferences').select('*').eq('user_id',currentUser.id).then(function(res){if(res.data){res.data.forEach(function(r){try{localStorage.setItem(r.key,r.value);}catch(e){}});}checkDone();});
-  supaClient.from('exercise_videos').select('*').eq('user_id',currentUser.id).then(function(res){if(res.data){var all=loadVideos();res.data.forEach(function(r){if(!r||!r.exercise_name)return;var existing=all[r.exercise_name];var remoteTs=r.updated_at?new Date(r.updated_at).getTime():0;var localTs=existing&&existing.updated_at?new Date(existing.updated_at).getTime():0;if(!existing||remoteTs>localTs){all[r.exercise_name]={url:r.video_url||'',updated_at:r.updated_at||new Date().toISOString()};}});saveVideos(all);}checkDone();});
+  fetchAllRows('workout_sets',['week','day','exercise_id','set_index'],function(data){var res={data:data};if(res.data){res.data.forEach(function(r){if(r.exercise_id==='_rest'){if(r.done)try{localStorage.setItem('rdc:w'+r.week+':'+r.day,'1');}catch(e){}return;}var k=sKey(r.week,r.day,r.exercise_id,r.set_index);var existing=null;try{existing=JSON.parse(localStorage.getItem(k));}catch(e){}if(!existing||(r.ts&&(!existing.ts||r.ts>existing.ts))){try{localStorage.setItem(k,JSON.stringify({weight:r.weight,done:r.done,reps:r.reps,rpe:r.rpe,ts:r.ts}));}catch(e){}}});}checkDone();});
+  fetchAllRows('body_weight',['date'],function(data){var res={data:data};if(res.data){res.data.forEach(function(r){saveBW(r.date,r.value);});}checkDone();});
+  fetchAllRows('user_preferences',['key'],function(data){var res={data:data};if(res.data){res.data.forEach(function(r){try{localStorage.setItem(r.key,r.value);}catch(e){}});}checkDone();});
+  fetchAllRows('exercise_videos',['exercise_name'],function(data){var res={data:data};if(res.data){var all=loadVideos();res.data.forEach(function(r){if(!r||!r.exercise_name)return;var existing=all[r.exercise_name];var remoteTs=r.updated_at?new Date(r.updated_at).getTime():0;var localTs=existing&&existing.updated_at?new Date(existing.updated_at).getTime():0;if(!existing||remoteTs>localTs){all[r.exercise_name]={url:r.video_url||'',updated_at:r.updated_at||new Date().toISOString()};}});saveVideos(all);}checkDone();});
 }
 function pushSetToSupabase(w,day,exId,setIdx,data){if(!supaClient||!currentUser)return;supaClient.from('workout_sets').upsert({user_id:currentUser.id,week:w,day:day,exercise_id:exId,set_index:setIdx,weight:data.weight||'',reps:data.reps||'',done:data.done||false,rpe:data.rpe||'',ts:data.ts||Date.now()},{onConflict:'user_id,week,day,exercise_id,set_index'}).then(function(){});}
 function pushBWToSupabase(dateStr,val){if(!supaClient||!currentUser)return;supaClient.from('body_weight').upsert({user_id:currentUser.id,date:dateStr,value:val},{onConflict:'user_id,date'}).then(function(){});}
