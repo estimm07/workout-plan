@@ -1116,6 +1116,7 @@ function planItemHTML(day,it){
     var t=it.table,h='<table class="exercise-table"><thead><tr>'+t.head.map(function(x){return '<th>'+x+'</th>';}).join('')+'</tr></thead><tbody>';
     t.rows.forEach(function(r){
       if(r.ex){
+        if(PLAN_RENDER_WEEK)r=resolveRow(r,PLAN_RENDER_WEEK);
         h+='<tr class="exercise-main-row">'+planCellHTML({name:r.name,cue:r.cue})+'<td class="ex-sets">'+r.sets+'</td><td class="ex-rest">'+r.rest+'</td><td class="ex-tempo">'+r.tempo+'</td></tr>';
         h+='<tr class="set-tracker-row"><td colspan="'+t.head.length+'"><div class="set-tracker" id="trk-'+day.id+'-'+r.ex+'"></div></td></tr>';
       }else{h+='<tr class="exercise-main-row">'+r.map(planCellHTML).join('')+'</tr>';}
@@ -1135,7 +1136,9 @@ function planDayHTML(day){
   var h=day.start?'<button class="start-session-btn" onclick="startSession(\''+day.id+'\')">▶ &nbsp;START WORKOUT — '+day.start+'</button>':'<button class="rdc-btn" id="rdcBtn-'+day.id+'" onclick="toggleRestDayComplete(\''+day.id+'\')">Mark Day Complete</button>';
   return h+day.blocks.map(function(b){return planBlockHTML(day,b);}).join('');
 }
-function renderPlanPages(plan){
+var PLAN_RENDER_WEEK=null;
+function renderPlanPages(plan,w){
+  PLAN_RENDER_WEEK=w||null;
   var tabs=document.getElementById('weekTabs');
   if(tabs){
     tabs.innerHTML=plan.days.map(function(d,i){
@@ -1245,7 +1248,7 @@ function showDay(id,btn){
 function isDayComplete(week,day){
   var plan=planForWeek(week);
   if(plan.restDays.indexOf(day)!==-1)return true;
-  var exList=plan.session.exercises[day];if(!exList||!exList.length)return false;
+  var exList=exercisesForWeek(week)[day];if(!exList||!exList.length)return false;
   var total=0,doneCt=0;
   for(var i=0;i<exList.length;i++){
     var ex=exList[i];
@@ -1481,12 +1484,12 @@ function historyExercises(){
 // Calls cb(week, day, setData) for every stored set of exId, in week order.
 function forEachSetOf(exId,cb,weeks){
   var ws=weeks;if(!ws){ws=[];for(var w=1;w<=historyLastWeek();w++)ws.push(w);}
-  ws.forEach(function(w){var exs=exercisesForWeek(w);
+  ws.forEach(function(w){var exs=exercisesForWeek(w,true);
     Object.keys(exs).forEach(function(day){exs[day].forEach(function(ex){if(ex.id!==exId)return;
       for(var s=0;s<ex.sets+2;s++)cb(w,day,loadSet(w,day,ex.id,s));});});});
 }
 function getWeekVolume(week){
-  var exs=exercisesForWeek(week);
+  var exs=exercisesForWeek(week,true);
   var total=0;Object.keys(exs).forEach(function(day){exs[day].forEach(function(ex){if(BW_EXERCISES.has(ex.id))return;for(var s=0;s<ex.sets+2;s++){var d=loadSet(week,day,ex.id,s);if(d.done&&d.weight)total+=parseFloat(d.weight)||0;}});});return total;
 }
 function getAllPRs(){
@@ -1803,8 +1806,39 @@ function phaseForWeek(w){
   var last=ph[ph.length-1];return {num:ph.length,label:last.label,cls:last.cls};
 }
 function dayLabelForWeek(w,day){var d=planForWeek(w).days.filter(function(x){return x.id===day;})[0];return d?d.tab:day;}
-function exercisesForWeek(w){return planForWeek(w).session.exercises;}
-function exerciseById(w,id){var exs=exercisesForWeek(w),found=null;Object.keys(exs).forEach(function(d){exs[d].forEach(function(e){if(e.id===id&&!found)found=e;});});return found;}
+// ----- Plans written as rows (Full Body etc.) -----
+// A main-table row is {ex,label,name,cue,sets,rest,tempo,n,secs,main?,targets?,kb?,kbWeeks?}.
+// kb:{ex?,label,name,cue?} is the kettlebell version, used when the kettlebell switch is on
+// (and, if kbWeeks is set, only in those weeks of the plan). A kb version with its own ex id
+// keeps its own history; without one it logs as the same exercise.
+function planRows(plan,cb){plan.days.forEach(function(day){day.blocks.forEach(function(b){b.items.forEach(function(it){
+  if(it.table)it.table.rows.forEach(function(r){if(r.ex)cb(day,r);});});});});}
+function rowExercise(r,v){v=v||{};return {id:v.ex||r.ex,label:v.label||r.label||r.name,sets:r.n,rest:r.secs,main:r.main,targets:r.targets};}
+function kbActive(r,w){return !!(r.kb&&hasKettlebells()&&(!r.kbWeeks||r.kbWeeks.indexOf(localWeek(w))>=0));}
+function resolveRow(r,w){if(!kbActive(r,w))return r;var k=r.kb;return Object.assign({},r,{ex:k.ex||r.ex,label:k.label||k.name,name:k.name,cue:k.cue||r.cue});}
+// Fill a row-based plan's session data: every exercise and kettlebell version (for history),
+// day titles, and prescriptions for workout mode.
+function finalizeRowPlan(plan){
+  var s=plan.session=plan.session||{},all={},pres={},titles={};
+  plan.days.forEach(function(d){all[d.id]=[];if(d.start)titles[d.id]=d.start;});
+  planRows(plan,function(day,r){
+    all[day.id].push(rowExercise(r));pres[r.ex]=r.sets+(r.tempo&&r.tempo!=='—'?' · Tempo '+r.tempo:'');
+    if(r.kb&&r.kb.ex){all[day.id].push(rowExercise(r,r.kb));pres[r.kb.ex]=pres[r.ex];}
+  });
+  s.exercises=all;s.prescriptions=pres;s.titles=titles;s.warmup=s.warmup||{};s.cardio=s.cardio||{};s.cooldown=s.cooldown||{};
+  plan.fromRows=true;
+}
+var _exCache={};
+// Exercises to show and log in week w (kettlebell versions applied).
+// all=true returns every exercise and kettlebell version the plan can log, for history scans.
+function exercisesForWeek(w,all){
+  var plan=planForWeek(w);if(!plan.fromRows||all)return plan.session.exercises;
+  var key=plan.id+'|'+localWeek(w)+'|'+hasKettlebells();if(_exCache[key])return _exCache[key];
+  var out={};plan.days.forEach(function(d){out[d.id]=[];});
+  planRows(plan,function(day,r){var v=kbActive(r,w)?r.kb:null;out[day.id].push(rowExercise(r,v));});
+  return (_exCache[key]=out);
+}
+function exerciseById(w,id){var exs=exercisesForWeek(w,true),found=null;Object.keys(exs).forEach(function(d){exs[d].forEach(function(e){if(e.id===id&&!found)found=e;});});return found;}
 // Sets × reps text for this week: an exercise's targets list (one per phase) if it has one,
 // otherwise the base text with its leading set count replaced by this week's count.
 function targetText(base,ex,w){
@@ -1815,7 +1849,7 @@ function targetText(base,ex,w){
 function updatePhaseTargets(){
   var w=getActiveWeek(),plan=planForWeek(w);
   plan.days.forEach(function(day){day.blocks.forEach(function(b){b.items.forEach(function(it){
-    if(!it.table)return;it.table.rows.forEach(function(r){if(!r.ex)return;
+    if(!it.table)return;it.table.rows.forEach(function(r){if(!r.ex)return;r=resolveRow(r,w);
       var trk=document.getElementById('trk-'+day.id+'-'+r.ex);if(!trk)return;
       var row=trk.closest('tr');row=row&&row.previousElementSibling;var cell=row&&row.querySelector('.ex-sets');
       if(cell)cell.innerHTML=targetText(r.sets,exerciseById(w,r.ex),w);});});});});
@@ -1827,13 +1861,14 @@ function setsFor(ex,w){
   if(plan.extraSets&&ex.main!==false)extra=plan.extraSets[phaseForWeek(w).num-1]||0;
   return ex.sets+extra;
 }
-var activePlanId='forge-ul';
+var activePlanId='forge-ul',activePlanSig='forge-ul';
 function applyPlanForWeek(w){
-  var plan=planForWeek(w);if(plan.id===activePlanId)return false;
-  activePlanId=plan.id;var s=plan.session;
-  EXERCISES=s.exercises;DAY_TITLES=s.titles;EX_PRESCRIPTIONS=s.prescriptions;WARMUP_DATA=s.warmup;CARDIO_DATA=s.cardio;COOLDOWN_DATA=s.cooldown;
+  var plan=planForWeek(w),sig=plan.id+(plan.fromRows?'|'+localWeek(w)+'|'+hasKettlebells():'');
+  if(sig===activePlanSig)return false;
+  activePlanSig=sig;activePlanId=plan.id;var s=plan.session;
+  EXERCISES=exercisesForWeek(w);DAY_TITLES=s.titles;EX_PRESCRIPTIONS=s.prescriptions;WARMUP_DATA=s.warmup;CARDIO_DATA=s.cardio;COOLDOWN_DATA=s.cooldown;
   DAY_LABELS={};plan.days.forEach(function(d){DAY_LABELS[d.id]=d.tab;});
-  renderPlanPages(plan);
+  renderPlanPages(plan,w);
   return true;
 }
 // ===== PLANS SCREEN =====
@@ -1853,7 +1888,8 @@ function weeksWithLogs(from,to){
   return Object.keys(weeks).length;
 }
 function hasKettlebells(){try{return localStorage.getItem('hasKettlebells')==='1';}catch(e){return false;}}
-function setHasKettlebells(on){var v=on?'1':'0';try{localStorage.setItem('hasKettlebells',v);}catch(e){}pushPrefToSupabase('hasKettlebells',v);}
+function setHasKettlebells(on){var v=on?'1':'0';try{localStorage.setItem('hasKettlebells',v);}catch(e){}pushPrefToSupabase('hasKettlebells',v);
+  if(applyPlanForWeek(getActiveWeek())){buildTrackers();updatePhaseTargets();renderDay();}}
 function planMetaText(plan){var days=plan.days.filter(function(d){return d.start;}).length;return plan.weeks+' weeks · '+days+' training days a week · '+plan.phases.length+' phases';}
 function renderPlansScreen(){
   var t=loadPlanTimeline(),cur=t[t.length-1],plan=PLANS[cur.plan],end=planEndWeek(cur);
