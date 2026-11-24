@@ -924,7 +924,7 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
     <div class="more-card" onclick="showSubSection('safety')"><div class="more-card-icon">🛡️</div><div class="more-card-title">Safety</div><div class="more-card-desc">Form cues &amp; back protocol</div></div>
     <div class="more-card" id="recoveryModeMoreCard" onclick="showSubSection('recoverymode')"><div class="more-card-icon">🩹</div><div class="more-card-title" id="recoveryModeMoreTitle">Recovery Mode</div><div class="more-card-desc" id="recoveryModeMoreDesc">Lower back flare protocol</div></div>
     <div class="more-card" onclick="showSubSection('themes')"><div class="more-card-icon">🎨</div><div class="more-card-title">Themes</div><div class="more-card-desc">Customize colors &amp; appearance</div></div>
-    <div class="more-card" onclick="showSubSection('syncdata')"><div class="more-card-icon">☁️</div><div class="more-card-title">Sync Data</div><div class="more-card-desc">Push all data to cloud &amp; re-sync</div></div>
+    <div class="more-card" onclick="showSubSection('syncdata')"><div class="more-card-icon">☁️</div><div class="more-card-title">Sync Data</div><div class="more-card-desc">Cloud sync, backup &amp; restore</div></div>
   </div>
 </div>
 
@@ -1093,6 +1093,11 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
   <div class="sync-status-card" id="syncStatusCard"><div class="sync-status-icon" id="syncStatusIcon">☁️</div><div><div class="sync-status-title" id="syncStatusTitle">Ready to sync</div><div class="sync-status-sub" id="syncStatusSub">Tap the button below to push all your workout data, body weight, and preferences to Supabase.</div></div></div>
   <button class="sync-now-btn" id="syncNowBtn" onclick="forceSyncNow()">↑ Push All Data to Cloud</button>
   <button class="sync-pull-btn" id="syncPullBtn" onclick="forcePullNow()">↓ Pull Latest from Cloud</button>
+  <div class="section-title" style="margin-top:var(--sp-8);">Backup</div>
+  <p style="color:var(--text2);font-size:13px;margin-bottom:var(--sp-4);">Save a copy of everything on this device to a file. Restoring adds the file's data back without deleting anything newer.</p>
+  <button class="sync-pull-btn" id="backupExportBtn" onclick="exportBackup()" style="margin-bottom:var(--sp-3);">⬇ Download Backup File</button>
+  <button class="sync-pull-btn" id="backupImportBtn" onclick="document.getElementById('backupFileInput').click()">⬆ Restore from Backup File</button>
+  <input type="file" id="backupFileInput" accept=".json,application/json" style="display:none;" onchange="importBackupFile(this)"/>
   <div style="margin-top:var(--sp-6);padding:var(--sp-4);background:var(--card);border-radius:var(--r-md);border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;margin-bottom:var(--sp-2);">Logged in as</div><div style="font-size:14px;color:var(--text);" id="syncUserEmail">—</div></div>
 </div>
 
@@ -1794,6 +1799,58 @@ function forcePullNow(){
   if(!supaClient||!currentUser){setSyncStatus('⚠️','Not logged in','Please log in first.');return;}
   var btn=document.getElementById('syncNowBtn');var pullBtn=document.getElementById('syncPullBtn');if(btn)btn.disabled=true;if(pullBtn)pullBtn.disabled=true;setSyncStatus('⏳','Pulling...','Fetching latest data from the cloud.');
   pullFromSupabase(function(){if(btn)btn.disabled=false;if(pullBtn)pullBtn.disabled=false;setSyncStatus('✅','Pull complete','Latest cloud data loaded. Refreshing app...');setTimeout(function(){initUI();setSyncStatus('☁️','Ready to sync','Your data is up to date.');},1200);});
+}
+// ===== BACKUP / RESTORE =====
+// Only FORGE's own keys are exported or restored (never Supabase login tokens).
+var BACKUP_PREFIXES=['wlog:','wdur:','rdc:','bw:'];
+var BACKUP_EXACT_KEYS=['appTheme','appThemeCustom','recoveryMode',VIDEOS_KEY];
+function isBackupKey(k){
+  if(typeof k!=='string')return false;
+  if(BACKUP_EXACT_KEYS.indexOf(k)!==-1)return true;
+  for(var i=0;i<BACKUP_PREFIXES.length;i++){if(k.indexOf(BACKUP_PREFIXES[i])===0)return true;}
+  return false;
+}
+function exportBackup(){
+  var keys={},count=0,sets=0;
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(!isBackupKey(k))continue;keys[k]=localStorage.getItem(k);count++;if(k.indexOf('wlog:')===0)sets++;}}catch(e){}
+  var payload={app:'FORGE',version:1,exportedAt:new Date().toISOString(),keys:keys};
+  var blob=new Blob([JSON.stringify(payload,null,1)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');
+  a.href=url;a.download='forge-backup-'+todayStr()+'.json';document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  setSyncStatus('💾','Backup downloaded',sets+' logged sets and '+(count-sets)+' other items saved to your file.');
+}
+function importBackupFile(input){
+  var file=input&&input.files&&input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(){input.value='';restoreBackupText(String(reader.result||''));};
+  reader.onerror=function(){input.value='';setSyncStatus('⚠️','Could not read file','Try choosing the backup file again.');};
+  reader.readAsText(file);
+}
+function restoreBackupText(text){
+  var data=null;try{data=JSON.parse(text);}catch(e){}
+  if(!data||data.app!=='FORGE'||!data.keys||typeof data.keys!=='object'){setSyncStatus('⚠️','Not a FORGE backup','That file is not a FORGE backup. Choose a file named forge-backup-….json.');return;}
+  var entries=Object.keys(data.keys).filter(function(k){return isBackupKey(k)&&typeof data.keys[k]==='string';});
+  if(!entries.length){setSyncStatus('⚠️','Backup is empty','There is nothing in that file to restore.');return;}
+  var when=data.exportedAt?new Date(data.exportedAt).toLocaleString():'an unknown date';
+  if(!confirm('Restore '+entries.length+' items from the backup made '+when+'?\n\nNothing will be deleted. Logged sets on this device that are newer than the backup are kept.'))return;
+  var restored=0,keptNewer=0;
+  entries.forEach(function(k){
+    var incoming=data.keys[k];
+    try{
+      if(k.indexOf('wlog:')===0){
+        var cur=null,inc=null;try{cur=JSON.parse(localStorage.getItem(k));}catch(e){}try{inc=JSON.parse(incoming);}catch(e){}
+        if(!inc||typeof inc!=='object')return;
+        if(cur&&cur.ts&&(!inc.ts||cur.ts>inc.ts)){keptNewer++;return;}
+      }
+      localStorage.setItem(k,incoming);restored++;
+    }catch(e){}
+  });
+  try{loadSavedTheme();}catch(e){}
+  try{initUI();}catch(e){}
+  var msg=restored+(restored===1?' item':' items')+' restored'+(keptNewer?', '+keptNewer+(keptNewer===1?' newer set':' newer sets')+' on this device kept':'')+'.';
+  if(supaClient&&currentUser){setSyncStatus('✅','Backup restored',msg+' Pushing to the cloud…');setTimeout(forceSyncNow,800);}
+  else{setSyncStatus('✅','Backup restored',msg);}
 }
 function loadSavedTheme(){
   try{var themeId=localStorage.getItem('appTheme')||'default';if(themeId==='custom'){var custom={};try{custom=JSON.parse(localStorage.getItem('appThemeCustom')||'{}');}catch(e){}if(custom.accent)applyCustomColor('accent',custom.accent);if(custom.bg)applyCustomColor('bg',custom.bg);if(custom.surface)applyCustomColor('surface',custom.surface);var ap=document.getElementById('customAccent');if(ap&&custom.accent)ap.value=custom.accent;var bp=document.getElementById('customBg');if(bp&&custom.bg)bp.value=custom.bg;var sp=document.getElementById('customSurface');if(sp&&custom.surface)sp.value=custom.surface;}else{applyTheme(themeId);}}catch(e){}
