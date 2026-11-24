@@ -1125,7 +1125,7 @@ renderPlanPages(PLANS['forge-ul']);
 // ═══════════════════════════════════════════════════════
 //  CORE CONFIG
 // ═══════════════════════════════════════════════════════
-const EXERCISES = {
+var EXERCISES = {
   d1: [
     {id:'bench-press',   label:'DB Bench Press',          sets:3, rest:75},
     {id:'pullups',       label:'Pull-Ups',                 sets:3, rest:90},
@@ -1213,9 +1213,9 @@ function showDay(id,btn){
   updateDayPillStates();
 }
 function isDayComplete(week,day){
-  var restDays=['d3','d6','d7'];
-  if(restDays.indexOf(day)!==-1)return true;
-  var exList=EXERCISES[day];if(!exList||!exList.length)return false;
+  var plan=planForWeek(week);
+  if(plan.restDays.indexOf(day)!==-1)return true;
+  var exList=plan.session.exercises[day];if(!exList||!exList.length)return false;
   var total=0,doneCt=0;
   for(var i=0;i<exList.length;i++){
     var ex=exList[i];
@@ -1245,8 +1245,20 @@ function updateDayPillStates(){
     btn.classList.toggle('rdc-done',complete);
   });
 }
+var activeWeek=null;
 function getActiveWeek(){return activeWeek||1;}
-function getPhaseLabel(week){if(week<=3)return 'Phase 1';if(week<=6)return 'Phase 2';return 'Phase 3';}
+function getPhaseLabel(week){return 'Phase '+phaseForWeek(week).num;}
+function renderWeekSelect(){
+  var select=document.getElementById('activeWeekSelect');if(!select)return;
+  var t=loadPlanTimeline(),html='';
+  t.forEach(function(entry,i){
+    var plan=PLANS[entry.plan],end=(i<t.length-1)?Math.min(planEndWeek(entry),t[i+1].start-1):planEndWeek(entry),opts='';
+    for(var w=entry.start;w<=end;w++)opts+='<option value="'+w+'">Week '+localWeek(w)+' — '+phaseForWeek(w).label+'</option>';
+    html+=t.length>1?'<optgroup label="'+plan.name+'">'+opts+'</optgroup>':opts;
+  });
+  select.innerHTML=html;
+  if(activeWeek)select.value=String(activeWeek);
+}
 function getDayLabel(dayId){var btn=document.querySelector('.week-tab[data-day="'+dayId+'"]');return btn?btn.getAttribute('data-day-label'):dayId;}
 function updateCurrentFocus(dayId){
   var title=document.getElementById('currentFocusTitle');
@@ -1264,9 +1276,8 @@ function updateWeekIndicator(){
   var badge=document.getElementById('weekInfoBadge');
   var select=document.getElementById('activeWeekSelect');
   if(select && String(select.value)!==String(activeWeek)) select.value=String(activeWeek);
-  if(activeWeek<=3){badge.textContent='PHASE 1';badge.className='week-info-badge p1';}
-  else if(activeWeek<=6){badge.textContent='PHASE 2';badge.className='week-info-badge p2';}
-  else{badge.textContent='PHASE 3';badge.className='week-info-badge p3';}
+  var ph=phaseForWeek(activeWeek||1);
+  if(badge){badge.textContent='PHASE '+ph.num;badge.className='week-info-badge '+ph.cls;}
   document.querySelectorAll('.week-pill').forEach(function(btn){
     var isActive=parseInt(btn.getAttribute('data-week'),10)===activeWeek;
     btn.classList.toggle('active',isActive);
@@ -1275,6 +1286,7 @@ function updateWeekIndicator(){
 }
 function setActiveWeek(week){
   activeWeek=week;
+  if(applyPlanForWeek(activeWeek))buildTrackers();
   updateWeekIndicator();
   try{autoSelectNextDay();}catch(e){}
   renderDay();
@@ -1283,6 +1295,7 @@ function setActiveWeek(week){
 function onWeekChange(){
   var select=document.getElementById('activeWeekSelect');
   activeWeek=select?parseInt(select.value,10):activeWeek;
+  if(applyPlanForWeek(activeWeek))buildTrackers();
   updateWeekIndicator();
   try{autoSelectNextDay();}catch(e){}
   renderDay();
@@ -1304,15 +1317,16 @@ function toggleRestDayComplete(dayId){
   saveData();
 }
 function autoSelectNextDay(){
-  var dayOrder=['d1','d2','d3','d4','d5','d6','d7'];
-  var foundWeek=null,foundDay=null;
-  for(var w=1;w<=8;w++){
+  var foundWeek=null,foundDay=null,lastWeek=lastPlannedWeek();
+  for(var w=1;w<=lastWeek;w++){
+    var dayOrder=planForWeek(w).days.map(function(d){return d.id;});
     for(var di=0;di<dayOrder.length;di++){
       if(!isDayComplete(w,dayOrder[di])){foundWeek=w;foundDay=dayOrder[di];break;}
     }
     if(foundWeek)break;
   }
-  if(!foundWeek){foundWeek=1;foundDay='d1';}
+  if(!foundWeek){var tl=loadPlanTimeline();foundWeek=tl[tl.length-1].start;foundDay=planForWeek(foundWeek).days[0].id;}
+  if(applyPlanForWeek(foundWeek))buildTrackers();
   if(foundWeek!==activeWeek){
     activeWeek=foundWeek;
     var select=document.getElementById('activeWeekSelect');
@@ -1323,6 +1337,7 @@ function autoSelectNextDay(){
   if(targetBtn)showDay(foundDay,targetBtn);
 }
 function initUI(){
+  renderWeekSelect();
   var select=document.getElementById('activeWeekSelect');
   if(select){activeWeek=parseInt(select.value,10)||1;}
   updateWeekIndicator();
@@ -1686,6 +1701,51 @@ function _updateRestZone(){var countEl=document.getElementById('sessionRestCount
 function skipRest(){clearInterval(session.restInterval);session.restRemaining=0;session.restActive=false;var zone=document.getElementById('sessionRestZone');if(zone)zone.innerHTML='';}
 function updateSessionVolume(){var total=0;(session.exercises||[]).forEach(function(ex){if(BW_EXERCISES.has(ex.id))return;for(var s=0;s<ex.sets+2;s++){var d=loadSet(session.week,session.day,ex.id,s);if(d.done&&d.weight)total+=parseFloat(d.weight)||0;}});var el=document.getElementById('sessionVol');if(el)el.textContent=total.toLocaleString()+' lbs';}
 var COOLDOWN_DATA={d1:[{name:'Doorway Chest Stretch',duration:'45 sec/side',cue:'Arms at 90°, lean through doorway'},{name:'Lat Stretch (bar hang)',duration:'30 sec × 2',cue:'Passive dead hang on pull-up bar'},{name:'Child\'s Pose',duration:'60 sec',cue:'Reach long, let thoracic relax'},{name:'Supine Spinal Twist',duration:'45 sec/side',cue:'Keep shoulders flat, gentle rotation'}],d2:[{name:'Pigeon Pose (or Figure-4)',duration:'60 sec/side',cue:'Hips square, breathe into the stretch'},{name:'Lying Hamstring Stretch',duration:'45 sec/side',cue:'Loop band or towel around foot, leg straight'},{name:'Hip Flexor Stretch (kneeling)',duration:'45 sec/side',cue:'Rear knee on floor, drive hips forward gently'},{name:'Child\'s Pose',duration:'60 sec',cue:'Wide knees, arms extended, breathe deeply'},{name:'Supine Spinal Twist',duration:'45 sec/side',cue:'Keep lower back relaxed, don\'t force rotation'}],d4:[{name:'Cross-Body Shoulder Stretch',duration:'45 sec/side',cue:'Pull arm across chest, keep shoulder down'},{name:'Overhead Tricep Stretch',duration:'30 sec/side',cue:'Elbow bent behind head, gentle pressure'},{name:'Doorway Chest Stretch',duration:'45 sec/side',cue:'Arms at 90°, lean through gently'},{name:'Neck Side Stretch',duration:'30 sec/side',cue:'Ear to shoulder, no rotation, slow and gentle'}],d5:[{name:'Pigeon Pose (or Figure-4)',duration:'60 sec/side',cue:'Breathe into the hip, don\'t force it'},{name:'Standing Quad Stretch',duration:'30 sec/side',cue:'Hold wall for balance, keep knees together'},{name:'Seated Hamstring Stretch',duration:'45 sec/side',cue:'Sit on floor, reach toward foot, back straight'},{name:'Glute Bridge Hold (stretch)',duration:'30 sec',cue:'Hold at top, focus on breathing and release'},{name:'Child\'s Pose',duration:'60 sec',cue:'Final full-body decompression'}]};
+// ═══════════════════════════════════════════════════════
+//  PLAN TIMELINE: which plan covers which weeks
+// ═══════════════════════════════════════════════════════
+// Weeks are numbered continuously across plans (plan 2 might cover weeks 9–14),
+// so logged sets keep the same storage keys and Supabase rows.
+PLANS['forge-ul'].phases=phases;
+PLANS['forge-ul'].schedule=dayPlans;
+PLANS['forge-ul'].restDays=['d3','d6','d7'];
+PLANS['forge-ul'].session={exercises:EXERCISES,titles:DAY_TITLES,prescriptions:EX_PRESCRIPTIONS,warmup:WARMUP_DATA,cardio:CARDIO_DATA,cooldown:COOLDOWN_DATA};
+var PLAN_TIMELINE_KEY='planTimeline';
+var DEFAULT_PLAN_TIMELINE=[{plan:'forge-ul',start:1}];
+function loadPlanTimeline(){
+  var t=null;try{t=JSON.parse(localStorage.getItem(PLAN_TIMELINE_KEY)||'null');}catch(e){}
+  if(!Array.isArray(t)||!t.length)return DEFAULT_PLAN_TIMELINE.slice();
+  t=t.filter(function(e){return e&&PLANS[e.plan]&&e.start>=1;});
+  if(!t.length)return DEFAULT_PLAN_TIMELINE.slice();
+  return t.sort(function(a,b){return a.start-b.start;});
+}
+function savePlanTimeline(t){var v=JSON.stringify(t);try{localStorage.setItem(PLAN_TIMELINE_KEY,v);}catch(e){}pushPrefToSupabase(PLAN_TIMELINE_KEY,v);}
+function planEntryForWeek(w){var t=loadPlanTimeline();var e=t[0];t.forEach(function(x){if(w>=x.start)e=x;});return e;}
+function planForWeek(w){return PLANS[planEntryForWeek(w).plan];}
+function localWeek(w){return w-planEntryForWeek(w).start+1;}
+function planEndWeek(entry){return entry.start+PLANS[entry.plan].weeks-1;}
+function lastPlannedWeek(){var t=loadPlanTimeline();return planEndWeek(t[t.length-1]);}
+function historyLastWeek(){
+  var max=lastPlannedWeek();
+  allLogKeys().forEach(function(k){var w=parseInt(k.split(':')[1].replace('w',''),10);if(w>max)max=w;});
+  return max;
+}
+function phaseForWeek(w){
+  var plan=planForWeek(w),lw=localWeek(w),ph=plan.phases;
+  for(var i=0;i<ph.length;i++){if(ph[i].weeks.indexOf(lw)>=0)return {num:i+1,label:ph[i].label,cls:ph[i].cls};}
+  var last=ph[ph.length-1];return {num:ph.length,label:last.label,cls:last.cls};
+}
+function dayLabelForWeek(w,day){var d=planForWeek(w).days.filter(function(x){return x.id===day;})[0];return d?d.tab:day;}
+function exercisesForWeek(w){return planForWeek(w).session.exercises;}
+var activePlanId='forge-ul';
+function applyPlanForWeek(w){
+  var plan=planForWeek(w);if(plan.id===activePlanId)return false;
+  activePlanId=plan.id;var s=plan.session;
+  EXERCISES=s.exercises;DAY_TITLES=s.titles;EX_PRESCRIPTIONS=s.prescriptions;WARMUP_DATA=s.warmup;CARDIO_DATA=s.cardio;COOLDOWN_DATA=s.cooldown;
+  DAY_LABELS={};plan.days.forEach(function(d){DAY_LABELS[d.id]=d.tab;});
+  renderPlanPages(plan);
+  return true;
+}
 function calcStreak(){
   var streak=0;
   for(var w=1;w<=8;w++){
