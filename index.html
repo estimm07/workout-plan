@@ -1291,12 +1291,26 @@ function setActiveWeek(week){
   try{autoSelectNextDay();}catch(e){}
   renderDay();
 }
+// WEEK DROPDOWN BEHAVIOR
+// false (current): picking a week in the "Logging for" dropdown stays on that week,
+//   so you can browse or log any week, including weeks of a finished plan.
+// true (behavior from the Apr 9 2026 upload until Nov 2026): picking any week
+//   immediately jumps back to your next unfinished workout, so the dropdown
+//   can't be used to move away from it. Set this to true to restore that.
+// Opening the app always starts on your next unfinished workout either way.
+var WEEK_PICKER_JUMPS_TO_NEXT_WORKOUT=false;
 function onWeekChange(){
   var select=document.getElementById('activeWeekSelect');
   activeWeek=select?parseInt(select.value,10):activeWeek;
-  if(applyPlanForWeek(activeWeek))buildTrackers();
+  var replanned=applyPlanForWeek(activeWeek);
   updateWeekIndicator();
-  try{autoSelectNextDay();}catch(e){}
+  if(WEEK_PICKER_JUMPS_TO_NEXT_WORKOUT){
+    if(replanned)buildTrackers();
+    try{autoSelectNextDay();}catch(e){}
+  }else{
+    buildTrackers();
+    if(replanned){var first=document.querySelector('.week-tab');if(first)showDay(first.getAttribute('data-day'),first);}
+  }
   renderDay();
 }
 function renderWeekTabs(){
