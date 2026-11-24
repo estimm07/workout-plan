@@ -1308,6 +1308,7 @@ function updateWeekIndicator(){
   if(select && String(select.value)!==String(activeWeek)) select.value=String(activeWeek);
   var ph=phaseForWeek(activeWeek||1);
   updatePlanText(planForWeek(activeWeek||1));
+  updatePhaseTargets();
   if(badge){badge.textContent='PHASE '+ph.num;badge.className='week-info-badge '+ph.cls;}
   document.querySelectorAll('.week-pill').forEach(function(btn){
     var isActive=parseInt(btn.getAttribute('data-week'),10)===activeWeek;
@@ -1730,10 +1731,10 @@ function renderSessionExercise(idx){
     var setsHTML='<div class="session-set-cols"><div class="session-col-label">Set</div><div class="session-col-label">Last Wk</div><div class="session-col-label">Reps</div><div class="session-col-label">Weight</div><div class="session-col-label"></div></div>';
     for(var s=0;s<setsFor(ex,week);s++){var cur=loadSet(week,day,ex.id,s);var prev=loadSet(prevWeek,day,ex.id,s);var prevDisplay=prev.weight?prev.weight+'lb':'—';setsHTML+='<div class="session-set-row'+(cur.done?' done-row':'')+'" id="srow-'+ex.id+'-'+s+'"><div class="session-set-num">'+(s+1)+'</div><div class="session-prev-val'+(prev.weight?' has-val':'')+'">'+prevDisplay+'</div><input type="number" class="session-weight-input" id="sreps-'+ex.id+'-'+s+'" placeholder="reps" min="0" step="1" value="'+(cur.reps||'')+'" oninput="saveSessionReps(\''+day+'\',\''+ex.id+'\','+s+',this.value)"/><input type="number" class="session-weight-input" id="sinp-'+ex.id+'-'+s+'" placeholder="lbs" min="0" step="2.5" value="'+(cur.weight||'')+'" oninput="saveSessionSet(\''+day+'\',\''+ex.id+'\','+s+',this.value,document.getElementById(\'sdone-'+ex.id+'-'+s+'\').classList.contains(\'done\'))"/><button class="session-done-btn'+(cur.done?' done':'')+'" id="sdone-'+ex.id+'-'+s+'" onclick="toggleSessionSet(\''+day+'\',\''+ex.id+'\','+s+','+(ex.rest||60)+','+(s<setsFor(ex,week)-1)+')">✓</button></div>';}
     var isFirst=navIdx===1;var isLast=navIdx===session.exercises.length;var prevNav=navIdx-1;var nextNav=navIdx+1;
-    var nextHTML=!isLast?'<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(navIdx+1)+')"><div class="session-next-label">Up next</div><div class="session-next-name">'+session.exercises[idx+1].label+' · '+(EX_PRESCRIPTIONS[session.exercises[idx+1].id]||'')+'</div></div>':'<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(session.exercises.length+1)+')"><div class="session-next-label">Up next</div><div class="session-next-name" style="color:var(--done-text)">🚶 Cardio Finisher</div></div>';
+    var nextHTML=!isLast?'<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(navIdx+1)+')"><div class="session-next-label">Up next</div><div class="session-next-name">'+session.exercises[idx+1].label+' · '+targetText(EX_PRESCRIPTIONS[session.exercises[idx+1].id],session.exercises[idx+1],session.week)+'</div></div>':'<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(session.exercises.length+1)+')"><div class="session-next-label">Up next</div><div class="session-next-name" style="color:var(--done-text)">🚶 Cardio Finisher</div></div>';
     var navRow='<div class="session-ex-nav-row"><button class="session-ex-arrow" onclick="renderSessionNav('+prevNav+')">←</button><div class="session-ex-count">Exercise '+(idx+1)+' of '+session.exercises.length+'</div><button class="session-ex-arrow" onclick="renderSessionNav('+nextNav+')">→</button></div>';
     var exNameRow='<div class="session-context-kicker">Current exercise</div><div class="session-ex-name-row"><div class="session-ex-name">'+ex.label+'</div><button class="session-ex-info-btn" onclick="showExInfo(\''+ex.id+'\',\''+ex.label+'\')">ℹ</button></div>';
-    var body=document.getElementById('sessionBody');if(body)body.innerHTML='<div class="session-ex-card"><div class="session-ex-header">'+navRow+exNameRow+'<div class="session-ex-prescription">'+(EX_PRESCRIPTIONS[ex.id]||'')+' · Rest '+(ex.rest||60)+'s</div></div>'+suggHTML+setsHTML+'</div><div id="sessionRestZone"></div>'+nextHTML;
+    var body=document.getElementById('sessionBody');if(body)body.innerHTML='<div class="session-ex-card"><div class="session-ex-header">'+navRow+exNameRow+'<div class="session-ex-prescription">'+targetText(EX_PRESCRIPTIONS[ex.id],ex,session.week)+' · Rest '+(ex.rest||60)+'s</div></div>'+suggHTML+setsHTML+'</div><div id="sessionRestZone"></div>'+nextHTML;
     if(session.restRemaining>0||session.restActive){_renderRestZone();}
   }catch(e){console.error('renderSessionExercise error:',e);}
 }
@@ -1803,6 +1804,22 @@ function phaseForWeek(w){
 }
 function dayLabelForWeek(w,day){var d=planForWeek(w).days.filter(function(x){return x.id===day;})[0];return d?d.tab:day;}
 function exercisesForWeek(w){return planForWeek(w).session.exercises;}
+function exerciseById(w,id){var exs=exercisesForWeek(w),found=null;Object.keys(exs).forEach(function(d){exs[d].forEach(function(e){if(e.id===id&&!found)found=e;});});return found;}
+// Sets × reps text for this week: an exercise's targets list (one per phase) if it has one,
+// otherwise the base text with its leading set count replaced by this week's count.
+function targetText(base,ex,w){
+  if(!ex)return base||'';
+  if(ex.targets)return ex.targets[phaseForWeek(w).num-1]||ex.targets[ex.targets.length-1];
+  return String(base||'').replace(/^\d+/,String(setsFor(ex,w)));
+}
+function updatePhaseTargets(){
+  var w=getActiveWeek(),plan=planForWeek(w);
+  plan.days.forEach(function(day){day.blocks.forEach(function(b){b.items.forEach(function(it){
+    if(!it.table)return;it.table.rows.forEach(function(r){if(!r.ex)return;
+      var trk=document.getElementById('trk-'+day.id+'-'+r.ex);if(!trk)return;
+      var row=trk.closest('tr');row=row&&row.previousElementSibling;var cell=row&&row.querySelector('.ex-sets');
+      if(cell)cell.innerHTML=targetText(r.sets,exerciseById(w,r.ex),w);});});});});
+}
 // Sets to log for an exercise in a given week. plan.extraSets lists extra sets per phase
 // (e.g. [0,1,1]); they apply to every exercise except ones marked main:false.
 function setsFor(ex,w){
