@@ -1290,7 +1290,6 @@ function setActiveWeek(week){
   updateWeekIndicator();
   try{autoSelectNextDay();}catch(e){}
   renderDay();
-  saveData();
 }
 function onWeekChange(){
   var select=document.getElementById('activeWeekSelect');
@@ -1299,7 +1298,6 @@ function onWeekChange(){
   updateWeekIndicator();
   try{autoSelectNextDay();}catch(e){}
   renderDay();
-  saveData();
 }
 function renderWeekTabs(){
   updateDayPillStates();
@@ -1314,7 +1312,6 @@ function toggleRestDayComplete(dayId){
   var week=getActiveWeek();
   saveRestDayComplete(week,dayId,!loadRestDayComplete(week,dayId));
   updateDayPillStates();
-  saveData();
 }
 function autoSelectNextDay(){
   var foundWeek=null,foundDay=null,lastWeek=lastPlannedWeek();
@@ -1415,26 +1412,43 @@ var phases=[{weeks:[1,2,3],label:'Foundation',cls:'p1'},{weeks:[4,5,6],label:'Hy
 var dayPlans=['Upper A','Lower A','<span class="rest-badge">Rest / Active</span>','Upper B','Lower B','<span class="rest-badge">Optional</span>','<span class="rest-badge">Full Rest</span>'];
 function buildSchedule(){
   var tbody=document.getElementById('scheduleBody');if(!tbody)return;
-  for(var w=1;w<=8;w++){
-    var ph=phases.filter(function(p){return p.weeks.indexOf(w)>=0;})[0];var tr=document.createElement('tr');
+  tbody.innerHTML='';
+  var plan=planForWeek(getActiveWeek());
+  for(var w=1;w<=plan.weeks;w++){
+    var ph=plan.phases.filter(function(p){return p.weeks.indexOf(w)>=0;})[0];var tr=document.createElement('tr');
     var h='<td style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--text2);">WK '+w+'</td><td><span class="phase-badge '+ph.cls+'">'+ph.label+'</span></td>';
-    dayPlans.forEach(function(d){h+='<td style="font-size:12px;">'+d+'</td>';});tr.innerHTML=h;tbody.appendChild(tr);
+    plan.schedule.forEach(function(d){h+='<td style="font-size:12px;">'+d+'</td>';});tr.innerHTML=h;tbody.appendChild(tr);
   }
 }
 
 var MUSCLE_MAP={'bench-press':'Chest','incline-press':'Chest','pullups':'Back','bent-row':'Back','chest-row':'Back','chinups':'Back','face-pull':'Back','db-curl':'Arms','shoulder-press':'Shoulders','lat-raise':'Shoulders','skull-crusher':'Arms','oh-tricep':'Arms','hip-thrust':'Glutes','goblet-squat':'Quads','rdl':'Hamstrings','rev-lunge':'Quads','calf-raise':'Quads','sl-hip-thrust':'Glutes','bss':'Quads','nordic':'Hamstrings','clamshell':'Glutes','dead-bug':'Core','plank':'Core'};
 var MUSCLE_COLORS={'Chest':'#3b82f6','Back':'#34d399','Shoulders':'#fb923c','Arms':'#a78bfa','Glutes':'#f472b6','Quads':'#34d399','Hamstrings':'#22d3ee','Core':'#60a5fa'};
 var volRange=4,muscleRange='week';var volBarChartInst=null,volLineChartInst=null;
+// Every exercise from every plan in the timeline, in plan → day → exercise order, each id once.
+function historyExercises(){
+  var seen={},list=[];
+  loadPlanTimeline().forEach(function(entry){var ex=PLANS[entry.plan].session.exercises;
+    Object.keys(ex).forEach(function(day){ex[day].forEach(function(e){if(!seen[e.id]){seen[e.id]=1;list.push(e);}});});});
+  return list;
+}
+// Calls cb(week, day, setData) for every stored set of exId, in week order.
+function forEachSetOf(exId,cb,weeks){
+  var ws=weeks;if(!ws){ws=[];for(var w=1;w<=historyLastWeek();w++)ws.push(w);}
+  ws.forEach(function(w){var exs=exercisesForWeek(w);
+    Object.keys(exs).forEach(function(day){exs[day].forEach(function(ex){if(ex.id!==exId)return;
+      for(var s=0;s<ex.sets+2;s++)cb(w,day,loadSet(w,day,ex.id,s));});});});
+}
 function getWeekVolume(week){
-  var total=0;Object.keys(EXERCISES).forEach(function(day){EXERCISES[day].forEach(function(ex){if(BW_EXERCISES.has(ex.id))return;for(var s=0;s<ex.sets+2;s++){var d=loadSet(week,day,ex.id,s);if(d.done&&d.weight)total+=parseFloat(d.weight)||0;}});});return total;
+  var exs=exercisesForWeek(week);
+  var total=0;Object.keys(exs).forEach(function(day){exs[day].forEach(function(ex){if(BW_EXERCISES.has(ex.id))return;for(var s=0;s<ex.sets+2;s++){var d=loadSet(week,day,ex.id,s);if(d.done&&d.weight)total+=parseFloat(d.weight)||0;}});});return total;
 }
 function getAllPRs(){
   var prs={};var currentWeek=getActiveWeek();
-  Object.keys(EXERCISES).forEach(function(day){EXERCISES[day].forEach(function(ex){for(var w=1;w<=8;w++){for(var s=0;s<ex.sets+2;s++){var d=loadSet(w,day,ex.id,s);if(!d.done)continue;var isBW=BW_EXERCISES.has(ex.id);var val=isBW?(parseFloat(d.reps)||0):(parseFloat(d.weight)||0);if(!val)continue;if(!prs[ex.id]||val>prs[ex.id].val){prs[ex.id]={label:ex.label,day:DAY_LABELS[day]||day,val:val,isBW:isBW,week:w,isNew:w===currentWeek};}}}}); });return prs;
+  historyExercises().forEach(function(ex){forEachSetOf(ex.id,function(w,day,d){if(!d.done)return;var isBW=BW_EXERCISES.has(ex.id);var val=isBW?(parseFloat(d.reps)||0):(parseFloat(d.weight)||0);if(!val)return;if(!prs[ex.id]||val>prs[ex.id].val){prs[ex.id]={label:ex.label,day:dayLabelForWeek(w,day),val:val,isBW:isBW,week:w,isNew:w===currentWeek};}});});return prs;
 }
 function getMuscleVolume(mode){
   var muscles={};var currentWeek=getActiveWeek();
-  Object.keys(EXERCISES).forEach(function(day){EXERCISES[day].forEach(function(ex){var muscle=MUSCLE_MAP[ex.id]||'Other';var weeks=mode==='week'?[currentWeek]:[1,2,3,4,5,6,7,8];weeks.forEach(function(w){for(var s=0;s<ex.sets+2;s++){var d=loadSet(w,day,ex.id,s);if(d.done)muscles[muscle]=(muscles[muscle]||0)+1;}});});});return muscles;
+  historyExercises().forEach(function(ex){var muscle=MUSCLE_MAP[ex.id]||'Other';forEachSetOf(ex.id,function(w,day,d){if(d.done)muscles[muscle]=(muscles[muscle]||0)+1;},mode==='week'?[currentWeek]:null);});return muscles;
 }
 var logSelectMode=false;var logSelectedKeys={};var logRange='all';
 function setLogRange(range,btn){logRange=range;document.querySelectorAll('.log-range-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderLogHistory();}
@@ -1447,7 +1461,9 @@ function deleteSelectedLogs(){Object.keys(logSelectedKeys).forEach(function(k){v
 function clearAllLogs(){allLogKeys().forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});if(supaClient&&currentUser){supaClient.from('workout_sets').delete().eq('user_id',currentUser.id).then(function(){});}renderLogHistory();buildTrackers();renderProgress();}
 function buildLogGroups(wfv,dfv){
   var grouped={};var allowedWeeks=null;
-  if(logRange==='first4')allowedWeeks={1:1,2:1,3:1,4:1};else if(logRange==='last4')allowedWeeks={5:1,6:1,7:1,8:1};
+  var pe=planEntryForWeek(getActiveWeek()),pEnd=planEndWeek(pe),aw;
+  if(logRange==='first4'){allowedWeeks={};for(aw=pe.start;aw<pe.start+4;aw++)allowedWeeks[aw]=1;}
+  else if(logRange==='last4'){allowedWeeks={};for(aw=Math.max(pe.start,pEnd-3);aw<=pEnd;aw++)allowedWeeks[aw]=1;}
   allLogKeys().forEach(function(k){var p=k.replace('wlog:','').split(':');if(p.length<4)return;var week=p[0].replace('w',''),day=p[1],exId=p[2],si=parseInt(p[3].replace('s',''));if(allowedWeeks&&!allowedWeeks[+week])return;if(dfv&&day!==dfv)return;var val;try{val=JSON.parse(localStorage.getItem(k)||'{}');}catch(e){return;}if(!val.done&&!val.weight)return;if(!grouped[week])grouped[week]={};if(!grouped[week][day])grouped[week][day]={};if(!grouped[week][day][exId])grouped[week][day][exId]=[];grouped[week][day][exId][si]={weight:val.weight,done:val.done,reps:val.reps||'',rpe:val.rpe||'',ts:val.ts};});return grouped;
 }
 function renderLogHistory(){
@@ -1455,7 +1471,7 @@ function renderLogHistory(){
   var df=document.getElementById('logDayFilter');var dfv=df?df.value:'';var grouped=buildLogGroups('',dfv);var weeks=Object.keys(grouped).sort(function(a,b){return +a-+b;});
   if(!weeks.length){container.innerHTML='<div class="log-empty"><div class="log-empty-icon">📋</div><div>No workout data logged yet.<br>Head to <strong>Workouts</strong>, enter your weights, and mark sets complete!</div></div>';return;}
   var html='';
-  weeks.forEach(function(week){Object.keys(grouped[week]).sort().forEach(function(day){var exMap=grouped[week][day];var allSets=[];Object.values(exMap).forEach(function(sets){sets.forEach(function(s){if(s)allSets.push(s);});});var done=allSets.filter(function(s){return s.done;}).length;var total=allSets.length;var ts=allSets.map(function(s){return s.ts;}).filter(Boolean);var dateStr=ts.length?new Date(Math.max.apply(null,ts)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';var phase=PHASE_MAP[+week]||'';var savedDur=loadDuration(+week,day);var durDisplay=savedDur?savedDur+' min':'—';var selKey=week+'|'+day;var isSelected=logSelectedKeys[selKey]?true:false;var cardClass='log-session-card'+(logSelectMode?' log-selectable':'')+(isSelected?' log-selected':'');var checkHtml=logSelectMode?'<div class="log-select-check">'+(isSelected?'✓':'')+'</div>':'';var cardOnclick=logSelectMode?' onclick="toggleLogSelect(\''+week+'\',\''+day+'\')"':'';html+='<div class="'+cardClass+'" id="logcard-'+week+'-'+day+'"'+cardOnclick+'>';html+='<div class="log-session-header"'+(logSelectMode?'':' onclick="toggleLogCard(\''+week+'\',\''+day+'\')"')+'>';html+='<div class="log-session-header-top">'+checkHtml+'<div class="log-session-header-left">WEEK '+week+' &nbsp;·&nbsp; '+dateStr+'</div><span class="phase-badge '+(PHASE_CLS[phase]||'')+'" style="display:inline-block;">'+phase+'</span></div><div class="log-session-title">'+(DAY_LABELS[day]||day)+'</div></div>';html+='<div class="log-session-stats"><div class="log-stat"><div class="log-stat-val">'+done+'</div><div class="log-stat-lbl">Sets Done</div></div><div class="log-stat"><div class="log-stat-val">'+total+'</div><div class="log-stat-lbl">Logged</div></div><div class="log-stat"><div class="log-stat-val">'+(total>0?Math.round(done/total*100):0)+'%</div><div class="log-stat-lbl">Completion</div></div><div class="log-stat" style="cursor:pointer;" onclick="editLogDuration(\''+week+'\',\''+day+'\',this)"><div class="log-stat-val" id="logdur-'+week+'-'+day+'">'+durDisplay+'</div><div class="log-stat-lbl">Duration <span style="font-size:8px;color:var(--text3);">✎</span></div></div></div>';html+='<div class="log-expand-btn" id="logexpandbtn-'+week+'-'+day+'" onclick="toggleLogCard(\''+week+'\',\''+day+'\')"><span>SHOW DETAILS</span><span>▾</span></div>';html+='<div class="log-exercise-list" id="logdetail-'+week+'-'+day+'">';Object.keys(exMap).forEach(function(exId){var def=null;var dayExs=EXERCISES[day]||[];for(var i=0;i<dayExs.length;i++){if(dayExs[i].id===exId){def=dayExs[i];break;}}var lbl=def?def.label:exId;html+='<div class="log-exercise-row"><div class="log-ex-name">'+lbl+'</div><div class="log-sets-line">';exMap[exId].forEach(function(s,si){if(!s)return;var chipId='chip-'+week+'-'+day+'-'+exId+'-'+si;var wDisplay=s.weight?s.weight+' lbs':'BW';var rDisplay=' · '+(s.reps?s.reps+' reps':'— reps');var rpeDisplay=s.rpe?(' · RPE '+s.rpe):'';var chipLabel='S'+(si+1)+': '+wDisplay+rDisplay+rpeDisplay;var completedClass=s.done?'completed':'';html+='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+si+')">'+chipLabel+'</span>';});html+='</div></div>';});html+='</div></div>';});});
+  weeks.forEach(function(week){Object.keys(grouped[week]).sort().forEach(function(day){var exMap=grouped[week][day];var allSets=[];Object.values(exMap).forEach(function(sets){sets.forEach(function(s){if(s)allSets.push(s);});});var done=allSets.filter(function(s){return s.done;}).length;var total=allSets.length;var ts=allSets.map(function(s){return s.ts;}).filter(Boolean);var dateStr=ts.length?new Date(Math.max.apply(null,ts)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';var phase=phaseForWeek(+week).label;var savedDur=loadDuration(+week,day);var durDisplay=savedDur?savedDur+' min':'—';var selKey=week+'|'+day;var isSelected=logSelectedKeys[selKey]?true:false;var cardClass='log-session-card'+(logSelectMode?' log-selectable':'')+(isSelected?' log-selected':'');var checkHtml=logSelectMode?'<div class="log-select-check">'+(isSelected?'✓':'')+'</div>':'';var cardOnclick=logSelectMode?' onclick="toggleLogSelect(\''+week+'\',\''+day+'\')"':'';html+='<div class="'+cardClass+'" id="logcard-'+week+'-'+day+'"'+cardOnclick+'>';html+='<div class="log-session-header"'+(logSelectMode?'':' onclick="toggleLogCard(\''+week+'\',\''+day+'\')"')+'>';html+='<div class="log-session-header-top">'+checkHtml+'<div class="log-session-header-left">WEEK '+week+' &nbsp;·&nbsp; '+dateStr+'</div><span class="phase-badge '+(PHASE_CLS[phase]||'')+'" style="display:inline-block;">'+phase+'</span></div><div class="log-session-title">'+(DAY_LABELS[day]||day)+'</div></div>';html+='<div class="log-session-stats"><div class="log-stat"><div class="log-stat-val">'+done+'</div><div class="log-stat-lbl">Sets Done</div></div><div class="log-stat"><div class="log-stat-val">'+total+'</div><div class="log-stat-lbl">Logged</div></div><div class="log-stat"><div class="log-stat-val">'+(total>0?Math.round(done/total*100):0)+'%</div><div class="log-stat-lbl">Completion</div></div><div class="log-stat" style="cursor:pointer;" onclick="editLogDuration(\''+week+'\',\''+day+'\',this)"><div class="log-stat-val" id="logdur-'+week+'-'+day+'">'+durDisplay+'</div><div class="log-stat-lbl">Duration <span style="font-size:8px;color:var(--text3);">✎</span></div></div></div>';html+='<div class="log-expand-btn" id="logexpandbtn-'+week+'-'+day+'" onclick="toggleLogCard(\''+week+'\',\''+day+'\')"><span>SHOW DETAILS</span><span>▾</span></div>';html+='<div class="log-exercise-list" id="logdetail-'+week+'-'+day+'">';Object.keys(exMap).forEach(function(exId){var def=null;var dayExs=EXERCISES[day]||[];for(var i=0;i<dayExs.length;i++){if(dayExs[i].id===exId){def=dayExs[i];break;}}var lbl=def?def.label:exId;html+='<div class="log-exercise-row"><div class="log-ex-name">'+lbl+'</div><div class="log-sets-line">';exMap[exId].forEach(function(s,si){if(!s)return;var chipId='chip-'+week+'-'+day+'-'+exId+'-'+si;var wDisplay=s.weight?s.weight+' lbs':'BW';var rDisplay=' · '+(s.reps?s.reps+' reps':'— reps');var rpeDisplay=s.rpe?(' · RPE '+s.rpe):'';var chipLabel='S'+(si+1)+': '+wDisplay+rDisplay+rpeDisplay;var completedClass=s.done?'completed':'';html+='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+si+')">'+chipLabel+'</span>';});html+='</div></div>';});html+='</div></div>';});});
   container.innerHTML=html;updateDeleteBtn();
 }
 function showProgTab(id,btn){
@@ -1468,7 +1484,8 @@ function setRange(weeks,btn){volRange=weeks;document.querySelectorAll('.prog-ran
 function setMuscleRange(mode,btn){muscleRange=mode;btn.closest('.prog-range-toggle').querySelectorAll('.range-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderMuscles();}
 function renderProgress(){renderVolume();renderPRs();renderMuscles();}
 function renderVolume(){
-  var labels=[],data=[],startWeek=Math.max(1,9-volRange);for(var w=startWeek;w<=8;w++){labels.push('Wk '+w);data.push(getWeekVolume(w));}
+  var endWeek=planEndWeek(planEntryForWeek(getActiveWeek()));
+  var labels=[],data=[],startWeek=Math.max(1,endWeek+1-volRange);for(var w=startWeek;w<=endWeek;w++){labels.push('Wk '+w);data.push(getWeekVolume(w));}
   var hasData=data.some(function(v){return v>0;});var currentVol=data[data.length-1]||0;var prevVol=data[data.length-2]||0;var delta=currentVol-prevVol;
   var volEl=document.getElementById('vol-total');if(volEl)volEl.innerHTML=hasData?currentVol.toLocaleString()+' <span>lbs this week</span>':'— <span>lbs</span>';
   var deltaEl=document.getElementById('vol-delta');if(deltaEl){if(!hasData){deltaEl.textContent='Log workouts to see your trend';deltaEl.className='prog-delta neutral';}else if(delta>0){deltaEl.textContent='↑ +'+delta.toLocaleString()+' lbs vs last week';deltaEl.className='prog-delta';}else if(delta<0){deltaEl.textContent='↓ '+delta.toLocaleString()+' lbs vs last week';deltaEl.className='prog-delta down';}else{deltaEl.textContent='→ Same volume as last week';deltaEl.className='prog-delta neutral';}}
@@ -1748,9 +1765,9 @@ function applyPlanForWeek(w){
 }
 function calcStreak(){
   var streak=0;
-  for(var w=1;w<=8;w++){
+  for(var w=1;w<=lastPlannedWeek();w++){
     var weekDone=true;
-    var dayOrder=['d1','d2','d3','d4','d5','d6','d7'];
+    var dayOrder=planForWeek(w).days.map(function(d){return d.id;});
     for(var di=0;di<dayOrder.length;di++){
       if(!isDayComplete(w,dayOrder[di])){weekDone=false;break;}
     }
@@ -1773,7 +1790,7 @@ function endSession(){
   clearInterval(session.elapsedInterval);clearInterval(session.restInterval);clearInterval(session.cardioInterval);
   var secs=Math.floor((Date.now()-session.startTime)/1000);var mins=Math.round(secs/60)||1;saveDuration(session.week,session.day,mins);
   var totalVol=0,setsDone=0,newPRs=[];
-  session.exercises.forEach(function(ex){for(var s=0;s<ex.sets+2;s++){var d=loadSet(session.week,session.day,ex.id,s);if(!d.done)continue;setsDone++;if(!BW_EXERCISES.has(ex.id)&&d.weight){var w=parseFloat(d.weight)||0;totalVol+=w;var isNewPR=true;for(var pw=1;pw<session.week&&isNewPR;pw++){for(var ps=0;ps<ex.sets+2;ps++){var pd=loadSet(pw,session.day,ex.id,ps);if(pd.done&&pd.weight&&parseFloat(pd.weight)>=w){isNewPR=false;break;}}}if(isNewPR&&w>0&&!newPRs.filter(function(p){return p.id===ex.id;}).length)newPRs.push({id:ex.id,label:ex.label,val:w});}}});
+  session.exercises.forEach(function(ex){for(var s=0;s<ex.sets+2;s++){var d=loadSet(session.week,session.day,ex.id,s);if(!d.done)continue;setsDone++;if(!BW_EXERCISES.has(ex.id)&&d.weight){var w=parseFloat(d.weight)||0;totalVol+=w;var isNewPR=true;var priorWeeks=[];for(var pw=1;pw<session.week;pw++)priorWeeks.push(pw);forEachSetOf(ex.id,function(pw2,pday,pd){if(pd.done&&pd.weight&&parseFloat(pd.weight)>=w)isNewPR=false;},priorWeeks);if(isNewPR&&w>0&&!newPRs.filter(function(p){return p.id===ex.id;}).length)newPRs.push({id:ex.id,label:ex.label,val:w});}}});
   var prsHTML=newPRs.length?'<div class="summary-prs"><div class="summary-prs-title">🏆 New Personal Records</div>'+newPRs.map(function(pr){return '<div class="summary-pr-row"><div class="summary-pr-name">'+pr.label+'</div><div class="summary-pr-val">'+pr.val+' lbs</div></div>';}).join('')+'</div>':'';
   var cooldowns=COOLDOWN_DATA[session.day]||[];var coolHTML='';
   if(cooldowns.length){coolHTML='<div class="summary-cooldown"><div class="summary-cooldown-title">🧘 Cool-Down</div>'+cooldowns.map(function(c){return '<div class="summary-cooldown-row"><div class="summary-cooldown-name">'+c.name+'</div><div class="summary-cooldown-meta"><span class="summary-cooldown-dur">'+c.duration+'</span><div class="summary-cooldown-cue">'+c.cue+'</div></div></div>';}).join('')+'</div>';}
@@ -1841,7 +1858,7 @@ function forceSyncNow(){
   setSyncStatus('⏳','Syncing...','Pushing all your data to the cloud. This may take a moment.');localStorage.removeItem('supa_migrated');
   var sets=[];allLogKeys().forEach(function(k){try{var val=JSON.parse(localStorage.getItem(k)||'{}');var p=k.replace('wlog:','').split(':');if(p.length<4)return;sets.push({user_id:currentUser.id,week:parseInt(p[0].replace('w',''),10),day:p[1],exercise_id:p[2],set_index:parseInt(p[3].replace('s',''),10),weight:val.weight||'',reps:val.reps||'',done:val.done||false,rpe:val.rpe||'',ts:val.ts||Date.now()});}catch(e){}});
   var bwEntries=[];allBWKeys().forEach(function(k){var val=loadBW(k.replace('bw:',''));if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});});
-  var prefKeys=['appTheme','appThemeCustom'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
+  var prefKeys=['appTheme','appThemeCustom','planTimeline'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
   var prefs=[];prefKeys.forEach(function(k){var v=localStorage.getItem(k);if(v)prefs.push({user_id:currentUser.id,key:k,value:v});});
   var videoMap=loadVideos();var videos=[];Object.keys(videoMap).forEach(function(name){var rec=videoMap[name];if(rec&&rec.url)videos.push({user_id:currentUser.id,exercise_name:name,video_url:rec.url,updated_at:rec.updated_at||new Date().toISOString()});});
   var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)+(videos.length?1:0)||1;var hadError=false;
@@ -1859,7 +1876,7 @@ function forcePullNow(){
 // ===== BACKUP / RESTORE =====
 // Only FORGE's own keys are exported or restored (never Supabase login tokens).
 var BACKUP_PREFIXES=['wlog:','wdur:','rdc:','bw:'];
-var BACKUP_EXACT_KEYS=['appTheme','appThemeCustom','recoveryMode',VIDEOS_KEY];
+var BACKUP_EXACT_KEYS=['appTheme','appThemeCustom','recoveryMode','planTimeline',VIDEOS_KEY];
 function isBackupKey(k){
   if(typeof k!=='string')return false;
   if(BACKUP_EXACT_KEYS.indexOf(k)!==-1)return true;
@@ -2018,7 +2035,7 @@ function migrateLocalToSupabase(cb){
   if(!currentUser)return cb&&cb();var migrated=localStorage.getItem('supa_migrated');if(migrated){return cb&&cb();}showSyncIndicator('↑ migrating data...');
   var sets=[];allLogKeys().forEach(function(k){try{var val=JSON.parse(localStorage.getItem(k)||'{}');var p=k.replace('wlog:','').split(':');if(p.length<4)return;sets.push({user_id:currentUser.id,week:parseInt(p[0].replace('w',''),10),day:p[1],exercise_id:p[2],set_index:parseInt(p[3].replace('s',''),10),weight:val.weight||'',reps:val.reps||'',done:val.done||false,rpe:val.rpe||'',ts:val.ts||Date.now()});}catch(e){}});
   var bwEntries=[];allBWKeys().forEach(function(k){var val=loadBW(k.replace('bw:',''));if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});});
-  var prefKeys=['appTheme','appThemeCustom'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
+  var prefKeys=['appTheme','appThemeCustom','planTimeline'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
   var prefs=[];prefKeys.forEach(function(k){var v=localStorage.getItem(k);if(v)prefs.push({user_id:currentUser.id,key:k,value:v});});
   var videoMap=loadVideos();var videos=[];Object.keys(videoMap).forEach(function(name){var rec=videoMap[name];if(rec&&rec.url)videos.push({user_id:currentUser.id,exercise_name:name,video_url:rec.url,updated_at:rec.updated_at||new Date().toISOString()});});
   var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)+(videos.length?1:0)||1;
