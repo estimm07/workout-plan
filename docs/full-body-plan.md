@@ -1,6 +1,6 @@
 # Full Body 3x/Week — 8-Week Plan (approved spec)
 
-Status: **approved, not yet built into the app.** This file is the source of truth for building it.
+Status: **built into the app** as the `full-body` plan in `index.html`. This file remains the source of truth for its content.
 
 Based on our earlier Full Body draft merged with a reel by @darrenliufitness ("Busy job? Kids? No problem"):
 3 full-body days, 2–3 working sets of 5–15 reps, add a little weight each week, finish with core, under 50 minutes.
