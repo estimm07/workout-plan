@@ -173,6 +173,14 @@ select::-ms-expand{display:none;}
 .plan-card .sync-pull-btn,.plan-card .sync-now-btn{margin-top:var(--sp-4);}
 .plan-progress{height:6px;border-radius:999px;background:var(--bg3);margin-top:var(--sp-3);overflow:hidden;}
 .plan-progress>div{height:100%;background:var(--accent);border-radius:999px;}
+.setup-picker{margin-bottom:var(--sp-4);}
+.setup-picker-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);margin-bottom:var(--sp-2);}
+.setup-picker-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-2);}
+.setup-opt{display:flex;flex-direction:column;gap:2px;text-align:left;padding:10px 12px;border-radius:var(--r-md);background:var(--card);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:'Inter Tight',sans-serif;min-height:44px;}
+.setup-opt.active{border-color:var(--accent);background:var(--accent-dim);}
+.setup-opt-name{font-size:14px;font-weight:600;}
+.setup-opt-desc{font-size:11px;color:var(--text2);line-height:1.3;}
+.log-setup-tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600;vertical-align:middle;background:var(--accent-dim);color:var(--accent-text);border:1px solid var(--accent-border);}
 .plan-toggle{display:flex;gap:var(--sp-3);align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);cursor:pointer;font-size:14px;color:var(--text);line-height:1.5;}
 .plan-toggle input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex-shrink:0;}
 .plan-toggle-sub{font-size:12px;color:var(--text2);}
@@ -717,6 +725,12 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
     <div class="stat-card"><div class="stat-label">Session Length</div><div class="stat-value">45</div><div class="stat-desc">avg minutes</div></div>
     <div class="stat-card"><div class="stat-label">Pull-up Target</div><div class="stat-value">15+</div><div class="stat-desc">by week 8</div></div>
   </div>
+  <div data-plan-only="full-body" class="summary-grid">
+    <div class="stat-card"><div class="stat-label">Duration</div><div class="stat-value">8</div><div class="stat-desc">weeks / 3 phases</div></div>
+    <div class="stat-card"><div class="stat-label">Sessions/Week</div><div class="stat-value">3</div><div class="stat-desc">full body + 2 walks</div></div>
+    <div class="stat-card"><div class="stat-label">Session Length</div><div class="stat-value">&lt;50</div><div class="stat-desc">minutes</div></div>
+    <div class="stat-card"><div class="stat-label">Working Sets</div><div class="stat-value">2–3</div><div class="stat-desc">of 5–15 reps</div></div>
+  </div>
   <div class="section-title">Your Ranked Goals</div>
   <ul class="goal-list">
     <li><span class="goal-num">01</span><div><strong>Build Muscle</strong> — Progressive overload via volume and load increases each week</div></li>
@@ -726,6 +740,10 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
   </ul>
   <div data-plan-only="forge-ul" class="section-title">Split Structure</div>
   <div data-plan-only="forge-ul" class="note-box"><strong>Upper / Lower Split</strong> — Best choice for your profile. Allows each muscle group 2× weekly frequency for muscle growth, keeps any single session under 60 min, and lets us isolate lower-body days to be fully back-safe with hip/glute emphasis while upper days handle the heavier pressing and pulling.<br><br><strong>Day Structure:</strong> Upper A → Lower A → Rest → Upper B → Lower B → Optional Cardio/Active → Rest</div>
+  <div data-plan-only="full-body" class="section-title">Split Structure</div>
+  <div data-plan-only="full-body" class="note-box"><strong>Full Body 3x / Week</strong> — Every muscle trained three times a week in short sessions, built for a busy schedule. Each day has 5 main slots plus a 5-minute core finisher, and every workout stays under 50 minutes.<br><br><strong>Week:</strong> Full Body A (Mon) → Walk / Mobility (Tue) → Full Body B (Wed) → Walk / Mobility (Thu) → Full Body C (Fri) → Optional (Sat) → Rest (Sun)<br><br><strong>Equipment:</strong> pick <strong>Home</strong>, <strong>Home + KB</strong> or <strong>Gym</strong> above Start Workout each time you train.</div>
+  <div data-plan-only="full-body" class="section-title">Lower-Back Care</div>
+  <div data-plan-only="full-body" class="note-box">Only one hinge a week (Day B), kept light and controlled: stop at mid-shin with a neutral spine. No conventional deadlifts and no kettlebell swings. Shoulder press is seated with back support. Stop any exercise that causes back discomfort; swap to the Home version or skip the set.</div>
   <div class="section-title">Equipment Used</div>
   <div class="summary-grid" style="margin-top:16px;">
     <div class="stat-card"><div class="stat-label">Primary</div><div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.8;">Dumbbells 5–55 lbs<br>Pull-up bar<br>Bench / box</div></div>
@@ -743,6 +761,10 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
       <tbody id="scheduleBody"></tbody>
     </table>
   </div>
+  <div data-plan-only="full-body" class="section-title">Phase Summaries</div>
+  <div data-plan-only="full-body" class="phase-block"><h3 style="color:var(--accent-text)">Phase 1 — Weeks 1–3: Foundation</h3><p>Learn every movement and set your starting weights. Form first.</p><ul><li>Main lifts: 2 × 12–15 | Accessories: 2 × 12–15</li><li>Effort: RPE 7 (3 reps left in the tank)</li><li>Tue/Thu: 20–25 min incline walk at 3–5%, or 15 min mobility</li></ul></div>
+  <div data-plan-only="full-body" class="phase-block"><h3 style="color:var(--warning)">Phase 2 — Weeks 4–6: Build</h3><p>A third set on everything and heavier weights in a moderate rep range.</p><ul><li>Main lifts: 3 × 8–12 | Accessories: 3 × 10–12</li><li>Effort: RPE 8</li><li>Keep adding a little weight each week</li></ul></div>
+  <div data-plan-only="full-body" class="phase-block"><h3 style="color:var(--done-text)">Phase 3 — Weeks 7–8: Strength</h3><p>Heavier main lifts in low reps with longer rest.</p><ul><li>Main lifts: 3 × 5–8, rest 2 min | Accessories: 3 × 10–12</li><li>Effort: RPE 8–9, form still strict</li><li>Week 8: see how far your main lifts have come</li></ul></div>
   <div data-plan-only="forge-ul" class="section-title">Phase Summaries</div>
   <div data-plan-only="forge-ul" class="phase-block"><h3 style="color:var(--accent-text)">Phase 1 — Weeks 1–3: Foundation &amp; Form</h3><p>Establish movement patterns, back-safe hip hinge mechanics, and baseline volume. Moderate loads, strict tempo.</p><ul><li>Sets: 3 per exercise | Reps: 10–12 | Rest: 75 sec</li><li>Incline walk: 10 min at 6–8% grade, 3.0 mph</li><li>Focus: Perfect form, feel the right muscles working</li></ul></div>
   <div data-plan-only="forge-ul" class="phase-block"><h3 style="color:var(--warning)">Phase 2 — Weeks 4–6: Hypertrophy Peak</h3><p>Increase volume and load. This is the primary muscle-building block. Tempos tighten, weights go up.</p><ul><li>Sets: 4 per exercise | Reps: 8–10 | Rest: 60–90 sec</li><li>Incline walk: 12–15 min at 8–10% grade, 3.2 mph</li><li>Focus: Progressive overload, controlled fatigue</li></ul></div>
@@ -809,6 +831,10 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
     <div class="prog-card-info"><h3>Treadmill Progression</h3><ul><li>Weeks 1–2: 6–8% grade, 3.0 mph, 10 min</li><li>Weeks 3–4: 8–10% grade, 3.0 mph, 12 min</li><li>Weeks 5–6: 10% grade, 3.2 mph, 15 min</li><li>Weeks 7–8: 12% grade, 3.2–3.5 mph, 15 min</li></ul></div>
     <div class="prog-card-info"><h3>Pull-Up Progression</h3><ul><li>Wk 1–2: 3 × 6–8 reps (bodyweight)</li><li>Wk 3–4: 3 × 8–10 reps</li><li>Wk 5–6: 4 × 8–10 reps</li><li>Wk 7–8: 4 × 10–12 or add band-weight vest if available</li></ul></div>
   </div>
+  <div data-plan-only="full-body" class="section-title dense-section-gap">Week-by-Week Blueprint</div><p data-plan-only="full-body" class="section-intro">Double progression: hit the top of the rep range on every set, then add weight (5 lb with dumbbells, smaller jumps where your equipment allows). The main lifts are the first 3 exercises of each day.</p>
+  <div data-plan-only="full-body" class="phase-block"><h3 style="color:var(--accent-text)">Weeks 1–3: Foundation</h3><p>2 working sets on everything. Pick weights you could do 3 more reps with.</p><ul><li>Main lifts: 2 × 12–15 · Accessories: 2 × 12–15</li><li>Rest: 90 sec main, 60 sec accessories</li><li>Core finisher: 2 sets</li></ul></div>
+  <div data-plan-only="full-body" class="phase-block"><h3 style="color:var(--warning)">Weeks 4–6: Build</h3><p>Add a 3rd set to every exercise. Rep range drops, so weights go up.</p><ul><li>Main lifts: 3 × 8–12 · Accessories: 3 × 10–12</li><li>Effort: RPE 8</li><li>Core finisher: 3 sets</li></ul></div>
+  <div data-plan-only="full-body" class="phase-block"><h3 style="color:var(--done-text)">Weeks 7–8: Strength</h3><p>Go heavier on the main lifts and rest 2 minutes between their sets.</p><ul><li>Main lifts: 3 × 5–8 · Accessories: 3 × 10–12</li><li>Effort: RPE 8–9</li><li>Stop a set early if form or your back says so</li></ul></div>
   <div data-plan-only="forge-ul" class="section-title dense-section-gap">Week-by-Week Blueprint</div><p data-plan-only="forge-ul" class="section-intro">Think of this as the high-level roadmap for how volume, intensity, and cardio progress over the full 8-week plan.</p>
   <div data-plan-only="forge-ul" class="phase-block"><h3 style="color:var(--accent-text)">Weeks 1–3: Foundation</h3><p>Base template. Focus on form, not weight. Learn the hip thrust pattern — this is your deadlift replacement.</p><ul><li>Sets: 3 per main exercise</li><li>Reps: 10–12 (upper), 10–12 (lower)</li><li>Rest: 75 sec upper, 90 sec lower</li><li>Cardio: 10–12 min at 6–8% grade</li><li>Week 3: increase all loads by 5 lbs where form is clean</li></ul></div>
   <div data-plan-only="forge-ul" class="phase-block"><h3 style="color:var(--warning)">Weeks 4–6: Hypertrophy</h3><p>Add 1 set to every main exercise. Reduce rest periods by 15 sec. Increase treadmill grade and duration.</p><ul><li>Sets: 4 per main exercise</li><li>Reps: 8–10 (heavier loads)</li><li>Rest: 60–75 sec upper, 75–90 sec lower</li><li>Cardio: 12–15 min at 8–10% grade</li><li>Week 5: add tempo technique</li><li>Week 6: introduce 1 drop set per session</li></ul></div>
@@ -1056,7 +1082,7 @@ ul.info-section-body,.info-section-body ul{list-style:none;padding:0;margin:0;}
   <p class="section-intro">Pick the plan you're training on. Switching starts the new plan at Week 1 the week after your last logged workout. Your old plan's logs, PRs and charts stay in your history.</p>
   <div id="plansCurrent"></div>
   <div class="section-title" style="margin-top:var(--sp-8);">Equipment</div>
-  <label class="plan-toggle"><input type="checkbox" id="kettlebellToggle" onchange="setHasKettlebells(this.checked)"/><span><strong>I have kettlebells</strong><br/><span class="plan-toggle-sub">Plans that offer kettlebell versions of exercises will use them. Turn off to use the dumbbell versions.</span></span></label>
+  <p class="section-intro">Plans that offer <strong>Home</strong>, <strong>Home + KB</strong> and <strong>Gym</strong> versions let you pick one above <strong>Start Workout</strong> for each workout. New workouts start with the one you used last. Your choice is saved with the workout and shown in your log.</p>
   <div class="section-title" style="margin-top:var(--sp-8);">Plan Library</div>
   <div id="plansLibrary"></div>
   <div class="section-title" style="margin-top:var(--sp-8);">Your Plan History</div>
@@ -1116,7 +1142,7 @@ function planItemHTML(day,it){
     var t=it.table,h='<table class="exercise-table"><thead><tr>'+t.head.map(function(x){return '<th>'+x+'</th>';}).join('')+'</tr></thead><tbody>';
     t.rows.forEach(function(r){
       if(r.ex){
-        if(PLAN_RENDER_WEEK)r=resolveRow(r,PLAN_RENDER_WEEK);
+        if(PLAN_RENDER_WEEK)r=resolveRow(r,PLAN_RENDER_WEEK,day.id);
         h+='<tr class="exercise-main-row">'+planCellHTML({name:r.name,cue:r.cue})+'<td class="ex-sets">'+r.sets+'</td><td class="ex-rest">'+r.rest+'</td><td class="ex-tempo">'+r.tempo+'</td></tr>';
         h+='<tr class="set-tracker-row"><td colspan="'+t.head.length+'"><div class="set-tracker" id="trk-'+day.id+'-'+r.ex+'"></div></td></tr>';
       }else{h+='<tr class="exercise-main-row">'+r.map(planCellHTML).join('')+'</tr>';}
@@ -1132,13 +1158,21 @@ function planItemHTML(day,it){
 function planBlockHTML(day,b){
   return '<div class="workout-block"><button type="button" class="block-header" onclick="toggleBlock(this)" aria-expanded="false"><div class="block-icon icon-'+b.icon+'">'+b.emoji+'</div><div class="block-header-text"><div class="block-title">'+b.title+'</div><div class="block-meta">'+b.meta+'</div></div><div class="block-toggle" aria-hidden="true">▾</div></button><div class="block-body">'+b.items.map(function(it){return planItemHTML(day,it);}).join('')+'</div></div>';
 }
+// Home / Home + KB / Gym picker for plans that offer setups (drawn above Start Workout).
+function setupPickerHTML(day){
+  var plan=PLAN_RENDER_PLAN,w=PLAN_RENDER_WEEK;if(!day.start||!plan||!plan.setups||!w)return '';
+  var cur=setupFor(w,day.id);
+  return '<div class="setup-picker" role="radiogroup" aria-label="Equipment for this workout"><div class="setup-picker-label">Equipment for this workout</div><div class="setup-picker-row">'+
+    plan.setups.map(function(id){var on=id===cur;return '<button type="button" class="setup-opt'+(on?' active':'')+'" role="radio" aria-checked="'+on+'" onclick="setWorkoutSetup(\''+day.id+'\',\''+id+'\')"><span class="setup-opt-name">'+SETUPS[id].label+'</span><span class="setup-opt-desc">'+SETUPS[id].desc+'</span></button>';}).join('')+
+    '</div></div>';
+}
 function planDayHTML(day){
-  var h=day.start?'<button class="start-session-btn" onclick="startSession(\''+day.id+'\')">▶ &nbsp;START WORKOUT — '+day.start+'</button>':'<button class="rdc-btn" id="rdcBtn-'+day.id+'" onclick="toggleRestDayComplete(\''+day.id+'\')">Mark Day Complete</button>';
+  var h=setupPickerHTML(day)+(day.start?'<button class="start-session-btn" onclick="startSession(\''+day.id+'\')">▶ &nbsp;START WORKOUT — '+day.start+'</button>':'<button class="rdc-btn" id="rdcBtn-'+day.id+'" onclick="toggleRestDayComplete(\''+day.id+'\')">Mark Day Complete</button>');
   return h+day.blocks.map(function(b){return planBlockHTML(day,b);}).join('');
 }
-var PLAN_RENDER_WEEK=null;
+var PLAN_RENDER_WEEK=null,PLAN_RENDER_PLAN=null;
 function renderPlanPages(plan,w){
-  PLAN_RENDER_WEEK=w||null;
+  PLAN_RENDER_WEEK=w||null;PLAN_RENDER_PLAN=plan;
   var tabs=document.getElementById('weekTabs');
   if(tabs){
     tabs.innerHTML=plan.days.map(function(d,i){
@@ -1199,6 +1233,7 @@ const BW_EXERCISES = new Set(['pullups','chinups','nordic']);
 
 function sKey(w,day,ex,s){return 'wlog:w'+w+':'+day+':'+ex+':s'+s;}
 function saveSet(w,day,ex,s,weight,done,reps,rpe){
+  try{lockWorkoutSetup(w,day);}catch(e){}
   var data={weight:weight,done:done,reps:reps||'',rpe:rpe||'',ts:Date.now()};
   try{localStorage.setItem(sKey(w,day,ex,s),JSON.stringify(data));}catch(e){}
   pushSetToSupabase(w,day,ex,s,data);
@@ -1271,7 +1306,7 @@ function updateDayPillStates(){
     var mark=btn.querySelector('.tab-submark');
     if(mark)mark.textContent=btn.classList.contains('active')?'• CURRENT':'';
   });
-  ['d3','d6','d7'].forEach(function(dayId){
+  planForWeek(week).restDays.forEach(function(dayId){
     var btn=document.getElementById('rdcBtn-'+dayId);if(!btn)return;
     var complete=loadRestDayComplete(week,dayId);
     btn.textContent=complete?'✓ Day Complete':'Mark Day Complete';
@@ -1521,7 +1556,7 @@ function renderLogHistory(){
   var df=document.getElementById('logDayFilter');var dfv=df?df.value:'';var grouped=buildLogGroups('',dfv);var weeks=Object.keys(grouped).sort(function(a,b){return +a-+b;});
   if(!weeks.length){container.innerHTML='<div class="log-empty"><div class="log-empty-icon">📋</div><div>No workout data logged yet.<br>Head to <strong>Workouts</strong>, enter your weights, and mark sets complete!</div></div>';return;}
   var html='';
-  weeks.forEach(function(week){Object.keys(grouped[week]).sort().forEach(function(day){var exMap=grouped[week][day];var allSets=[];Object.values(exMap).forEach(function(sets){sets.forEach(function(s){if(s)allSets.push(s);});});var done=allSets.filter(function(s){return s.done;}).length;var total=allSets.length;var ts=allSets.map(function(s){return s.ts;}).filter(Boolean);var dateStr=ts.length?new Date(Math.max.apply(null,ts)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';var phase=phaseForWeek(+week).label;var savedDur=loadDuration(+week,day);var durDisplay=savedDur?savedDur+' min':'—';var selKey=week+'|'+day;var isSelected=logSelectedKeys[selKey]?true:false;var cardClass='log-session-card'+(logSelectMode?' log-selectable':'')+(isSelected?' log-selected':'');var checkHtml=logSelectMode?'<div class="log-select-check">'+(isSelected?'✓':'')+'</div>':'';var cardOnclick=logSelectMode?' onclick="toggleLogSelect(\''+week+'\',\''+day+'\')"':'';html+='<div class="'+cardClass+'" id="logcard-'+week+'-'+day+'"'+cardOnclick+'>';html+='<div class="log-session-header"'+(logSelectMode?'':' onclick="toggleLogCard(\''+week+'\',\''+day+'\')"')+'>';html+='<div class="log-session-header-top">'+checkHtml+'<div class="log-session-header-left">WEEK '+week+' &nbsp;·&nbsp; '+dateStr+'</div><span class="phase-badge '+(PHASE_CLS[phase]||'')+'" style="display:inline-block;">'+phase+'</span></div><div class="log-session-title">'+(DAY_LABELS[day]||day)+'</div></div>';html+='<div class="log-session-stats"><div class="log-stat"><div class="log-stat-val">'+done+'</div><div class="log-stat-lbl">Sets Done</div></div><div class="log-stat"><div class="log-stat-val">'+total+'</div><div class="log-stat-lbl">Logged</div></div><div class="log-stat"><div class="log-stat-val">'+(total>0?Math.round(done/total*100):0)+'%</div><div class="log-stat-lbl">Completion</div></div><div class="log-stat" style="cursor:pointer;" onclick="editLogDuration(\''+week+'\',\''+day+'\',this)"><div class="log-stat-val" id="logdur-'+week+'-'+day+'">'+durDisplay+'</div><div class="log-stat-lbl">Duration <span style="font-size:8px;color:var(--text3);">✎</span></div></div></div>';html+='<div class="log-expand-btn" id="logexpandbtn-'+week+'-'+day+'" onclick="toggleLogCard(\''+week+'\',\''+day+'\')"><span>SHOW DETAILS</span><span>▾</span></div>';html+='<div class="log-exercise-list" id="logdetail-'+week+'-'+day+'">';Object.keys(exMap).forEach(function(exId){var def=null;var dayExs=EXERCISES[day]||[];for(var i=0;i<dayExs.length;i++){if(dayExs[i].id===exId){def=dayExs[i];break;}}var lbl=def?def.label:exId;html+='<div class="log-exercise-row"><div class="log-ex-name">'+lbl+'</div><div class="log-sets-line">';exMap[exId].forEach(function(s,si){if(!s)return;var chipId='chip-'+week+'-'+day+'-'+exId+'-'+si;var wDisplay=s.weight?s.weight+' lbs':'BW';var rDisplay=' · '+(s.reps?s.reps+' reps':'— reps');var rpeDisplay=s.rpe?(' · RPE '+s.rpe):'';var chipLabel='S'+(si+1)+': '+wDisplay+rDisplay+rpeDisplay;var completedClass=s.done?'completed':'';html+='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+si+')">'+chipLabel+'</span>';});html+='</div></div>';});html+='</div></div>';});});
+  weeks.forEach(function(week){Object.keys(grouped[week]).sort().forEach(function(day){var exMap=grouped[week][day];var allSets=[];Object.values(exMap).forEach(function(sets){sets.forEach(function(s){if(s)allSets.push(s);});});var done=allSets.filter(function(s){return s.done;}).length;var total=allSets.length;var ts=allSets.map(function(s){return s.ts;}).filter(Boolean);var dateStr=ts.length?new Date(Math.max.apply(null,ts)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';var phase=phaseForWeek(+week).label;var savedDur=loadDuration(+week,day);var durDisplay=savedDur?savedDur+' min':'—';var selKey=week+'|'+day;var isSelected=logSelectedKeys[selKey]?true:false;var cardClass='log-session-card'+(logSelectMode?' log-selectable':'')+(isSelected?' log-selected':'');var checkHtml=logSelectMode?'<div class="log-select-check">'+(isSelected?'✓':'')+'</div>':'';var cardOnclick=logSelectMode?' onclick="toggleLogSelect(\''+week+'\',\''+day+'\')"':'';html+='<div class="'+cardClass+'" id="logcard-'+week+'-'+day+'"'+cardOnclick+'>';html+='<div class="log-session-header"'+(logSelectMode?'':' onclick="toggleLogCard(\''+week+'\',\''+day+'\')"')+'>';html+='<div class="log-session-header-top">'+checkHtml+'<div class="log-session-header-left">WEEK '+week+' &nbsp;·&nbsp; '+dateStr+'</div><span class="phase-badge '+phaseForWeek(+week).cls+'" style="display:inline-block;">'+phase+'</span></div><div class="log-session-title">'+dayLabelForWeek(+week,day)+(setupLabelFor(+week,day)?' <span class="log-setup-tag">'+setupLabelFor(+week,day)+'</span>':'')+'</div></div>';html+='<div class="log-session-stats"><div class="log-stat"><div class="log-stat-val">'+done+'</div><div class="log-stat-lbl">Sets Done</div></div><div class="log-stat"><div class="log-stat-val">'+total+'</div><div class="log-stat-lbl">Logged</div></div><div class="log-stat"><div class="log-stat-val">'+(total>0?Math.round(done/total*100):0)+'%</div><div class="log-stat-lbl">Completion</div></div><div class="log-stat" style="cursor:pointer;" onclick="editLogDuration(\''+week+'\',\''+day+'\',this)"><div class="log-stat-val" id="logdur-'+week+'-'+day+'">'+durDisplay+'</div><div class="log-stat-lbl">Duration <span style="font-size:8px;color:var(--text3);">✎</span></div></div></div>';html+='<div class="log-expand-btn" id="logexpandbtn-'+week+'-'+day+'" onclick="toggleLogCard(\''+week+'\',\''+day+'\')"><span>SHOW DETAILS</span><span>▾</span></div>';html+='<div class="log-exercise-list" id="logdetail-'+week+'-'+day+'">';Object.keys(exMap).forEach(function(exId){var def=null;var dayExs=EXERCISES[day]||[];for(var i=0;i<dayExs.length;i++){if(dayExs[i].id===exId){def=dayExs[i];break;}}var lbl=def?def.label:exId;html+='<div class="log-exercise-row"><div class="log-ex-name">'+lbl+'</div><div class="log-sets-line">';exMap[exId].forEach(function(s,si){if(!s)return;var chipId='chip-'+week+'-'+day+'-'+exId+'-'+si;var wDisplay=s.weight?s.weight+' lbs':'BW';var rDisplay=' · '+(s.reps?s.reps+' reps':'— reps');var rpeDisplay=s.rpe?(' · RPE '+s.rpe):'';var chipLabel='S'+(si+1)+': '+wDisplay+rDisplay+rpeDisplay;var completedClass=s.done?'completed':'';html+='<span class="log-set-chip '+completedClass+'" id="'+chipId+'" onclick="openChipEdit(\''+week+'\',\''+day+'\',\''+exId+'\','+si+')">'+chipLabel+'</span>';});html+='</div></div>';});html+='</div></div>';});});
   container.innerHTML=html;updateDeleteBtn();
 }
 function showProgTab(id,btn){
@@ -1585,6 +1620,8 @@ var EX_PRESCRIPTIONS={'bench-press':'3 × 10–12 · Tempo 3-1-1','pullups':'3 �
 var WARMUP_DATA={d1:[{name:'Arm Circles',cue:'Small to large, forward & back',duration:'60 sec',secs:60},{name:'Band Pull-Aparts',cue:'Keep arms straight, squeeze scapulas',duration:'2×15 reps',secs:null},{name:'Cat-Cow',cue:'Slow, full spinal range',duration:'10 reps',secs:null},{name:'Dead Bug',cue:'Lower back pressed to floor the entire time',duration:'6 reps/side',secs:null},{name:'Incline Treadmill Walk',cue:'5% grade, 2.8 mph',duration:'3 min',secs:180}],d2:[{name:'Glute Bridge (Bodyweight)',cue:'Squeeze glutes at top, hold 2 sec',duration:'2×15 reps',secs:null},{name:'Clamshells (Band)',cue:'Keep hips stacked, rotate from hip',duration:'15/side',secs:null},{name:'Hip 90/90 Stretch',cue:'Sit on floor, both knees at 90°',duration:'60 sec',secs:60},{name:'Leg Swing (front-back)',cue:'Hold wall, keep torso still',duration:'10/side',secs:null},{name:'Bodyweight Squat',cue:'Sit back and down, knees track toes',duration:'15 reps',secs:null}],d4:[{name:'Band External Rotation',cue:'Elbow at 90°, anchor band at elbow height',duration:'15/side',secs:null},{name:'Scapular Push-Up',cue:'In plank, protract/retract scapulas only',duration:'12 reps',secs:null},{name:'Inchworm',cue:'Walk hands out to plank and back, slow',duration:'6 reps',secs:null},{name:'Dead Bug',cue:'Opposite arm/leg, back flat',duration:'8/side',secs:null}],d5:[{name:'Glute Bridge (BW, slow)',cue:'Squeeze at top, controlled',duration:'2×12 reps',secs:null},{name:'Monster Walks (band)',cue:'Band around ankles, stay low',duration:'2×10/direction',secs:null},{name:'Hip 90/90 Transitions',cue:'Controlled, both sides',duration:'8/side',secs:null},{name:'BW Squat to Box (pause)',cue:'Sit to box, pause 2 sec, stand',duration:'10 reps',secs:null}]};
 var CARDIO_DATA={d1:[{name:'Ramp-up',detail:'5% grade · 3.0 mph',duration:'2 min',secs:120},{name:'Work',detail:'8% grade · 3.0 mph',duration:'6 min',secs:360},{name:'Cool-down',detail:'3% grade · 2.5 mph',duration:'2 min',secs:120}],d2:[{name:'Ramp-up',detail:'6% grade · 2.8 mph',duration:'2 min',secs:120},{name:'Work',detail:'8% grade · 3.0 mph',duration:'8 min',secs:480},{name:'Cool-down',detail:'2% grade · 2.5 mph',duration:'2 min',secs:120}],d4:[{name:'Continuous Walk',detail:'8% grade · 3.0 mph',duration:'10 min',secs:600}],d5:[{name:'Ramp-up',detail:'8% grade · 2.8 mph',duration:'2 min',secs:120},{name:'Work',detail:'10% grade · 3.0 mph',duration:'8 min',secs:480},{name:'Cool-down',detail:'3% grade · 2.5 mph',duration:'2 min',secs:120}]};
 var session={day:null,week:null,exercises:[],currentExIdx:0,startTime:null,elapsedInterval:null,restInterval:null,restRemaining:0,restTotal:0,cardioInterval:null,warmupStates:{},cardioStates:{}};
+// Days with no cardio finisher (e.g. Full Body, whose walks are on recovery days) skip that step.
+function hasCardio(){return (CARDIO_DATA[session.day]||[]).length>0;}
 function sessionNavCount(){return session.exercises.length+2;}
 function isWarmupIdx(i){return i===0;}
 function isCardioIdx(i){return i===session.exercises.length+1;}
@@ -1597,7 +1634,8 @@ function togglePauseSession(){
 function startSession(day){
   try{
     session.day=day;session.week=getActiveWeek();session.exercises=EXERCISES[day]||[];session.currentExIdx=0;session.startTime=Date.now();session.paused=false;session.pausedAt=null;session.restActive=false;session.warmupStates={};session.cardioStates={};clearInterval(session.cardioInterval);session.cardioInterval=null;
-    var nameEl=document.getElementById('sessionDayName');if(nameEl)nameEl.textContent=DAY_TITLES[day]||day;
+    lockWorkoutSetup(session.week,day);var stl=setupLabelFor(session.week,day);
+    var nameEl=document.getElementById('sessionDayName');if(nameEl)nameEl.textContent=(DAY_TITLES[day]||day)+(stl?' · '+stl.toUpperCase():'');
     clearInterval(session.elapsedInterval);session.elapsedInterval=setInterval(function(){var secs=Math.floor((Date.now()-session.startTime)/1000);var m=Math.floor(secs/60),s=secs%60;var el=document.getElementById('sessionElapsed');if(el)el.textContent=m+':'+(s<10?'0':'')+s;updateSessionVolume();},1000);
     buildSessionNav();renderSessionNav(0);var modal=document.getElementById('sessionModal');if(modal)modal.classList.add('open');document.body.style.overflow='hidden';
   }catch(e){console.error('startSession error:',e);}
@@ -1606,11 +1644,12 @@ function buildSessionNav(){
   var nav=document.getElementById('sessionExNav');if(!nav)return;var pills='';
   var warmupDone=isWarmupComplete();pills+='<button class="session-ex-pill'+(warmupDone?' done':'')+'" onclick="renderSessionNav(0)">🔥 Warm-Up</button>';
   session.exercises.forEach(function(ex,i){var allDone=isExerciseDone(ex);var shortLabel=ex.label.replace('Dumbbell ','DB ').replace(' (bench)','').replace(' (DB)','').replace(' (Alternating)','').replace(' (LIGHT)','');pills+='<button class="session-ex-pill'+(allDone?' done':'')+'" onclick="renderSessionNav('+(i+1)+')">'+shortLabel+'</button>';});
-  var cardioDone=isCardioComplete();pills+='<button class="session-ex-pill'+(cardioDone?' done':'')+'" onclick="renderSessionNav('+(session.exercises.length+1)+')">🚶 Cardio</button>';
+  if(hasCardio()){var cardioDone=isCardioComplete();pills+='<button class="session-ex-pill'+(cardioDone?' done':'')+'" onclick="renderSessionNav('+(session.exercises.length+1)+')">🚶 Cardio</button>';}
   nav.innerHTML=pills;
 }
 function renderSessionNav(navIdx){
   session.currentExIdx=navIdx;var pills=document.querySelectorAll('.session-ex-pill');pills.forEach(function(p,i){p.classList.toggle('active',i===navIdx);});
+  if(isCardioIdx(navIdx)&&!hasCardio()){renderSessionNav(session.exercises.length);return;}
   if(isWarmupIdx(navIdx))renderWarmup();else if(isCardioIdx(navIdx))renderCardio();else renderSessionExercise(exIdx(navIdx));
 }
 function isWarmupComplete(){var activities=WARMUP_DATA[session.day]||[];if(!activities.length)return false;for(var i=0;i<activities.length;i++){if(!session.warmupStates[i])return false;}return true;}
@@ -1734,7 +1773,7 @@ function renderSessionExercise(idx){
     var setsHTML='<div class="session-set-cols"><div class="session-col-label">Set</div><div class="session-col-label">Last Wk</div><div class="session-col-label">Reps</div><div class="session-col-label">Weight</div><div class="session-col-label"></div></div>';
     for(var s=0;s<setsFor(ex,week);s++){var cur=loadSet(week,day,ex.id,s);var prev=loadSet(prevWeek,day,ex.id,s);var prevDisplay=prev.weight?prev.weight+'lb':'—';setsHTML+='<div class="session-set-row'+(cur.done?' done-row':'')+'" id="srow-'+ex.id+'-'+s+'"><div class="session-set-num">'+(s+1)+'</div><div class="session-prev-val'+(prev.weight?' has-val':'')+'">'+prevDisplay+'</div><input type="number" class="session-weight-input" id="sreps-'+ex.id+'-'+s+'" placeholder="reps" min="0" step="1" value="'+(cur.reps||'')+'" oninput="saveSessionReps(\''+day+'\',\''+ex.id+'\','+s+',this.value)"/><input type="number" class="session-weight-input" id="sinp-'+ex.id+'-'+s+'" placeholder="lbs" min="0" step="2.5" value="'+(cur.weight||'')+'" oninput="saveSessionSet(\''+day+'\',\''+ex.id+'\','+s+',this.value,document.getElementById(\'sdone-'+ex.id+'-'+s+'\').classList.contains(\'done\'))"/><button class="session-done-btn'+(cur.done?' done':'')+'" id="sdone-'+ex.id+'-'+s+'" onclick="toggleSessionSet(\''+day+'\',\''+ex.id+'\','+s+','+(ex.rest||60)+','+(s<setsFor(ex,week)-1)+')">✓</button></div>';}
     var isFirst=navIdx===1;var isLast=navIdx===session.exercises.length;var prevNav=navIdx-1;var nextNav=navIdx+1;
-    var nextHTML=!isLast?'<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(navIdx+1)+')"><div class="session-next-label">Up next</div><div class="session-next-name">'+session.exercises[idx+1].label+' · '+targetText(EX_PRESCRIPTIONS[session.exercises[idx+1].id],session.exercises[idx+1],session.week)+'</div></div>':'<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(session.exercises.length+1)+')"><div class="session-next-label">Up next</div><div class="session-next-name" style="color:var(--done-text)">🚶 Cardio Finisher</div></div>';
+    var nextHTML=!isLast?'<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(navIdx+1)+')"><div class="session-next-label">Up next</div><div class="session-next-name">'+session.exercises[idx+1].label+' · '+targetText(EX_PRESCRIPTIONS[session.exercises[idx+1].id],session.exercises[idx+1],session.week)+'</div></div>':!hasCardio()?'<div class="session-next-preview" style="cursor:pointer;" onclick="endSession()"><div class="session-next-label">Up next</div><div class="session-next-name" style="color:var(--done-text)">✓ Finish workout</div></div>':'<div class="session-next-preview" style="cursor:pointer;" onclick="renderSessionNav('+(session.exercises.length+1)+')"><div class="session-next-label">Up next</div><div class="session-next-name" style="color:var(--done-text)">🚶 Cardio Finisher</div></div>';
     var navRow='<div class="session-ex-nav-row"><button class="session-ex-arrow" onclick="renderSessionNav('+prevNav+')">←</button><div class="session-ex-count">Exercise '+(idx+1)+' of '+session.exercises.length+'</div><button class="session-ex-arrow" onclick="renderSessionNav('+nextNav+')">→</button></div>';
     var exNameRow='<div class="session-context-kicker">Current exercise</div><div class="session-ex-name-row"><div class="session-ex-name">'+ex.label+'</div><button class="session-ex-info-btn" onclick="showExInfo(\''+ex.id+'\',\''+ex.label+'\')">ℹ</button></div>';
     var body=document.getElementById('sessionBody');if(body)body.innerHTML='<div class="session-ex-card"><div class="session-ex-header">'+navRow+exNameRow+'<div class="session-ex-prescription">'+targetText(EX_PRESCRIPTIONS[ex.id],ex,session.week)+' · Rest '+(ex.rest||60)+'s</div></div>'+suggHTML+setsHTML+'</div><div id="sessionRestZone"></div>'+nextHTML;
@@ -1780,6 +1819,121 @@ PLANS['forge-ul'].extraSets=[0,1,1]; // blueprint: 4 sets per main exercise from
 PLANS['forge-ul'].title='FORGE — 8 Week Program';
 PLANS['forge-ul'].summary='Upper/Lower split · 4 training days + optional 5th · 3 phases: Foundation, Hypertrophy, Intensification. Back-safe hinging, incline-walk finishers.';
 PLANS['forge-ul'].session={exercises:EXERCISES,titles:DAY_TITLES,prescriptions:EX_PRESCRIPTIONS,warmup:WARMUP_DATA,cardio:CARDIO_DATA,cooldown:COOLDOWN_DATA};
+// Form cues, muscle groups and bodyweight/band lifts for the Full Body plan's new exercises.
+Object.assign(EX_INFO,{
+  'hack-squat':{cues:['Feet shoulder-width, mid-platform','Back and hips flat against the pad','Lower until thighs are parallel or just below','Drive through the whole foot, don\'t lock the knees hard'],notes:'The machine guides the path, so the load can go up without the back working to stabilize.',back:'Keep your lower back pressed into the pad. If it lifts off at the bottom, shorten the range.'},
+  'machine-row':{cues:['Chest against the pad the whole set','Pull elbows back past the torso','Squeeze shoulder blades together for a beat','Control the return to a full stretch'],notes:'Same job as the chest-supported DB row: back work with no lower-back load.',back:null},
+  'pallof-press':{cues:['Stand side-on to the anchor, feet hip-width','Hold the handle at your sternum','Press straight out and hold 2 seconds','Don\'t let the band rotate your torso'],notes:'An anti-rotation drill: the work is resisting the twist. Step further from the anchor to make it harder.',back:'One of the safest core exercises for the lower back. Keep ribs down and glutes lightly squeezed.'},
+  'kb-deadlift':{cues:['Bell between the feet, under the hips','Push hips back, soft knees, flat back','Grip, brace, then stand up by driving the floor away','Finish tall with glutes squeezed, no leaning back'],notes:'A slow, controlled pull from the floor. Not a swing: no momentum.',back:'Keep the spine neutral and the bell close. If you can\'t reach it with a flat back, raise it on a step.'},
+  'lat-pulldown':{cues:['Thighs locked under the pad','Grip a bit wider than shoulders','Pull the bar to the upper chest, elbows down and back','Control it up to a full stretch'],notes:'A good way to load the pull-up pattern in the gym. Pull-ups can be logged on the Home version instead.',back:null},
+  'walking-lunge':{cues:['Long step forward, torso tall','Back knee drops just above the floor','Front shin roughly vertical','Push through the front heel into the next step'],notes:'Each step counts as one rep per leg. Short hallway? Do reverse-and-step lunges in place.',back:'Stay upright. Leaning forward under load puts more stress on the lower back.'},
+  'split-squat':{cues:['Staggered stance, both feet on the floor','Drop straight down, back knee toward the floor','Front knee tracks over the toes','Drive up through the front foot'],notes:'The floor-based version of the Bulgarian split squat: easier to balance and to load heavy.',back:null},
+  'db-fly':{cues:['Lie flat, dumbbells over the chest, palms facing','Slight bend in the elbows, locked in place','Open wide until you feel a chest stretch','Bring them back up like hugging a tree'],notes:'Go lighter than you think: this is a stretch and squeeze, not a press.',back:null},
+  'machine-fly':{cues:['Seat set so handles line up with mid-chest','Slight elbow bend, fixed','Bring the handles together and squeeze','Return slowly to a comfortable stretch'],notes:'Constant tension makes the machine or cable version harder at the top than dumbbells.',back:null},
+  'one-arm-row':{cues:['Hand and knee on the bench, back flat','Weight hangs straight below the shoulder','Pull toward the hip, elbow close to the body','Lower to a full stretch without twisting'],notes:'With a kettlebell the handle sits higher, so the pull feels a little shorter. Same movement, same history.',back:'Brace on the bench so the spine stays still. No twisting to heave the weight up.'},
+  'incline-curl':{cues:['Bench at 45°, arms hang straight down','Keep the upper arms still','Curl up without swinging the shoulders forward','Lower all the way to a full stretch'],notes:'The incline puts the biceps in a long stretch. Expect to use less weight than a standing curl.',back:null},
+  'band-rev-fly':{cues:['Hold the band at chest height, arms straight','Pull the band apart out to the sides','Squeeze the rear shoulders and upper back','Return slowly'],notes:'Log reps rather than weight. Use a heavier band or a closer grip to progress.',back:null},
+  'rev-pec-deck':{cues:['Face the pad, handles at shoulder height','Slight elbow bend, fixed','Sweep the arms back and out','Pause, then return under control'],notes:'Targets the rear delts. Keep the weight light enough that the traps don\'t take over.',back:null},
+  'suitcase-carry':{cues:['Heavy weight in one hand at your side','Stand tall, shoulders level','Walk slowly, don\'t lean toward or away from the weight','Switch hands and repeat'],notes:'Log the weight you carry. Progress by going heavier, then longer.',back:'A great back-friendly core drill. Stop if you can\'t stay upright.'}
+});
+Object.assign(MUSCLE_MAP,{'hack-squat':'Quads','machine-row':'Back','pallof-press':'Core','kb-deadlift':'Hamstrings','lat-pulldown':'Back','walking-lunge':'Quads','split-squat':'Quads','db-fly':'Chest','machine-fly':'Chest','one-arm-row':'Back','incline-curl':'Arms','band-rev-fly':'Shoulders','rev-pec-deck':'Shoulders','suitcase-carry':'Core'});
+['pallof-press','band-rev-fly'].forEach(function(id){BW_EXERCISES.add(id);});
+// ----- FULL BODY 3x/WEEK (spec: docs/full-body-plan.md) -----
+// Row-based plan with Home / Home + KB / Gym versions of each slot.
+(function(){
+  var MAIN=['2 × 12–15','3 × 8–12','3 × 5–8'],ACC=['2 × 12–15','3 × 10–12','3 × 10–12'];
+  // kind: 'main' (first 3 slots), 'acc' (accessories) or a targets list for core finishers.
+  function row(ex,name,cue,kind,tempo,kb,gym){
+    var t=kind==='main'?MAIN:kind==='acc'?ACC:kind;
+    var r={ex:ex,name:name,label:name,cue:cue,sets:t[0],targets:t,n:2,tempo:tempo||'—',
+      rest:kind==='main'?'90 s · 2 min wks 7–8':kind==='acc'?'60 s':'45 s',secs:kind==='main'?90:kind==='acc'?60:45};
+    if(kb)r.kb=kb;if(gym)r.gym=gym;return r;
+  }
+  var HEAD=['Exercise','Sets × Reps','Rest','Tempo'];
+  var PRE={icon:'pre-rec',emoji:'🔴',title:'Pre-Workout (optional)',meta:'5 min · only if your back wants it',items:[
+    {rec:{icon:'🌡️',name:'Heating Pad — Lower Back',detail:'5–8 min before you start to loosen the lower back.',tags:[['heat','Heat']]}},
+    {rec:{icon:'🧱',name:'Foam Roller',detail:'Upper back, glutes and quads, 30–45 sec each. Skip the lower back itself.',tags:[['roll','Roll']]}}]};
+  var WARM={icon:'warm',emoji:'🔥',title:'Warm-Up — 5 min',meta:'Same every training day',items:[{table:{head:['Movement','Amount','Cue'],rows:[
+    [{name:'Cat-Cow'},'8 slow reps','Move one segment of the spine at a time'],
+    [{name:'Glute Bridges'},'12 reps','Squeeze glutes at the top, ribs down'],
+    [{name:'Band Pull-Aparts'},'15 reps','Straight arms, squeeze shoulder blades'],
+    [{name:'Bodyweight Box Squats'},'10 reps','Sit back to the box, stand tall']]}}]};
+  var POST={icon:'post-rec',emoji:'🔵',title:'Post-Workout',meta:'5 min',items:[
+    {rec:{icon:'🧱',name:'Foam Roller',detail:'Quads, glutes, upper back and lats, 30–45 sec each.',tags:[['roll','Roll']]}},
+    {rec:{icon:'🧊',name:'Ice (if needed)',detail:'10–15 min on the lower back only if it feels irritated.',tags:[['ice','Ice']]}},
+    {note:'<strong>Back check:</strong> stop any exercise that causes back discomfort. Swap to the Home version or skip the set.',tone:'warning'}]};
+  function mainBlock(title,meta,rows){return {icon:'main',emoji:'💪',title:title,meta:meta,items:[
+    {note:'Weeks 1–3: 2 sets · Weeks 4–6: 3 sets · Weeks 7–8: 3 heavier sets. Hit the top of the rep range on every set, then add weight.'},
+    {table:{head:HEAD,rows:rows}}]};}
+  function coreBlock(r){return {icon:'cool',emoji:'🧘',title:'Core Finisher — 5 min',meta:r.name,items:[{table:{head:HEAD,rows:[r]}}]};}
+  function trainingDay(id,tab,start,title,meta,rows,core){return {id:id,tab:tab,start:start,blocks:[PRE,WARM,mainBlock(title,meta,rows),coreBlock(core),POST]};}
+  function restDay(id,tab,blocks){return {id:id,tab:tab,start:null,blocks:blocks};}
+  var RECOVERY=[{icon:'cardio',emoji:'🚶',title:'Active Recovery',meta:'20–25 min · pick one',items:[
+    {note:'<strong>Incline walk:</strong> 20–25 min at 3–5% grade, easy pace. This replaces the finisher on training days so those stay under 50 minutes.'},
+    {note:'<strong>Or mobility:</strong> 15 min of cat-cow, hip flexor stretch, thoracic rotations and child\'s pose.'}]}];
+
+  var plan={id:'full-body',name:'Full Body 3x / Week',weeks:8,setups:['home','kb','gym'],
+    title:'FULL BODY — 8 Week Program',
+    summary:'3 full-body days (Mon · Wed · Fri) with walks on Tue/Thu · 2–3 working sets of 5–15 reps · under 50 min · Home, Home + KB or Gym versions of every exercise.',
+    phases:[{weeks:[1,2,3],label:'Foundation',cls:'p1'},{weeks:[4,5,6],label:'Build',cls:'p2'},{weeks:[7,8],label:'Strength',cls:'p3'}],
+    schedule:['Full Body A','<span class="rest-badge">Walk / Mobility</span>','Full Body B','<span class="rest-badge">Walk / Mobility</span>','Full Body C','<span class="rest-badge">Optional</span>','<span class="rest-badge">Full Rest</span>'],
+    restDays:['d2','d4','d6','d7'],extraSets:[0,1,1],
+    days:[
+      trainingDay('d1','Day 1 · Full Body A','DAY 1 · FULL BODY A','Main Workout — Full Body A','Squat · Push · Pull · Glutes · Shoulders',[
+        row('goblet-squat','Goblet Squat (Heels Raised)','Heels on a plate or wedge, elbows inside knees','main','3-1-1',
+          {name:'KB Goblet Squat',cue:'Hold the bell by the horns at your chest'},{ex:'hack-squat',name:'Hack Squat',cue:'Feet mid-platform, control the bottom'}),
+        row('incline-press','Incline DB Press','Bench at 30°, shoulder blades pinned','main','3-1-1'),
+        row('chest-row','Chest-Supported DB Row','Chest on the incline bench, pull to the hips','main','2-1-2',null,
+          {ex:'machine-row',name:'Machine Row',cue:'Chest on the pad, squeeze shoulder blades'}),
+        row('hip-thrust','DB Hip Thrust','Upper back on the bench, chin tucked, squeeze at the top','acc','2-1-2'),
+        row('lat-raise','Lateral Raise','Lead with the elbows, stop at shoulder height','acc','2-0-2')],
+        row('pallof-press','Pallof Press (Band)','Press out and hold 2 sec, don\'t let the band turn you',['2 × 10/side','3 × 10/side','3 × 12/side'],'—',null,
+          {name:'Pallof Press (Cable)',cue:'Cable at chest height, press out and hold 2 sec'})),
+      restDay('d2','Day 2 · Recovery',RECOVERY),
+      trainingDay('d3','Day 3 · Full Body B','DAY 3 · FULL BODY B','Main Workout — Full Body B','Hinge · Push · Pull · Legs · Arms',[
+        row('rdl','Light DB RDL','Soft knees, stop at mid-shin, neutral spine','main','3-1-1',
+          {ex:'kb-deadlift',name:'KB Deadlift',cue:'Bell between the feet, hinge and stand tall — no swings'},{name:'Romanian Deadlift',cue:'Bar close to the legs, stop at mid-shin'}),
+        row('shoulder-press','Seated DB Shoulder Press','Back against the bench, ribs down','main','2-1-2',null,
+          {name:'Shoulder Press (Seated)',cue:'Back supported, press straight up'}),
+        row('pullups','Pull-Ups (band-assisted if needed)','Full hang to chin over bar','main','2-1-2',
+          {name:'Pull-Ups'},{ex:'lat-pulldown',name:'Lat Pulldown',cue:'Pull to the upper chest, or do pull-ups instead'}),
+        row('walking-lunge','Walking Lunges (DB)','Long steps, back knee just above the floor','acc','—',
+          {name:'Walking Lunges (KB)',cue:'Bells at your sides or in the rack position'},{name:'Walking Lunges',cue:'Dumbbells at your sides, long steps'}),
+        row('oh-tricep','Overhead DB Tricep Extension','Elbows pointed forward, full stretch','acc','2-1-2',null,
+          {name:'Tricep Extensions (Cable)',cue:'Elbows pinned, full lockout'})],
+        row('dead-bug','Dead Bug','Lower back flat on the floor, slow and controlled',['2 × 8/side','3 × 8/side','3 × 10/side'],'—')),
+      restDay('d4','Day 4 · Recovery',RECOVERY),
+      trainingDay('d5','Day 5 · Full Body C','DAY 5 · FULL BODY C','Main Workout — Full Body C','Single Leg · Push · Pull · Arms · Rear Delts',[
+        row('bss','Bulgarian Split Squat','Rear foot on the bench, torso tall','main','3-1-1',null,
+          {ex:'split-squat',name:'Split Squat',cue:'Both feet on the floor, drop straight down'}),
+        row('db-fly','DB Chest Fly (Bench)','Slight elbow bend, stretch without pain','main','3-1-1',
+          {name:'DB Chest Fly'},{ex:'machine-fly',name:'Chest Fly (Machine or Cable)',cue:'Hug a big tree, squeeze in the middle'}),
+        row('one-arm-row','One-Arm DB Row','Hand and knee on the bench, pull to the hip','main','2-1-2',
+          {name:'KB Row',cue:'Hand on the bench, pull the bell to the hip'},{ex:'chest-row',name:'Chest-Supported Row',cue:'Chest on the pad, pull to the hips'}),
+        row('incline-curl','Incline DB Curl','Bench at 45°, arms hang straight down','acc','2-1-2',null,
+          {name:'Incline Bicep Curls'}),
+        row('band-rev-fly','Band Reverse Fly','Straight arms, pull the band apart at chest height','acc','2-1-2',null,
+          {ex:'rev-pec-deck',name:'Reverse Pec Deck',cue:'Handles at shoulder height, squeeze the rear delts'})],
+        row('suitcase-carry','Suitcase Carry (DB)','Walk tall with one weight, don\'t lean',['2 × 30 m/side','3 × 30 m/side','3 × 40 m/side'],'—',
+          {name:'Suitcase Carry (KB)'},{name:'Suitcase Carry'})),
+      restDay('d6','Day 6 · Optional',[{icon:'cardio',emoji:'🚶',title:'Saturday — Optional',meta:'Only if you feel recovered',items:[
+        {note:'<strong>Option A:</strong> 20–30 min incline walk at 3–5% grade.'},
+        {note:'<strong>Option B:</strong> 15 min mobility, or a family walk / bike ride. Nothing hard.'}]}]),
+      restDay('d7','Day 7 · Rest',[{icon:'cool',emoji:'😴',title:'Sunday — Full Rest',meta:'Recovery day',items:[
+        {note:'<strong>Rest day priorities:</strong> 7–9 hrs sleep, plenty of water, high-protein meals, light walking if you like. No structured exercise.'}]}])
+    ]};
+  // Workout mode: same warm-up every training day, post-workout foam roll, no cardio finisher.
+  var wu=[{name:'Cat-Cow',cue:'One segment of the spine at a time',duration:'8 reps',secs:null},
+    {name:'Glute Bridges',cue:'Squeeze glutes at the top',duration:'12 reps',secs:null},
+    {name:'Band Pull-Aparts',cue:'Straight arms, squeeze shoulder blades',duration:'15 reps',secs:null},
+    {name:'Bodyweight Box Squats',cue:'Sit back to the box, stand tall',duration:'10 reps',secs:null}];
+  var cd=[{name:'Foam Roll — Quads & Glutes',duration:'60 sec each',cue:'Slow passes, pause on tight spots'},
+    {name:'Foam Roll — Upper Back & Lats',duration:'60 sec',cue:'Skip the lower back itself'},
+    {name:'Child\'s Pose',duration:'60 sec',cue:'Reach long, breathe into the back'}];
+  plan.session={warmup:{d1:wu,d3:wu,d5:wu},cardio:{},cooldown:{d1:cd,d3:cd,d5:cd}};
+  PLANS[plan.id]=plan;
+  finalizeRowPlan(plan);
+})();
 var PLAN_TIMELINE_KEY='planTimeline';
 var DEFAULT_PLAN_TIMELINE=[{plan:'forge-ul',start:1}];
 function loadPlanTimeline(){
@@ -1807,35 +1961,58 @@ function phaseForWeek(w){
 }
 function dayLabelForWeek(w,day){var d=planForWeek(w).days.filter(function(x){return x.id===day;})[0];return d?d.tab:day;}
 // ----- Plans written as rows (Full Body etc.) -----
-// A main-table row is {ex,label,name,cue,sets,rest,tempo,n,secs,main?,targets?,kb?,kbWeeks?}.
-// kb:{ex?,label,name,cue?} is the kettlebell version, used when the kettlebell switch is on
-// (and, if kbWeeks is set, only in those weeks of the plan). A kb version with its own ex id
-// keeps its own history; without one it logs as the same exercise.
+// A main-table row is {ex,label,name,cue,sets,rest,tempo,n,secs,main?,targets?,kb?,kbWeeks?,gym?}.
+// The row itself is the Home version. kb / gym are {ex?,label,name,cue?}: the Home + KB and Gym
+// versions, used when that setup is picked for the workout (kb only in kbWeeks of the plan, if set).
+// A version with its own ex id is a different movement and keeps its own history; without one it
+// logs as the same exercise (e.g. DB Row and KB Row share one history).
+// Plans list their setups in plan.setups; the setup is chosen per workout (week + day).
+var SETUPS={home:{label:'Home',desc:'Dumbbells, bench, pull-up bar, bands'},kb:{label:'Home + KB',desc:'Home, with kettlebell versions'},gym:{label:'Gym',desc:'Machines and cables'}};
 function planRows(plan,cb){plan.days.forEach(function(day){day.blocks.forEach(function(b){b.items.forEach(function(it){
   if(it.table)it.table.rows.forEach(function(r){if(r.ex)cb(day,r);});});});});}
-function rowExercise(r,v){v=v||{};return {id:v.ex||r.ex,label:v.label||r.label||r.name,sets:r.n,rest:r.secs,main:r.main,targets:r.targets};}
-function kbActive(r,w){return !!(r.kb&&hasKettlebells()&&(!r.kbWeeks||r.kbWeeks.indexOf(localWeek(w))>=0));}
-function resolveRow(r,w){if(!kbActive(r,w))return r;var k=r.kb;return Object.assign({},r,{ex:k.ex||r.ex,label:k.label||k.name,name:k.name,cue:k.cue||r.cue});}
-// Fill a row-based plan's session data: every exercise and kettlebell version (for history),
+function rowExercise(r,v){v=v||{};return {id:v.ex||r.ex,label:v.label||v.name||r.label||r.name,sets:r.n,rest:r.secs,main:r.main,targets:r.targets};}
+function setupKey(w,day){return 'wsetup:w'+w+':'+day;}
+// Setup for one workout: the one saved for it, else the last one used, else Home + KB if the
+// old "I have kettlebells" switch was on, else Home. Plans without setups always use Home.
+function setupFor(w,day){
+  var plan=planForWeek(w);if(!plan.setups)return 'home';
+  var v=null;try{v=localStorage.getItem(setupKey(w,day))||localStorage.getItem('lastSetup');}catch(e){}
+  if(!v||plan.setups.indexOf(v)<0)v=hasKettlebells()&&plan.setups.indexOf('kb')>=0?'kb':plan.setups[0];
+  return v;
+}
+function savedSetupFor(w,day){try{return localStorage.getItem(setupKey(w,day));}catch(e){return null;}}
+function rowVersion(r,w,day){
+  var st=setupFor(w,day);
+  if(st==='gym'&&r.gym)return r.gym;
+  if(st==='kb'&&r.kb&&(!r.kbWeeks||r.kbWeeks.indexOf(localWeek(w))>=0))return r.kb;
+  return null;
+}
+function resolveRow(r,w,day){var v=rowVersion(r,w,day);if(!v)return r;return Object.assign({},r,{ex:v.ex||r.ex,label:v.label||v.name,name:v.name,cue:v.cue||r.cue});}
+// Fill a row-based plan's session data: every exercise and setup version (for history),
 // day titles, and prescriptions for workout mode.
 function finalizeRowPlan(plan){
   var s=plan.session=plan.session||{},all={},pres={},titles={};
   plan.days.forEach(function(d){all[d.id]=[];if(d.start)titles[d.id]=d.start;});
   planRows(plan,function(day,r){
     all[day.id].push(rowExercise(r));pres[r.ex]=r.sets+(r.tempo&&r.tempo!=='—'?' · Tempo '+r.tempo:'');
-    if(r.kb&&r.kb.ex){all[day.id].push(rowExercise(r,r.kb));pres[r.kb.ex]=pres[r.ex];}
+    [r.kb,r.gym].forEach(function(v){if(v&&v.ex&&v.ex!==r.ex&&!all[day.id].some(function(e){return e.id===v.ex;})){all[day.id].push(rowExercise(r,v));pres[v.ex]=pres[r.ex];}});
   });
   s.exercises=all;s.prescriptions=pres;s.titles=titles;s.warmup=s.warmup||{};s.cardio=s.cardio||{};s.cooldown=s.cooldown||{};
   plan.fromRows=true;
 }
+// Cache/redraw signature for week w: plan, plan week and each training day's setup.
+function weekSig(w){
+  var plan=planForWeek(w);if(!plan.fromRows)return plan.id;
+  return plan.id+'|'+localWeek(w)+'|'+plan.days.filter(function(d){return d.start;}).map(function(d){return setupFor(w,d.id);}).join(',');
+}
 var _exCache={};
-// Exercises to show and log in week w (kettlebell versions applied).
-// all=true returns every exercise and kettlebell version the plan can log, for history scans.
+// Exercises to show and log in week w (each workout's setup applied).
+// all=true returns every exercise and setup version the plan can log, for history scans.
 function exercisesForWeek(w,all){
   var plan=planForWeek(w);if(!plan.fromRows||all)return plan.session.exercises;
-  var key=plan.id+'|'+localWeek(w)+'|'+hasKettlebells();if(_exCache[key])return _exCache[key];
+  var key=weekSig(w);if(_exCache[key])return _exCache[key];
   var out={};plan.days.forEach(function(d){out[d.id]=[];});
-  planRows(plan,function(day,r){var v=kbActive(r,w)?r.kb:null;out[day.id].push(rowExercise(r,v));});
+  planRows(plan,function(day,r){out[day.id].push(rowExercise(r,rowVersion(r,w,day.id)));});
   return (_exCache[key]=out);
 }
 function exerciseById(w,id){var exs=exercisesForWeek(w,true),found=null;Object.keys(exs).forEach(function(d){exs[d].forEach(function(e){if(e.id===id&&!found)found=e;});});return found;}
@@ -1849,7 +2026,7 @@ function targetText(base,ex,w){
 function updatePhaseTargets(){
   var w=getActiveWeek(),plan=planForWeek(w);
   plan.days.forEach(function(day){day.blocks.forEach(function(b){b.items.forEach(function(it){
-    if(!it.table)return;it.table.rows.forEach(function(r){if(!r.ex)return;r=resolveRow(r,w);
+    if(!it.table)return;it.table.rows.forEach(function(r){if(!r.ex)return;r=resolveRow(r,w,day.id);
       var trk=document.getElementById('trk-'+day.id+'-'+r.ex);if(!trk)return;
       var row=trk.closest('tr');row=row&&row.previousElementSibling;var cell=row&&row.querySelector('.ex-sets');
       if(cell)cell.innerHTML=targetText(r.sets,exerciseById(w,r.ex),w);});});});});
@@ -1863,7 +2040,7 @@ function setsFor(ex,w){
 }
 var activePlanId='forge-ul',activePlanSig='forge-ul';
 function applyPlanForWeek(w){
-  var plan=planForWeek(w),sig=plan.id+(plan.fromRows?'|'+localWeek(w)+'|'+hasKettlebells():'');
+  var plan=planForWeek(w),sig=weekSig(w);
   if(sig===activePlanSig)return false;
   activePlanSig=sig;activePlanId=plan.id;var s=plan.session;
   EXERCISES=exercisesForWeek(w);DAY_TITLES=s.titles;EX_PRESCRIPTIONS=s.prescriptions;WARMUP_DATA=s.warmup;CARDIO_DATA=s.cardio;COOLDOWN_DATA=s.cooldown;
@@ -1890,6 +2067,23 @@ function weeksWithLogs(from,to){
 function hasKettlebells(){try{return localStorage.getItem('hasKettlebells')==='1';}catch(e){return false;}}
 function setHasKettlebells(on){var v=on?'1':'0';try{localStorage.setItem('hasKettlebells',v);}catch(e){}pushPrefToSupabase('hasKettlebells',v);
   if(applyPlanForWeek(getActiveWeek())){buildTrackers();updatePhaseTargets();renderDay();}}
+// Pick the setup for one workout. Sets already logged stay saved under their exercise;
+// switching back shows them again.
+function setWorkoutSetup(day,id){
+  var w=getActiveWeek();
+  try{localStorage.setItem(setupKey(w,day),id);localStorage.setItem('lastSetup',id);}catch(e){}
+  pushPrefToSupabase(setupKey(w,day),id);pushPrefToSupabase('lastSetup',id);
+  if(applyPlanForWeek(w)){buildTrackers();updatePhaseTargets();}
+  var btn=document.querySelector('.week-tab[data-day="'+day+'"]');if(btn)showDay(day,btn);
+  renderDay();
+}
+// Saves the setup for a workout when it is started, so it stays put if "last used" changes later.
+function lockWorkoutSetup(w,day){
+  var plan=planForWeek(w);if(!plan.setups||savedSetupFor(w,day))return;
+  var id=setupFor(w,day);try{localStorage.setItem(setupKey(w,day),id);localStorage.setItem('lastSetup',id);}catch(e){}
+  pushPrefToSupabase(setupKey(w,day),id);pushPrefToSupabase('lastSetup',id);
+}
+function setupLabelFor(w,day){var plan=planForWeek(w),v=savedSetupFor(w,day);return plan.setups&&v&&SETUPS[v]?SETUPS[v].label:'';}
 function planMetaText(plan){var days=plan.days.filter(function(d){return d.start;}).length;return plan.weeks+' weeks · '+days+' training days a week · '+plan.phases.length+' phases';}
 function renderPlansScreen(){
   var t=loadPlanTimeline(),cur=t[t.length-1],plan=PLANS[cur.plan],end=planEndWeek(cur);
@@ -1909,7 +2103,6 @@ function renderPlansScreen(){
   if(hist)hist.innerHTML=t.slice().reverse().map(function(entry){var i=t.indexOf(entry),p=PLANS[entry.plan];
     var e=(i<t.length-1)?Math.min(planEndWeek(entry),t[i+1].start-1):planEndWeek(entry);
     return '<div class="plan-history-row"><span>'+p.name+(i===t.length-1?' (current)':'')+'</span><span>'+weeksWithLogs(entry.start,e)+' of '+(e-entry.start+1)+' weeks logged</span></div>';}).join('');
-  var kb=document.getElementById('kettlebellToggle');if(kb)kb.checked=hasKettlebells();
 }
 function switchToPlan(id){
   var t=loadPlanTimeline(),cur=t[t.length-1],next=PLANS[id];if(!next)return;
@@ -2084,7 +2277,7 @@ function forceSyncNow(){
   setSyncStatus('⏳','Syncing...','Pushing all your data to the cloud. This may take a moment.');localStorage.removeItem('supa_migrated');
   var sets=[];allLogKeys().forEach(function(k){try{var val=JSON.parse(localStorage.getItem(k)||'{}');var p=k.replace('wlog:','').split(':');if(p.length<4)return;sets.push({user_id:currentUser.id,week:parseInt(p[0].replace('w',''),10),day:p[1],exercise_id:p[2],set_index:parseInt(p[3].replace('s',''),10),weight:val.weight||'',reps:val.reps||'',done:val.done||false,rpe:val.rpe||'',ts:val.ts||Date.now()});}catch(e){}});
   var bwEntries=[];allBWKeys().forEach(function(k){var val=loadBW(k.replace('bw:',''));if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});});
-  var prefKeys=['appTheme','appThemeCustom','planTimeline','hasKettlebells'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
+  var prefKeys=['appTheme','appThemeCustom','planTimeline','hasKettlebells','lastSetup'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&(kk.indexOf('wdur:')==0||kk.indexOf('wsetup:')==0))prefKeys.push(kk);}}catch(e){}
   var prefs=[];prefKeys.forEach(function(k){var v=localStorage.getItem(k);if(v)prefs.push({user_id:currentUser.id,key:k,value:v});});
   var videoMap=loadVideos();var videos=[];Object.keys(videoMap).forEach(function(name){var rec=videoMap[name];if(rec&&rec.url)videos.push({user_id:currentUser.id,exercise_name:name,video_url:rec.url,updated_at:rec.updated_at||new Date().toISOString()});});
   var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)+(videos.length?1:0)||1;var hadError=false;
@@ -2101,8 +2294,8 @@ function forcePullNow(){
 }
 // ===== BACKUP / RESTORE =====
 // Only FORGE's own keys are exported or restored (never Supabase login tokens).
-var BACKUP_PREFIXES=['wlog:','wdur:','rdc:','bw:'];
-var BACKUP_EXACT_KEYS=['appTheme','appThemeCustom','recoveryMode','planTimeline','hasKettlebells',VIDEOS_KEY];
+var BACKUP_PREFIXES=['wlog:','wdur:','wsetup:','rdc:','bw:'];
+var BACKUP_EXACT_KEYS=['appTheme','appThemeCustom','recoveryMode','planTimeline','hasKettlebells','lastSetup',VIDEOS_KEY];
 function isBackupKey(k){
   if(typeof k!=='string')return false;
   if(BACKUP_EXACT_KEYS.indexOf(k)!==-1)return true;
@@ -2261,7 +2454,7 @@ function migrateLocalToSupabase(cb){
   if(!currentUser)return cb&&cb();var migrated=localStorage.getItem('supa_migrated');if(migrated){return cb&&cb();}showSyncIndicator('↑ migrating data...');
   var sets=[];allLogKeys().forEach(function(k){try{var val=JSON.parse(localStorage.getItem(k)||'{}');var p=k.replace('wlog:','').split(':');if(p.length<4)return;sets.push({user_id:currentUser.id,week:parseInt(p[0].replace('w',''),10),day:p[1],exercise_id:p[2],set_index:parseInt(p[3].replace('s',''),10),weight:val.weight||'',reps:val.reps||'',done:val.done||false,rpe:val.rpe||'',ts:val.ts||Date.now()});}catch(e){}});
   var bwEntries=[];allBWKeys().forEach(function(k){var val=loadBW(k.replace('bw:',''));if(val)bwEntries.push({user_id:currentUser.id,date:k.replace('bw:',''),value:val});});
-  var prefKeys=['appTheme','appThemeCustom','planTimeline','hasKettlebells'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&kk.indexOf('wdur:')==0)prefKeys.push(kk);}}catch(e){}
+  var prefKeys=['appTheme','appThemeCustom','planTimeline','hasKettlebells','lastSetup'];try{for(var ki=0;ki<localStorage.length;ki++){var kk=localStorage.key(ki);if(kk&&(kk.indexOf('wdur:')==0||kk.indexOf('wsetup:')==0))prefKeys.push(kk);}}catch(e){}
   var prefs=[];prefKeys.forEach(function(k){var v=localStorage.getItem(k);if(v)prefs.push({user_id:currentUser.id,key:k,value:v});});
   var videoMap=loadVideos();var videos=[];Object.keys(videoMap).forEach(function(name){var rec=videoMap[name];if(rec&&rec.url)videos.push({user_id:currentUser.id,exercise_name:name,video_url:rec.url,updated_at:rec.updated_at||new Date().toISOString()});});
   var done=0;var total=(sets.length?1:0)+(bwEntries.length?1:0)+(prefs.length?1:0)+(videos.length?1:0)||1;
